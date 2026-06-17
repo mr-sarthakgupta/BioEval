@@ -1,0 +1,15 @@
+[submodule "repositories/MarkovianF1"]
+	path = repositories/MarkovianF1
+	url = https://github.com/YixinChen95/MarkovianF1.git
+[submodule "repositories/The-1000-Soil-ICR-Metagenome"]
+	path = repositories/The-1000-Soil-ICR-Metagenome
+	url = https://github.com/EMSL-MONet/The-1000-Soil-ICR-Metagenome.git
+[submodule "repositories/FTICR_preprocess"]
+	path = repositories/FTICR_preprocess
+	url = https://github.com/osumpcheng/FTICR_preprocess.git
+[submodule "repositories/TraceBIND"]
+	path = repositories/TraceBIND
+	url = https://github.com/lyx-lin/TraceBIND.git
+[submodule "repositories/FORGE"]
+	path = repositories/FORGE
+	url = https://github.com/sreerampeela/FORGE.git
