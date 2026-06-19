@@ -1,0 +1,109 @@
+problem_id: s41467-026-73635-7_butterfly-longevity-pollen-feeding
+# Hidden, host-only. Never mounted into the UEA container.
+# source_paths are globs relative to this problem's data/ directory.
+entries:
+  - id: survival_lifespan_records
+    description: >-
+      Individual- and cohort-level longevity and survival records for multiple
+      butterfly species reared under laboratory conditions (R .rds objects).
+    kind: raw
+    grantable: true
+    modalities: [rds, survival]
+    source_paths:
+      - figshare/31081597/lifespan_data.rds
+      - figshare/31081597/longsurv.rds
+      - figshare/31081597/totalcogsurv.RDS
+      - figshare/31081597/table_1_data.rds
+      - figshare/31081597/basta_summary.rds
+
+  - id: markrecapture_sightings
+    description: >-
+      Field mark-recapture sighting histories and per-individual identification
+      records across species, usable to estimate wild survival/recapture rates.
+    kind: raw
+    grantable: true
+    modalities: [rds, capture-recapture]
+    source_paths:
+      - figshare/31081597/sightings*.rds
+      - figshare/31081597/IDdata*.rds
+
+  - id: physiology_with_age
+    description: >-
+      Age-resolved physiological measurements: locomotor activity, grip strength,
+      and body-weight trajectories per species and treatment (R .rds objects).
+    kind: raw
+    grantable: true
+    modalities: [rds, physiology]
+    source_paths:
+      - figshare/31081597/locomotordata*.rds
+      - figshare/31081597/fullGSdata*.rds
+      - figshare/31081597/*weightdata*.rds
+      - figshare/31081597/pred.new_*.rds
+
+  - id: supplementary_tables
+    description: >-
+      Supplementary tabular datasets and sample metadata: per-individual and
+      per-species measurements behind the study's analyses (CSV/XLSX).
+    kind: raw
+    grantable: true
+    modalities: [csv, xlsx, metadata]
+    source_paths:
+      - figshare/31081597/Supplementary_Data_*.csv
+      - figshare/31081597/metadata.csv
+      - nature-supplementary/supplementary-data.xlsx
+
+  - id: phylogeny_tree
+    description: >-
+      Time-calibrated phylogenetic tree of the relevant butterfly tribe
+      (FigTree/Newick), usable for lineage-aware comparative analyses.
+    kind: raw
+    grantable: true
+    modalities: [newick, phylogeny]
+    source_paths:
+      - figshare/31081597/MCMCtree*.tree
+
+  - id: public_figshare_record
+    description: >-
+      The public deposited dataset for this study (raw measurement files only;
+      author analysis scripts and dataset README are excluded).
+    kind: online
+    grantable: true
+    modalities: [csv, rds]
+    online:
+      provider: figshare
+      article_id: 31081597
+      include: ["*.csv", "*.rds", "*.RDS", "*.tree"]
+      exclude: ["*.R", "README*", "metadata.json"]
+
+  # ---- explicitly blocked (leak vectors) ----
+  - id: author_analysis_code
+    description: Author analysis scripts.
+    kind: processed
+    grantable: false
+    reason: R analysis scripts encode the study's methods and conclusions.
+    source_paths:
+      - figshare/31081597/*.R
+
+  - id: dataset_readme
+    description: Figshare dataset README.
+    kind: processed
+    grantable: false
+    reason: The dataset README references the source publication and its findings.
+    source_paths:
+      - figshare/31081597/README.txt
+
+  - id: record_metadata
+    description: Repository record metadata.
+    kind: processed
+    grantable: false
+    reason: Record metadata exposes the paper title, authors, and DOI.
+    source_paths:
+      - figshare/31081597/metadata.json
+
+  - id: figure_source_data
+    description: Packaged per-figure source data.
+    kind: processed
+    grantable: false
+    reason: Figure source data directly encodes the published results.
+    source_paths:
+      - nature-supplementary/source-data.zip

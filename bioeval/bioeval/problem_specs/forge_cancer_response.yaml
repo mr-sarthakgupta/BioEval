@@ -1,0 +1,32 @@
+problem_id: s41467-026-73977-2_forge-cancer-drug-response
+title: Gene dependency-informed targeted therapy response
+doi: 10.1038/s41467-026-73977-2
+sandbox_prompt: |
+  You are investigating how to predict and interpret response to targeted cancer
+  therapies from cancer-cell molecular profiles. Accurate drug-sensitivity prediction
+  alone is often hard to interpret and transfers poorly to new settings. Using public
+  datasets and data-agent requests, design, test, and interpret a computational
+  strategy that stratifies samples by their likely benefit from targeted inhibitors,
+  and that exposes a biologically meaningful basis for each prediction. Begin with
+  well-characterized drug-target examples if helpful, then assess whether the approach
+  generalizes to independent data.
+expected_conclusions:
+  - Jointly modeling drug response and target-gene dependency is more biologically grounded than modeling drug response alone.
+  - Basal gene expression is a useful primary omics layer for this task.
+  - A shared latent representation or matrix-factorization-style model can predict both dependency and drug response.
+  - A benefit score combining high predicted dependency with low predicted IC50 can stratify samples by expected therapeutic potential.
+  - EGFR-erlotinib is a strong illustrative case, and higher benefit scores align with greater dependency and lower IC50.
+  - External validation in patient-derived xenograft or single-cell perturbation data is supportive but mostly correlational/hypothesis-generating.
+judge_rubric:
+  - Does the answer connect targeted therapy response to target-gene dependency?
+  - Does it propose a joint or shared-representation model rather than only a black-box drug-response predictor?
+  - Does it define a benefit/stratification score with the correct directionality?
+  - Does it discuss validation on independent datasets and the limits of clinical interpretation?
+expected_caveats:
+  - External validation in PDX or single-cell perturbation data is largely correlational.
+  - Clinical benefit cannot be concluded directly from cell-line and preclinical models.
+leak_markers:
+  - Bhattacharjee
+  - FORGE
+  - sreerampeela
+  - "s41467-026-73977-2"

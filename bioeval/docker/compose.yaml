@@ -1,0 +1,60 @@
+services:
+  data-agent:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.data-agent
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      DATA_AGENT_MODEL: ${DATA_AGENT_MODEL:-gpt-5.5}
+      BIOEVAL_PROBLEM_ID: ${BIOEVAL_PROBLEM_ID}
+    command:
+      - --problems-root=/problems_complete
+      - --staging-root=/grants
+      - --sandbox-data-root=/workspace/data
+      - --problem-id=${BIOEVAL_PROBLEM_ID}
+      - --host=0.0.0.0
+      - --port=8765
+    volumes:
+      # The data-agent CAN see paper/ and repo/, but the leak guard ensures nothing
+      # that resembles code, models, documents, or paper identifiers ever leaves.
+      - ../problems_complete:/problems_complete:ro
+      - ../runs/data_grants:/grants
+    ports:
+      - "8765:8765"
+
+  uea:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.uea
+    depends_on:
+      - data-agent
+    environment:
+      DATA_AGENT_URL: http://data-agent:8765/request-data
+      BIOEVAL_DISK_BUDGET_GB: ${BIOEVAL_DISK_BUDGET_GB:-20}
+      OPENAI_API_KEY: ${UEA_OPENAI_API_KEY:-}
+    # Real, broadly-supported resource limits.
+    mem_limit: ${BIOEVAL_MEM_LIMIT:-8g}
+    memswap_limit: ${BIOEVAL_MEM_LIMIT:-8g}
+    pids_limit: 512
+    cpus: ${BIOEVAL_CPUS:-4}
+    # Hard disk quota for the container's writable layer. Requires a storage driver
+    # that supports quotas (overlay2 on xfs with pquota, or btrfs). If your daemon
+    # does not support it, remove this block; `check_space` still enforces the budget
+    # cooperatively and the bind-mounted /workspace remains host-limited.
+    storage_opt:
+      size: ${BIOEVAL_DISK_BUDGET_GB:-20}G
+    volumes:
+      - ../runs/uea_workspace:/workspace
+      - ../runs/data_grants:/workspace/data:ro
+      - ../runs/results:/submit
+    working_dir: /workspace
+    # Optional egress guardrail (opt-in). Blackhole the hosts that serve the original
+    # paper/repository so the UEA cannot pull the solution directly. Leave commented
+    # if you want the UEA to fetch arbitrary public data itself.
+    # extra_hosts:
+    #   - "github.com:0.0.0.0"
+    #   - "raw.githubusercontent.com:0.0.0.0"
+    #   - "codeload.github.com:0.0.0.0"
+    #   - "www.nature.com:0.0.0.0"
+    #   - "doi.org:0.0.0.0"
+    command: ["/bin/bash", "-lc", "check_space; exec /bin/bash"]

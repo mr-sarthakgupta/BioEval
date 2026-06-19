@@ -1,0 +1,32 @@
+problem_id: s41467-026-73844-0_f1-atpase-markov-model
+title: F1-ATPase rotary catalysis mechanism
+doi: 10.1038/s41467-026-73844-0
+sandbox_prompt: |
+  You are investigating the rotary catalysis mechanism of bacterial F1-ATPase, the
+  motor that couples ATP turnover to mechanical rotation of its central stalk. A long
+  standing question is how the chemistry at the catalytic subunits is coordinated with
+  stepwise rotation. Using public literature and any datasets you can legitimately
+  request through the data-agent, build and test a quantitative mechanistic model that
+  reproduces the major single-molecule rotation observations and bulk kinetics. Your
+  goal is to determine the simplest model that is still consistent with the full body
+  of quantitative constraints, and to justify why simpler alternatives are inadequate.
+expected_conclusions:
+  - A quantitative chemo-mechanical Markov model can integrate gamma-subunit rotation, beta-subunit conformations, and nucleotide binding states.
+  - Three functionally distinct beta-subunit conformations are insufficient within the tested model family.
+  - At least four functionally distinct beta-subunit conformations are needed to explain the available constraints.
+  - Bi-site and tri-site catalytic pathways can both contribute, with their relative importance depending on ATP concentration.
+  - Brownian-ratchet-like stochastic rotation can explain large rotations and high apparent efficiency.
+judge_rubric:
+  - Does the answer propose and justify a Markov/state-based chemo-mechanical model?
+  - Does it recover the need for four beta-subunit conformations rather than three?
+  - Does it discuss concentration-dependent bi-site versus tri-site behavior?
+  - Does it distinguish model-supported conclusions from assumptions and literature-derived constraints?
+expected_caveats:
+  - Model selection depends on the chosen model family and the available constraints.
+  - Several rate constants are inferred indirectly rather than measured directly.
+leak_markers:
+  - Grubmuller
+  - "Grubmüller"
+  - MarkovianF1
+  - YixinChen95
+  - "s41467-026-73844-0"

@@ -1,0 +1,43 @@
+FROM python:3.11-slim
+
+ARG OPENCODE_INSTALL_URL=https://opencode.ai/install
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash \
+    ca-certificates \
+    curl \
+    git \
+    nodejs \
+    npm \
+    procps \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir \
+    biopython \
+    jupyter \
+    lifelines \
+    matplotlib \
+    numpy \
+    openpyxl \
+    pandas \
+    pyarrow \
+    requests \
+    scikit-learn \
+    scipy \
+    statsmodels
+
+# OpenCode installation changes over time; keep it isolated so users can override
+# OPENCODE_INSTALL_URL at build time if the upstream installer moves.
+RUN curl -fsSL "${OPENCODE_INSTALL_URL}" | bash || true
+
+COPY bioeval/container_tools/request_data.py /usr/local/bin/request_data
+COPY bioeval/container_tools/submit_answer.py /usr/local/bin/submit_answer
+COPY bioeval/container_tools/check_space.py /usr/local/bin/check_space
+RUN chmod +x /usr/local/bin/request_data /usr/local/bin/submit_answer /usr/local/bin/check_space
+
+WORKDIR /workspace
+ENV DATA_AGENT_URL=http://data-agent:8765/request-data
+ENV BIOEVAL_DISK_BUDGET_GB=20
+ENV BIOEVAL_SUBMIT_DIR=/submit
+
+CMD ["/bin/bash"]

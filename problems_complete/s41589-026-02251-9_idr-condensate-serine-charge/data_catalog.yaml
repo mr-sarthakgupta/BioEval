@@ -1,0 +1,67 @@
+problem_id: s41589-026-02251-9_idr-condensate-serine-charge
+# Hidden, host-only. Never mounted into the UEA container.
+entries:
+  - id: supplementary_data_tables
+    description: >-
+      Supplementary experimental data tables (spreadsheets): per-construct
+      measurements, sequence compositions, and assay readouts behind the study.
+    kind: raw
+    grantable: true
+    modalities: [xlsx, tabular]
+    source_paths:
+      - nature-supplementary/*.xlsx
+
+  - id: public_zenodo_record
+    description: >-
+      Public deposited datasets for this study (data tables only; the simulation
+      results archive, code archive, and supplementary-information PDFs are excluded).
+    kind: online
+    grantable: true
+    modalities: [xlsx]
+    online:
+      provider: zenodo
+      record_id: 19565235
+      include: ["*.xlsx"]
+      exclude: ["*.pdf", "*.rar", "*.zip", "metadata.json"]
+
+  - id: public_condensate_datasets
+    description: >-
+      Related public resources on intrinsically disordered region sequences and
+      biomolecular condensate behavior, available on the open web.
+    kind: online
+    grantable: true
+    modalities: [csv, fasta]
+    online: null
+
+  # ---- explicitly blocked (leak vectors) ----
+  - id: supplementary_information_pdf
+    description: Supplementary information documents.
+    kind: processed
+    grantable: false
+    reason: The supplementary-information PDFs contain the paper text and findings.
+    source_paths:
+      - nature-supplementary/*.pdf
+
+  - id: author_repo_archive
+    description: Deposited code archive for this study.
+    kind: processed
+    grantable: false
+    reason: The archive is the authors' analysis code and is the solution.
+    source_paths:
+      - zenodo/19565235/**/*.zip
+
+  - id: simulation_results_archive
+    description: Simulation input and results archive.
+    kind: processed
+    grantable: false
+    reason: The archive bundles simulation results that encode the study's findings.
+    source_paths:
+      - zenodo/19565235/*.rar
+
+  - id: record_metadata
+    description: Repository record metadata.
+    kind: processed
+    grantable: false
+    reason: Record metadata exposes the paper title, authors, and DOI.
+    source_paths:
+      - zenodo/19565235/metadata.json

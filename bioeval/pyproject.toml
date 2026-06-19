@@ -1,0 +1,34 @@
+[project]
+name = "bioeval"
+version = "0.1.0"
+description = "Minimal biology paper-inversion evaluation scaffold."
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi",
+  "openai",
+  "pydantic>=2",
+  "python-dotenv",
+  "pyyaml",
+  "requests",
+  "uvicorn",
+]
+
+[project.scripts]
+bioeval-data-agent = "bioeval.data_agent:main"
+bioeval-judge = "bioeval.judge:main"
+bioeval-print-prompt = "bioeval.print_prompt:main"
+# Tools the opencode data-agent calls to record a grant plan.
+stage_local = "bioeval.agent_tools:stage_local"
+derive_subset = "bioeval.agent_tools:derive_subset"
+fetch_online = "bioeval.agent_tools:fetch_online"
+deny = "bioeval.agent_tools:deny"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["bioeval*"]
+
+[tool.setuptools.package-data]
+bioeval = ["problem_specs/*.yaml"]

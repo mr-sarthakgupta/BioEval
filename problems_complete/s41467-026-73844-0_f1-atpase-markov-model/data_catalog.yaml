@@ -1,0 +1,34 @@
+problem_id: s41467-026-73844-0_f1-atpase-markov-model
+# Hidden, host-only. Never mounted into the UEA container.
+# This is a theory/modeling problem: there is no bundled raw experimental dataset.
+# Quantitative constraints must be drawn from the public single-molecule and
+# biochemistry literature, which the UEA can search on the open web.
+entries:
+  - id: published_literature_constraints
+    description: >-
+      No raw experimental dataset is bundled for this modeling problem. The
+      quantitative constraints needed (rotary step structure, nucleotide
+      binding/hydrolysis kinetics, single-molecule rotation statistics, ATPase
+      turnover rates) come from the published single-molecule and biochemistry
+      literature, which is available on the open web.
+    kind: online
+    grantable: true
+    modalities: [literature]
+    online: null
+
+  # ---- explicitly blocked (leak vectors) ----
+  - id: author_repo_archive
+    description: Deposited code archive for this study.
+    kind: processed
+    grantable: false
+    reason: The archive is the authors' model implementation and is the solution.
+    source_paths:
+      - zenodo/19133448/**/*.zip
+
+  - id: record_metadata
+    description: Repository record metadata.
+    kind: processed
+    grantable: false
+    reason: Record metadata exposes the paper title, authors, and DOI.
+    source_paths:
+      - zenodo/19133448/metadata.json

@@ -1,0 +1,31 @@
+problem_id: s41589-026-02251-9_idr-condensate-serine-charge
+title: Sequence grammar for IDR condensate miscibility
+doi: 10.1038/s41589-026-02251-9
+sandbox_prompt: |
+  You are studying how biomolecular condensates formed by intrinsically disordered
+  protein regions (IDRs) decide whether to mix with one another or remain as separate
+  coexisting phases. Using public literature and data-agent requests, determine which
+  properties of the IDR sequences govern whether two condensates are miscible, and
+  test whether the same properties are relevant to transcription-related condensates.
+  Your goal is to infer predictive determinants of mixing behavior that could be used
+  to anticipate or engineer it, and to assess whether they are causal rather than
+  merely correlative.
+expected_conclusions:
+  - Pairwise miscibility among IDR condensates can be related to amino-acid composition.
+  - Serine and aromatic residues tend to promote miscibility.
+  - Charged residues tend to promote immiscibility or demixing.
+  - Mutational or perturbation analyses should support these as causal rather than purely correlative features.
+  - Phosphorylation can shift miscibility by changing charge, acting as a regulatory switch.
+  - Miscibility with RNA polymerase II condensates is linked to transcriptional activity; highly charged transcription-factor regions tend to mix less and activate less.
+judge_rubric:
+  - Does the answer identify opposing effects of serine/aromatic residues versus charged residues?
+  - Does it connect phosphorylation to charge-mediated miscibility changes?
+  - Does it relate condensate miscibility to transcription-factor or Pol II function?
+  - Does it separate broad residue grammar from unsupported universal claims?
+expected_caveats:
+  - Composition-level rules may not capture sequence patterning or context effects.
+  - Findings from a limited set of IDRs may not generalize to all condensates.
+leak_markers:
+  - "Opposing Roles of Serine and Charge"
+  - GFP12345
+  - "s41589-026-02251-9"

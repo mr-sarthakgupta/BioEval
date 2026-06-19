@@ -1,0 +1,26 @@
+FROM python:3.11-slim
+
+ARG OPENCODE_INSTALL_URL=https://opencode.ai/install
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash \
+    ca-certificates \
+    curl \
+    git \
+    nodejs \
+    npm \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY pyproject.toml /app/
+COPY bioeval /app/bioeval
+RUN pip install --no-cache-dir -e . \
+    && pip install --no-cache-dir pandas pyarrow openpyxl
+
+# The data-agent reasons with opencode (GPT-5.5). Keep the installer isolated so it
+# can be overridden if upstream moves.
+RUN curl -fsSL "${OPENCODE_INSTALL_URL}" | bash || true
+ENV PATH="/root/.opencode/bin:${PATH}"
+
+EXPOSE 8765
+ENTRYPOINT ["bioeval-data-agent"]

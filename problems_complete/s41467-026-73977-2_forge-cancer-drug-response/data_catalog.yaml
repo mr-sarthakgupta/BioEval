@@ -1,0 +1,142 @@
+problem_id: s41467-026-73977-2_forge-cancer-drug-response
+# Hidden, host-only. Never mounted into the UEA container.
+entries:
+  - id: gene_dependency_matrix
+    description: >-
+      Genome-wide gene-dependency (loss-of-function/CRISPR) scores across many
+      cancer cell lines. Large file (~360 MB).
+    kind: raw
+    grantable: true
+    modalities: [csv, dependency]
+    approx_bytes: 358187867
+    source_paths:
+      - figshare/31268542/Dep.csv
+
+  - id: basal_expression_matrix
+    description: >-
+      Baseline gene-expression profiles across the same cancer cell lines.
+      Large file (~325 MB).
+    kind: raw
+    grantable: true
+    modalities: [csv, expression]
+    approx_bytes: 325222227
+    source_paths:
+      - figshare/31268542/Exp.csv
+
+  - id: drug_response_ic50
+    description: >-
+      Curated drug sensitivity (IC50) measurements across cell lines and compounds.
+    kind: raw
+    grantable: true
+    modalities: [csv, drug-response]
+    source_paths:
+      - figshare/31268542/Creammist_common_ic50.csv
+
+  - id: pancancer_expression_perturbation
+    description: >-
+      Large pan-cancer expression dataset used for external evaluation (~334 MB).
+    kind: raw
+    grantable: true
+    modalities: [csv, expression]
+    approx_bytes: 333976796
+    source_paths:
+      - figshare/31268542/Tahoe_voom_exp_final.csv
+
+  - id: pdx_expression
+    description: >-
+      Patient-derived xenograft expression profiles (normalised) for external
+      validation.
+    kind: raw
+    grantable: true
+    modalities: [csv, expression]
+    source_paths:
+      - figshare/31268542/pdx_subset_voom_normalised.csv
+
+  - id: pathway_feature_dataset
+    description: >-
+      Precomputed per-sample pathway-enrichment feature table that can be used as
+      model input features.
+    kind: processed
+    grantable: true
+    modalities: [parquet, features]
+    source_paths:
+      - figshare/31268542/precily_pes_dataset.parquet
+
+  - id: depmap_pointer
+    description: >-
+      Pointer/README for the public DepMap portal (gene dependency + expression).
+    kind: raw
+    grantable: true
+    modalities: [readme]
+    source_paths:
+      - external/depmap/README.md
+
+  - id: public_figshare_record
+    description: >-
+      Public deposited datasets for this study (raw data matrices only; trained
+      models and precomputed analysis outputs are excluded).
+    kind: online
+    grantable: true
+    modalities: [csv, parquet]
+    online:
+      provider: figshare
+      article_id: 31268542
+      include: ["*.csv", "*.parquet"]
+      exclude:
+        - "*FORGE.pkl"
+        - "*.hdf5"
+        - "*geneImp.csv"
+        - "*keyCluster_deg.csv"
+        - "*steinerTree.graphml"
+        - "*_results.csv"
+        - "*DEG_list*"
+        - "metadata.json"
+
+  - id: public_depmap_gdsc
+    description: >-
+      Related public resources for cancer dependency and drug response (e.g. the
+      DepMap portal and large drug-sensitivity panels), available on the open web.
+    kind: online
+    grantable: true
+    modalities: [csv]
+    online: null
+
+  # ---- explicitly blocked (leak vectors) ----
+  - id: author_repo_archive
+    description: Deposited code archive for this study.
+    kind: processed
+    grantable: false
+    reason: The archive is the authors' method implementation and is the solution.
+    source_paths:
+      - zenodo/19491795/**/*.zip
+
+  - id: trained_models
+    description: Trained model checkpoints.
+    kind: processed
+    grantable: false
+    reason: Trained author models encode the solution directly.
+    source_paths:
+      - figshare/31268542/*.hdf5
+      - figshare/31268542/*FORGE.pkl
+
+  - id: model_results
+    description: Precomputed analysis outputs.
+    kind: processed
+    grantable: false
+    reason: Gene-importance scores, key DEG clusters, Steiner networks, and result
+      tables are the study's findings.
+    source_paths:
+      - figshare/31268542/*geneImp.csv
+      - figshare/31268542/*keyCluster_deg.csv
+      - figshare/31268542/*steinerTree.graphml
+      - figshare/31268542/*_results.csv
+      - figshare/31268542/Tahoe100M_DEG_list
+
+  - id: record_metadata
+    description: Repository record metadata.
+    kind: processed
+    grantable: false
+    reason: Record metadata exposes the paper title, authors, and DOI.
+    source_paths:
+      - figshare/31268542/metadata.json
+      - zenodo/19491795/metadata.json
