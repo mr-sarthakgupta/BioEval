@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SUBMIT_DIR="${BIOEVAL_SUBMIT_DIR:-/submit}"
+mkdir -p "$SUBMIT_DIR"
+
+export BIOEVAL_TOOL_LOG="${BIOEVAL_TOOL_LOG:-$SUBMIT_DIR/tool_calls.jsonl}"
+export BIOEVAL_SHELL_COMMAND_LOG="${BIOEVAL_SHELL_COMMAND_LOG:-$SUBMIT_DIR/shell_commands.jsonl}"
+export BIOEVAL_TERMINAL_LOG="${BIOEVAL_TERMINAL_LOG:-$SUBMIT_DIR/terminal.typescript}"
+export HISTFILE="${HISTFILE:-$SUBMIT_DIR/bash_history}"
+export HISTTIMEFORMAT="${HISTTIMEFORMAT:-%F %T }"
+
+SESSION_META="$SUBMIT_DIR/session_start.json"
+python3 - <<'PY'
+from __future__ import annotations
+import json, os, platform
+from datetime import UTC, datetime
+from pathlib import Path
+
+def utc_now() -> str:
+    return datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+path = Path(os.environ.get("SESSION_META", "/submit/session_start.json"))
+path.parent.mkdir(parents=True, exist_ok=True)
+path.write_text(json.dumps({
+    "event": "session_start",
+    "timestamp": utc_now(),
+    "run_id": os.getenv("BIOEVAL_RUN_ID"),
+    "cwd": os.getcwd(),
+    "python": platform.python_version(),
+    "platform": platform.platform(),
+    "terminal_log": os.getenv("BIOEVAL_TERMINAL_LOG"),
+    "shell_command_log": os.getenv("BIOEVAL_SHELL_COMMAND_LOG"),
+    "tool_log": os.getenv("BIOEVAL_TOOL_LOG"),
+}, indent=2, sort_keys=True), encoding="utf-8")
+PY
+
+RCFILE="$(mktemp /tmp/bioeval_bashrc.XXXXXX)"
+cat > "$RCFILE" <<'BASHRC'
+export PROMPT_COMMAND='history -a'
+set -o history
+
+__bioeval_debug_trap() {
+  local previous_status="$?"
+  local command="$BASH_COMMAND"
+  trap - DEBUG
+  case "$command" in
+    __bioeval_debug_trap*|trap\ *|history\ -a|/usr/local/bin/record_shell_command*)
+      ;;
+    *)
+      /usr/local/bin/record_shell_command \
+        --status "$previous_status" \
+        --cwd "$PWD" \
+        --command "$command" >/dev/null 2>&1 || true
+      ;;
+  esac
+  trap __bioeval_debug_trap DEBUG
+}
+trap __bioeval_debug_trap DEBUG
+BASHRC
+
+echo "BioEval recording enabled."
+echo "Terminal transcript: $BIOEVAL_TERMINAL_LOG"
+echo "Shell command log:   $BIOEVAL_SHELL_COMMAND_LOG"
+echo "Tool call log:       $BIOEVAL_TOOL_LOG"
+
+if command -v script >/dev/null 2>&1; then
+  exec script -f -q -c "bash --rcfile '$RCFILE' -i" "$BIOEVAL_TERMINAL_LOG"
+fi
+
+echo "WARNING: script(1) is unavailable; terminal I/O transcript will not be captured." >&2
+exec bash --rcfile "$RCFILE" -i

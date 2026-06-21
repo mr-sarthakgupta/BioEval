@@ -7,18 +7,21 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       DATA_AGENT_MODEL: ${DATA_AGENT_MODEL:-gpt-5.5}
       BIOEVAL_PROBLEM_ID: ${BIOEVAL_PROBLEM_ID}
+      BIOEVAL_RUN_ID: ${BIOEVAL_RUN_ID:-default}
     command:
       - --problems-root=/problems_complete
-      - --staging-root=/grants
+      - --staging-root=/run/data_grants
       - --sandbox-data-root=/workspace/data
       - --problem-id=${BIOEVAL_PROBLEM_ID}
+      - --run-id=${BIOEVAL_RUN_ID:-default}
+      - --run-root=/run
       - --host=0.0.0.0
       - --port=8765
     volumes:
       # The data-agent CAN see paper/ and repo/, but the leak guard ensures nothing
       # that resembles code, models, documents, or paper identifiers ever leaves.
       - ../problems_complete:/problems_complete:ro
-      - ../runs/data_grants:/grants
+      - ../runs/${BIOEVAL_PROBLEM_ID}/${BIOEVAL_RUN_ID:-default}:/run
     ports:
       - "8765:8765"
 
@@ -32,6 +35,10 @@ services:
       DATA_AGENT_URL: http://data-agent:8765/request-data
       BIOEVAL_DISK_BUDGET_GB: ${BIOEVAL_DISK_BUDGET_GB:-20}
       OPENAI_API_KEY: ${UEA_OPENAI_API_KEY:-}
+      BIOEVAL_RUN_ID: ${BIOEVAL_RUN_ID:-default}
+      BIOEVAL_TOOL_LOG: /submit/tool_calls.jsonl
+      BIOEVAL_SHELL_COMMAND_LOG: /submit/shell_commands.jsonl
+      BIOEVAL_TERMINAL_LOG: /submit/terminal.typescript
     # Real, broadly-supported resource limits.
     mem_limit: ${BIOEVAL_MEM_LIMIT:-8g}
     memswap_limit: ${BIOEVAL_MEM_LIMIT:-8g}
@@ -44,9 +51,9 @@ services:
     storage_opt:
       size: ${BIOEVAL_DISK_BUDGET_GB:-20}G
     volumes:
-      - ../runs/uea_workspace:/workspace
-      - ../runs/data_grants:/workspace/data:ro
-      - ../runs/results:/submit
+      - ../runs/${BIOEVAL_PROBLEM_ID}/${BIOEVAL_RUN_ID:-default}/uea_workspace:/workspace
+      - ../runs/${BIOEVAL_PROBLEM_ID}/${BIOEVAL_RUN_ID:-default}/data_grants:/workspace/data:ro
+      - ../runs/${BIOEVAL_PROBLEM_ID}/${BIOEVAL_RUN_ID:-default}/results:/submit
     working_dir: /workspace
     # Optional egress guardrail (opt-in). Blackhole the hosts that serve the original
     # paper/repository so the UEA cannot pull the solution directly. Leave commented
@@ -57,4 +64,4 @@ services:
     #   - "codeload.github.com:0.0.0.0"
     #   - "www.nature.com:0.0.0.0"
     #   - "doi.org:0.0.0.0"
-    command: ["/bin/bash", "-lc", "check_space; exec /bin/bash"]
+    command: ["/bin/bash", "-lc", "check_space; exec bioeval_session"]

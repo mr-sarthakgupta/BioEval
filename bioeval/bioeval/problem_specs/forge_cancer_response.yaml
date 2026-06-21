@@ -3,13 +3,12 @@ title: Gene dependency-informed targeted therapy response
 doi: 10.1038/s41467-026-73977-2
 sandbox_prompt: |
   You are investigating how to predict and interpret response to targeted cancer
-  therapies from cancer-cell molecular profiles. Accurate drug-sensitivity prediction
-  alone is often hard to interpret and transfers poorly to new settings. Using public
-  datasets and data-agent requests, design, test, and interpret a computational
-  strategy that stratifies samples by their likely benefit from targeted inhibitors,
-  and that exposes a biologically meaningful basis for each prediction. Begin with
-  well-characterized drug-target examples if helpful, then assess whether the approach
-  generalizes to independent data.
+  therapies from cancer-cell molecular profiles. Using public datasets and data-agent
+  requests, examine which measurements are informative, how they relate to drug
+  sensitivity and perturbation response, and whether an interpretable computational
+  strategy can make useful sample-level predictions. Compare against simpler
+  alternatives where possible, and assess whether any conclusions generalize beyond
+  the discovery data.
 expected_conclusions:
   - Jointly modeling drug response and target-gene dependency is more biologically grounded than modeling drug response alone.
   - Basal gene expression is a useful primary omics layer for this task.

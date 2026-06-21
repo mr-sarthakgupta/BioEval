@@ -14,6 +14,7 @@ from bioeval import opencode_runner
 from bioeval.catalog import load_catalog
 from bioeval.curation import GrantPlan, select_instructions_by_keywords, stage_and_grant
 from bioeval.problems import load_problem_spec
+from bioeval.run_record import append_jsonl, utc_now
 from bioeval.schemas import DatasetGrant, DatasetRequest
 
 
@@ -23,6 +24,25 @@ class DataAgentSettings(BaseModel):
     sandbox_data_root: str = "/workspace/data"
     default_problem_id: str | None = None
     model: str = "gpt-5.5"
+    run_id: str = "default"
+    run_root: Path | None = None
+
+
+def _plan_record(plan: GrantPlan) -> dict:
+    return {
+        "deny": plan.deny,
+        "deny_reason": plan.deny_reason,
+        "message": plan.message,
+        "instructions": [
+            {
+                "entry_id": instr.entry_id,
+                "rows": instr.rows,
+                "columns": instr.columns,
+                "use_online": instr.use_online,
+            }
+            for instr in plan.instructions
+        ],
+    }
 
 
 def _identifiers_for(problem_id: str) -> list[str]:
@@ -91,15 +111,17 @@ def create_app(settings: DataAgentSettings) -> FastAPI:
         request = request.model_copy(update={"problem_id": problem_id})
         request_id = uuid.uuid4().hex[:12]
 
+        planner_error = None
         try:
             plan = make_plan(catalog, request, settings.model)
         except Exception as exc:  # noqa: BLE001 - never crash the endpoint
+            planner_error = str(exc)
             plan = GrantPlan(
                 instructions=select_instructions_by_keywords(catalog, request),
                 message=f"Planner error; used keyword fallback ({exc}).",
             )
 
-        return stage_and_grant(
+        grant = stage_and_grant(
             problem_root=problem_root,
             catalog=catalog,
             identifiers=_identifiers_for(problem_id),
@@ -109,6 +131,23 @@ def create_app(settings: DataAgentSettings) -> FastAPI:
             request_id=request_id,
             plan=plan,
         )
+        if settings.run_root is not None:
+            append_jsonl(
+                settings.run_root / "data_requests.jsonl",
+                {
+                    "event": "data_request",
+                    "timestamp": utc_now(),
+                    "run_id": settings.run_id,
+                    "problem_id": problem_id,
+                    "request_id": request_id,
+                    "data_agent_model": settings.model,
+                    "request": request.model_dump(),
+                    "planner_error": planner_error,
+                    "plan": _plan_record(plan),
+                    "grant": grant.model_dump(),
+                },
+            )
+        return grant
 
     return app
 
@@ -120,6 +159,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--sandbox-data-root", default="/workspace/data")
     parser.add_argument("--problem-id", default=os.getenv("BIOEVAL_PROBLEM_ID"))
     parser.add_argument("--model", default=os.getenv("DATA_AGENT_MODEL", "gpt-5.5"))
+    parser.add_argument("--run-id", default=os.getenv("BIOEVAL_RUN_ID", "default"))
+    parser.add_argument("--run-root", type=Path)
     parser.add_argument("--host", default="0.0.0.0")
     parser.add_argument("--port", type=int, default=int(os.getenv("DATA_AGENT_PORT", "8765")))
     return parser
@@ -135,8 +176,12 @@ def main() -> None:
         sandbox_data_root=args.sandbox_data_root,
         default_problem_id=args.problem_id,
         model=args.model,
+        run_id=args.run_id,
+        run_root=args.run_root.resolve() if args.run_root else None,
     )
     settings.staging_root.mkdir(parents=True, exist_ok=True)
+    if settings.run_root is not None:
+        settings.run_root.mkdir(parents=True, exist_ok=True)
 
     import uvicorn
 

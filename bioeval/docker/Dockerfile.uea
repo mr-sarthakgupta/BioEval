@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nodejs \
     npm \
     procps \
+    util-linux \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir \
@@ -33,7 +34,17 @@ RUN curl -fsSL "${OPENCODE_INSTALL_URL}" | bash || true
 COPY bioeval/container_tools/request_data.py /usr/local/bin/request_data
 COPY bioeval/container_tools/submit_answer.py /usr/local/bin/submit_answer
 COPY bioeval/container_tools/check_space.py /usr/local/bin/check_space
-RUN chmod +x /usr/local/bin/request_data /usr/local/bin/submit_answer /usr/local/bin/check_space
+COPY bioeval/container_tools/record_event.py /usr/local/bin/record_event
+COPY bioeval/container_tools/record_shell_command.py /usr/local/bin/record_shell_command
+COPY bioeval/container_tools/bioeval_session /usr/local/bin/bioeval_session
+COPY bioeval/container_tools/bioeval_tool_common.py /usr/local/bin/bioeval_tool_common.py
+COPY bioeval/container_tools/read_file.py /usr/local/bin/read_file
+COPY bioeval/container_tools/search.py /usr/local/bin/search
+COPY bioeval/container_tools/web_search.py /usr/local/bin/web_search
+COPY bioeval/container_tools/fetch_webpage.py /usr/local/bin/fetch_webpage
+COPY bioeval/container_tools/research_papers.py /usr/local/bin/research_papers
+COPY bioeval/container_tools/run_command.py /usr/local/bin/run_command
+RUN chmod +x /usr/local/bin/request_data /usr/local/bin/submit_answer /usr/local/bin/check_space /usr/local/bin/record_event /usr/local/bin/record_shell_command /usr/local/bin/bioeval_session /usr/local/bin/read_file /usr/local/bin/search /usr/local/bin/web_search /usr/local/bin/fetch_webpage /usr/local/bin/research_papers /usr/local/bin/run_command
 
 WORKDIR /workspace
 ENV DATA_AGENT_URL=http://data-agent:8765/request-data

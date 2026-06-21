@@ -1,16 +1,31 @@
 problem_id: s41467-026-73844-0_f1-atpase-markov-model
 # Hidden, host-only. Never mounted into the UEA container.
-# This is a theory/modeling problem: there is no bundled raw experimental dataset.
-# Quantitative constraints must be drawn from the public single-molecule and
-# biochemistry literature, which the UEA can search on the open web.
 entries:
+  - id: nucleotide_binding_titration_curves
+    description: >-
+      Experimental nucleotide-binding titration curves for bacterial F1-ATPase,
+      including ATP-only, ADP-only, mixed-nucleotide, and combined assay tables.
+      These measurements can constrain quantitative models of catalytic-state
+      occupancy and nucleotide dependence.
+    kind: raw
+    grantable: true
+    source_base: problem
+    modalities: [csv, binding, kinetics]
+    source_paths:
+      - repo/BayesianTraining/input_data/F1-ATPase_complete.bind.csv
+      - repo/BayesianTraining/input_data/F1-ATPase_both.bind.csv
+      - repo/BayesianTraining/input_data/F1-ATPase_onlyMix.bind.csv
+      - repo/BayesianTraining/input_data/F1-ATPase_onlyPure.bind.csv
+      - repo/MarkovModelPrediction/PlotScripts/include/ExpDataLib/F1-ATPase_ATP.bind.csv
+      - repo/MarkovModelPrediction/PlotScripts/include/ExpDataLib/F1-ATPase_ADP.bind.csv
+      - repo/MarkovModelPrediction/PlotScripts/include/ExpDataLib/F1-ATPase_mix.bind.csv
+
   - id: published_literature_constraints
     description: >-
-      No raw experimental dataset is bundled for this modeling problem. The
-      quantitative constraints needed (rotary step structure, nucleotide
-      binding/hydrolysis kinetics, single-molecule rotation statistics, ATPase
-      turnover rates) come from the published single-molecule and biochemistry
-      literature, which is available on the open web.
+      Quantitative constraints not present in the local tables, such as rotary
+      step structure, single-molecule rotation statistics, ATPase turnover
+      rates, and literature-reported hydrolysis kinetics, may be drawn from
+      public single-molecule and biochemistry literature.
     kind: online
     grantable: true
     modalities: [literature]

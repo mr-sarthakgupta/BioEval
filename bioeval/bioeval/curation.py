@@ -96,29 +96,35 @@ def _derive_table(src: Path, dest: Path, rows: int | None, columns: list[str] | 
     return True
 
 
+def _neutral_file_name(index: int, src: Path) -> str:
+    suffix = src.suffix.lower()
+    return f"file_{index:03d}{suffix or '.dat'}"
+
+
 def _stage_local_entry(
     entry: CatalogEntry,
     problem_root: Path,
     stage_dir: Path,
     instr: StageInstruction,
     *,
+    public_entry_id: str,
     remaining_bytes: int,
     notes: list[str],
 ) -> int:
     staged = 0
-    for src in resolve_entry_files(problem_root, entry):
-        rel = src.relative_to(problem_root / "data")
-        dest = stage_dir / entry.id / rel
+    for file_index, src in enumerate(resolve_entry_files(problem_root, entry), start=1):
+        neutral_name = _neutral_file_name(file_index, src)
+        dest = stage_dir / public_entry_id / neutral_name
         dest.parent.mkdir(parents=True, exist_ok=True)
         size = src.stat().st_size
         wants_subset = instr.rows is not None or instr.columns is not None
         if wants_subset and _derive_table(src, dest, instr.rows, instr.columns):
             staged += dest.stat().st_size if dest.exists() else 0
-            notes.append(f"Derived a subset of '{entry.id}/{rel.name}'.")
+            notes.append(f"Derived a requested table subset for '{public_entry_id}/{neutral_name}'.")
             continue
         if size > remaining_bytes - staged:
             notes.append(
-                f"Skipped '{entry.id}/{rel.name}' ({size} bytes) to stay within the "
+                f"Skipped '{public_entry_id}/{neutral_name}' ({size} bytes) to stay within the "
                 f"{remaining_bytes} byte budget; ask for a subset (rows/columns)."
             )
             continue
@@ -131,16 +137,17 @@ def _stage_online_entry(
     entry: CatalogEntry,
     stage_dir: Path,
     *,
+    public_entry_id: str,
     per_file_bytes: int,
     remaining_bytes: int,
     notes: list[str],
 ) -> int:
     if not entry.online:
         notes.append(
-            f"No direct download is configured for '{entry.id}'. {entry.description.strip()}"
+            f"No direct download is configured for '{public_entry_id}'. {entry.description.strip()}"
         )
         return 0
-    dest = stage_dir / entry.id
+    dest = stage_dir / public_entry_id
     dest.mkdir(parents=True, exist_ok=True)
     try:
         fetched = providers.fetch_online_spec(
@@ -150,7 +157,7 @@ def _stage_online_entry(
             max_total_bytes=remaining_bytes,
         )
     except Exception as exc:  # noqa: BLE001 - report fetch failures, do not crash
-        notes.append(f"Online fetch for '{entry.id}' failed: {exc}")
+        notes.append(f"Online fetch for '{public_entry_id}' failed: {exc}")
         return 0
     return sum(f.bytes for f in fetched)
 
@@ -178,10 +185,11 @@ def stage_and_grant(
     try:
         remaining = request.max_bytes
         for instr in plan.instructions:
-            entry = catalog.by_id(instr.entry_id)
+            entry = catalog.by_id_or_public_id(instr.entry_id)
             if entry is None:
-                notes.append(f"Unknown dataset id '{instr.entry_id}'.")
+                notes.append(f"Unknown requested dataset id '{instr.entry_id}'.")
                 continue
+            public_entry_id = catalog.public_id_for(entry.id) or "dataset_unknown"
             if not entry.grantable:
                 notes.append(f"'{instr.entry_id}' is not grantable.")
                 continue
@@ -192,6 +200,7 @@ def stage_and_grant(
                 used = _stage_online_entry(
                     entry,
                     tmp_root,
+                    public_entry_id=public_entry_id,
                     per_file_bytes=request.max_bytes,
                     remaining_bytes=remaining,
                     notes=notes,
@@ -202,6 +211,7 @@ def stage_and_grant(
                     problem_root,
                     tmp_root,
                     instr,
+                    public_entry_id=public_entry_id,
                     remaining_bytes=remaining,
                     notes=notes,
                 )
@@ -212,8 +222,16 @@ def stage_and_grant(
         grant_dir = staging_root / request_id
         grant_dir.mkdir(parents=True, exist_ok=True)
         granted_files: list[GrantedFile] = []
+        final_counts: dict[str, int] = {}
         for src in report.kept:
-            rel = src.relative_to(tmp_root)
+            staged_rel = src.relative_to(tmp_root)
+            dataset_dir = (
+                staged_rel.parts[0]
+                if staged_rel.parts and re.fullmatch(r"dataset_\d{3}", staged_rel.parts[0])
+                else "dataset_000"
+            )
+            final_counts[dataset_dir] = final_counts.get(dataset_dir, 0) + 1
+            rel = Path(dataset_dir) / _neutral_file_name(final_counts[dataset_dir], src)
             dest = grant_dir / rel
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, dest)

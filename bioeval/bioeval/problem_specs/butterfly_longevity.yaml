@@ -2,13 +2,13 @@ problem_id: s41467-026-73635-7_butterfly-longevity-pollen-feeding
 title: Heliconiini butterfly longevity and pollen feeding
 doi: 10.1038/s41467-026-73635-7
 sandbox_prompt: |
-  Some neotropical butterflies in the Heliconiini tribe are reported to be unusually
-  long-lived compared with related butterflies, but the size and the cause of this
-  difference are debated. Using public literature and data you obtain through the
-  data-agent, characterize how lifespan and the pace of ageing vary across these
-  species and their relatives, and determine which explanation is best supported by
-  the evidence. Consider both plastic effects of the adult environment and conditions,
-  and evolved differences between lineages, and weigh how strongly each is supported.
+  Some closely related neotropical butterflies appear to differ substantially in adult
+  lifespan and ageing rate, but the size and cause of these differences are debated.
+  Using public literature and data you obtain through the data-agent, characterize how
+  survival and age-associated physiology vary across the sampled species, then infer
+  which ecological, dietary, or lineage-level explanations are best supported.
+  Distinguish direct environmental effects from evolved differences where the data
+  allow it, and state the limits of the comparison.
 expected_conclusions:
   - Pollen-feeding Heliconius species show substantially longer maximum and median lifespans than non-pollen-feeding Heliconiini outgroups.
   - The data support roughly a three-fold lifespan extension in Heliconius, with some maximum records approaching one year.

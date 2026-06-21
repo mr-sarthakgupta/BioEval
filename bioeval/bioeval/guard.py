@@ -9,6 +9,7 @@ contains paper/repo identifiers is withheld.
 
 from __future__ import annotations
 
+import re
 import tarfile
 import zipfile
 from dataclasses import dataclass, field
@@ -25,6 +26,8 @@ MODEL_EXTENSIONS = {
     ".h5", ".hdf5", ".safetensors",
 }
 DOC_EXTENSIONS = {".pdf", ".doc", ".docx", ".ppt", ".pptx", ".tex"}
+METADATA_EXTENSIONS = {".md", ".markdown"}
+RESULT_EXTENSIONS = {".graphml"}
 
 # Archives we inspect member-by-member.
 INSPECTABLE_ARCHIVE_SUFFIXES = (".zip", ".tar", ".tar.gz", ".tgz", ".tar.bz2")
@@ -36,6 +39,17 @@ REPO_HINT_NAMES = {
     "readme.md", "readme.txt", "readme", "license", "license.txt", ".gitignore",
     "dockerfile", "makefile",
 }
+BLOCKED_BASENAMES = {
+    "metadata.json",
+    "readme.md",
+    "readme.txt",
+    "readme",
+}
+RESULT_NAME_RE = re.compile(
+    r"(source[-_]?data|geneimp|keycluster|steinertree|deg[_-]?list|"
+    r"(?:^|[_-])results?(?:[_-]|\.)|pdx[_-]?results)",
+    re.IGNORECASE,
+)
 
 _BYTE_SCAN_LIMIT = 6_000_000  # scan up to ~6 MB of head + tail per file
 
@@ -102,13 +116,37 @@ def _content_leak(path: Path, markers: list[bytes]) -> str | None:
     return None
 
 
+def _xlsx_content_leak(path: Path, markers: list[bytes]) -> str | None:
+    if not markers:
+        return None
+    try:
+        with zipfile.ZipFile(path) as zf:
+            xml_names = [
+                name for name in zf.namelist()
+                if name.endswith(".xml") and not name.startswith("xl/media/")
+            ]
+            scanned = 0
+            for name in xml_names:
+                blob = zf.read(name).lower()
+                scanned += len(blob)
+                for marker in markers:
+                    if marker and marker in blob:
+                        return "spreadsheet metadata/content matches a hidden paper/repo identifier"
+                if scanned >= _BYTE_SCAN_LIMIT:
+                    break
+    except Exception:
+        return "spreadsheet could not be scanned for identifiers"
+    return None
+
+
 def _build_markers(identifiers: list[str]) -> list[bytes]:
     markers: list[bytes] = []
-    for ident in identifiers:
-        ident = (ident or "").strip().lower()
+    for raw_ident in identifiers:
+        original = (raw_ident or "").strip()
+        ident = original.lower()
         # Only use reasonably specific identifiers to avoid false positives in
-        # legitimate data (e.g. a column named "longevity").
-        if len(ident) >= 8:
+        # legitimate data. Short all-caps method/repo markers are still useful.
+        if len(ident) >= 8 or (len(ident) >= 5 and original.isupper()):
             markers.append(ident.encode("utf-8", "ignore"))
     return list(dict.fromkeys(markers))
 
@@ -118,12 +156,20 @@ def scan_file(path: Path, identifiers: list[str]) -> str | None:
     name = path.name.lower()
     suffix = path.suffix.lower()
 
+    if name in BLOCKED_BASENAMES:
+        return "metadata/readme files are not grantable"
+    if RESULT_NAME_RE.search(name):
+        return "precomputed result/source-data files are not grantable"
     if suffix in CODE_EXTENSIONS:
         return "source code is not grantable"
     if suffix in MODEL_EXTENSIONS:
         return "serialized model artifact is not grantable"
     if suffix in DOC_EXTENSIONS:
         return "manuscript/document formats are not grantable"
+    if suffix in METADATA_EXTENSIONS:
+        return "metadata/readme files are not grantable"
+    if suffix in RESULT_EXTENSIONS:
+        return "precomputed result/network files are not grantable"
     if _has_suffix(name, OPAQUE_ARCHIVE_SUFFIXES):
         return "archive format cannot be inspected; withheld"
     if _has_suffix(name, INSPECTABLE_ARCHIVE_SUFFIXES):
@@ -138,6 +184,10 @@ def scan_file(path: Path, identifiers: list[str]) -> str | None:
         ident = (ident or "").strip().lower()
         if len(ident) >= 6 and ident in low_name:
             return "filename matches a hidden paper/repo identifier"
+    if suffix == ".xlsx":
+        reason = _xlsx_content_leak(path, markers)
+        if reason:
+            return reason
     return _content_leak(path, markers)
 
 

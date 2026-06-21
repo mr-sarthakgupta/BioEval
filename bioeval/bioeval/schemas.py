@@ -34,7 +34,14 @@ class CatalogEntry(BaseModel):
     grantable: bool = True
     source_paths: list[str] = Field(
         default_factory=list,
-        description="Glob patterns relative to the problem's data/ directory.",
+        description=(
+            "Glob patterns relative to `data/` by default. Set `source_base` to "
+            "`problem` for carefully curated host-only assets outside data/."
+        ),
+    )
+    source_base: Literal["data", "problem"] = Field(
+        default="data",
+        description="Base directory for source_paths. UEA never sees this value.",
     )
     online: dict[str, Any] | None = Field(
         default=None,
@@ -48,7 +55,6 @@ class CatalogEntry(BaseModel):
     def public_view(self) -> dict[str, Any]:
         """Agent/UEA-facing projection that never leaks host paths or block reasons."""
         return {
-            "id": self.id,
             "description": self.description,
             "kind": self.kind,
             "modalities": self.modalities,
@@ -69,8 +75,28 @@ class DataCatalog(BaseModel):
                 return entry
         return None
 
+    def public_id_for(self, entry_id: str) -> str | None:
+        for idx, entry in enumerate(self.grantable(), start=1):
+            if entry.id == entry_id:
+                return f"dataset_{idx:03d}"
+        return None
+
+    def by_public_id(self, public_id: str) -> CatalogEntry | None:
+        for idx, entry in enumerate(self.grantable(), start=1):
+            if public_id == f"dataset_{idx:03d}":
+                return entry
+        return None
+
+    def by_id_or_public_id(self, entry_id: str) -> CatalogEntry | None:
+        return self.by_id(entry_id) or self.by_public_id(entry_id)
+
     def public_view(self) -> list[dict[str, Any]]:
-        return [e.public_view() for e in self.grantable()]
+        public_entries = []
+        for idx, entry in enumerate(self.grantable(), start=1):
+            view = entry.public_view()
+            view["id"] = f"dataset_{idx:03d}"
+            public_entries.append(view)
+        return public_entries
 
 
 class GrantedFile(BaseModel):

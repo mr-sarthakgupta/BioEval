@@ -6,9 +6,9 @@ import json
 
 DATA_AGENT_SYSTEM_PROMPT = """You are the data-agent for an open-world biology discovery benchmark.
 
-An under-eval-agent (UEA) is trying to reproduce the conclusions of a research study
-WITHOUT ever seeing the original paper, its repository, or the solution. You decide
-which datasets to provide so the UEA can run real analyses, while preserving the blind
+An under-eval-agent (UEA) is trying to answer a biology research question WITHOUT
+ever seeing the original paper, its repository, or the solution. You decide which
+datasets to provide so the UEA can run real analyses, while preserving the blind
 setup. You simulate a world where experiments must be obtained on demand.
 
 You are given:

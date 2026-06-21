@@ -5,11 +5,12 @@ sandbox_prompt: |
   You are investigating the rotary catalysis mechanism of bacterial F1-ATPase, the
   motor that couples ATP turnover to mechanical rotation of its central stalk. A long
   standing question is how the chemistry at the catalytic subunits is coordinated with
-  stepwise rotation. Using public literature and any datasets you can legitimately
-  request through the data-agent, build and test a quantitative mechanistic model that
-  reproduces the major single-molecule rotation observations and bulk kinetics. Your
-  goal is to determine the simplest model that is still consistent with the full body
-  of quantitative constraints, and to justify why simpler alternatives are inadequate.
+  stepwise rotation. Using public literature and any datasets you legitimately obtain
+  through the data-agent, assemble the quantitative constraints that matter for this
+  coupling and compare plausible mechanistic explanations. Your goal is to identify
+  the simplest explanation that remains consistent with the available single-molecule,
+  binding, and bulk-kinetic evidence, and to state where the data do or do not rule
+  out alternatives.
 expected_conclusions:
   - A quantitative chemo-mechanical Markov model can integrate gamma-subunit rotation, beta-subunit conformations, and nucleotide binding states.
   - Three functionally distinct beta-subunit conformations are insufficient within the tested model family.

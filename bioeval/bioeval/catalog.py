@@ -32,18 +32,19 @@ def load_catalog(problem_root: Path) -> DataCatalog:
 
 
 def resolve_entry_files(problem_root: Path, entry: CatalogEntry) -> list[Path]:
-    """Expand an entry's `source_paths` globs (relative to data/) into real files."""
-    data_root = problem_root / "data"
+    """Expand an entry's source globs without exposing host layout to the UEA."""
+    source_root = problem_root / ("data" if entry.source_base == "data" else "")
+    source_root = source_root.resolve()
     files: list[Path] = []
     seen: set[Path] = set()
     for pattern in entry.source_paths:
-        for match in sorted(data_root.glob(pattern)):
+        for match in sorted(source_root.glob(pattern)):
             if not match.is_file():
                 continue
             resolved = match.resolve()
-            # Defense in depth: never escape the data/ subtree.
+            # Defense in depth: never escape the configured source subtree.
             try:
-                resolved.relative_to(data_root.resolve())
+                resolved.relative_to(source_root)
             except ValueError:
                 continue
             if resolved not in seen:

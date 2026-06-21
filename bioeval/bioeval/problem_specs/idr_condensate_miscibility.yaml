@@ -5,11 +5,10 @@ sandbox_prompt: |
   You are studying how biomolecular condensates formed by intrinsically disordered
   protein regions (IDRs) decide whether to mix with one another or remain as separate
   coexisting phases. Using public literature and data-agent requests, determine which
-  properties of the IDR sequences govern whether two condensates are miscible, and
-  test whether the same properties are relevant to transcription-related condensates.
-  Your goal is to infer predictive determinants of mixing behavior that could be used
-  to anticipate or engineer it, and to assess whether they are causal rather than
-  merely correlative.
+  measurable properties of IDR sequences and perturbations are associated with mixing
+  behavior. Your goal is to infer predictive determinants that could be used to
+  anticipate or engineer condensate compatibility, and to assess which claims are
+  supported by direct perturbation evidence rather than correlation alone.
 expected_conclusions:
   - Pairwise miscibility among IDR condensates can be related to amino-acid composition.
   - Serine and aromatic residues tend to promote miscibility.
