@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Minimal biology paper-inversion evaluation scaffold."
 requires-python = ">=3.11"
 dependencies = [
+  "boto3",
   "fastapi",
   "openai",
   "pydantic>=2",
@@ -18,6 +19,7 @@ bioeval-data-agent = "bioeval.data_agent:main"
 bioeval-judge = "bioeval.judge:main"
 bioeval-init-run = "bioeval.init_run:main"
 bioeval-print-prompt = "bioeval.print_prompt:main"
+bioeval-run-bedrock-uea = "bioeval.run_bedrock_uea:main"
 # Tools the opencode data-agent calls to record a grant plan.
 stage_local = "bioeval.agent_tools:stage_local"
 derive_subset = "bioeval.agent_tools:derive_subset"

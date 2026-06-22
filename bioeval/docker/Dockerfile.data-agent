@@ -17,8 +17,8 @@ COPY bioeval /app/bioeval
 RUN pip install --no-cache-dir -e . \
     && pip install --no-cache-dir pandas pyarrow openpyxl
 
-# The data-agent reasons with opencode (GPT-5.5). Keep the installer isolated so it
-# can be overridden if upstream moves.
+# OpenAI-compatible configs can still reason through opencode. Bedrock defaults use
+# boto3 directly, matching skydiscover's AWS setup.
 RUN curl -fsSL "${OPENCODE_INSTALL_URL}" | bash || true
 ENV PATH="/root/.opencode/bin:${PATH}"
 

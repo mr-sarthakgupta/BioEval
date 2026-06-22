@@ -5,7 +5,17 @@ services:
       dockerfile: docker/Dockerfile.data-agent
     environment:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      DATA_AGENT_MODEL: ${DATA_AGENT_MODEL:-gpt-5.5}
+      DATA_AGENT_MODEL: ${DATA_AGENT_MODEL:-us.anthropic.claude-sonnet-4-6}
+      DATA_AGENT_API_BASE: ${DATA_AGENT_API_BASE:-bedrock:us-east-1}
+      AWS_BEARER_TOKEN_BEDROCK: ${AWS_BEARER_TOKEN_BEDROCK:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+      AWS_PROFILE: ${AWS_PROFILE:-default}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-us-east-1}
+      BEDROCK_AWS_REGION: ${BEDROCK_AWS_REGION:-us-east-1}
+      BEDROCK_PROMPT_CACHE_TTL: ${BEDROCK_PROMPT_CACHE_TTL:-1h}
       BIOEVAL_PROBLEM_ID: ${BIOEVAL_PROBLEM_ID}
       BIOEVAL_RUN_ID: ${BIOEVAL_RUN_ID:-default}
     command:
@@ -20,8 +30,9 @@ services:
     volumes:
       # The data-agent CAN see paper/ and repo/, but the leak guard ensures nothing
       # that resembles code, models, documents, or paper identifiers ever leaves.
-      - ../problems_complete:/problems_complete:ro
+      - ../../problems_complete:/problems_complete:ro
       - ../runs/${BIOEVAL_PROBLEM_ID}/${BIOEVAL_RUN_ID:-default}:/run
+      - ${HOME}/.aws:/root/.aws:ro
     ports:
       - "8765:8765"
 
@@ -35,6 +46,17 @@ services:
       DATA_AGENT_URL: http://data-agent:8765/request-data
       BIOEVAL_DISK_BUDGET_GB: ${BIOEVAL_DISK_BUDGET_GB:-20}
       OPENAI_API_KEY: ${UEA_OPENAI_API_KEY:-}
+      UEA_BEDROCK_MODEL: ${UEA_BEDROCK_MODEL:-us.anthropic.claude-sonnet-4-6}
+      UEA_BEDROCK_API_BASE: ${UEA_BEDROCK_API_BASE:-bedrock:us-east-1}
+      AWS_BEARER_TOKEN_BEDROCK: ${AWS_BEARER_TOKEN_BEDROCK:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+      AWS_PROFILE: ${AWS_PROFILE:-default}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-us-east-1}
+      BEDROCK_AWS_REGION: ${BEDROCK_AWS_REGION:-us-east-1}
+      BEDROCK_PROMPT_CACHE_TTL: ${BEDROCK_PROMPT_CACHE_TTL:-1h}
       BIOEVAL_RUN_ID: ${BIOEVAL_RUN_ID:-default}
       BIOEVAL_TOOL_LOG: /submit/tool_calls.jsonl
       BIOEVAL_SHELL_COMMAND_LOG: /submit/shell_commands.jsonl
@@ -44,16 +66,13 @@ services:
     memswap_limit: ${BIOEVAL_MEM_LIMIT:-8g}
     pids_limit: 512
     cpus: ${BIOEVAL_CPUS:-4}
-    # Hard disk quota for the container's writable layer. Requires a storage driver
-    # that supports quotas (overlay2 on xfs with pquota, or btrfs). If your daemon
-    # does not support it, remove this block; `check_space` still enforces the budget
-    # cooperatively and the bind-mounted /workspace remains host-limited.
-    storage_opt:
-      size: ${BIOEVAL_DISK_BUDGET_GB:-20}G
+    # Disk usage is enforced cooperatively by `check_space`; Docker writable-layer
+    # quotas are not portable across WSL/storage-driver configurations.
     volumes:
       - ../runs/${BIOEVAL_PROBLEM_ID}/${BIOEVAL_RUN_ID:-default}/uea_workspace:/workspace
       - ../runs/${BIOEVAL_PROBLEM_ID}/${BIOEVAL_RUN_ID:-default}/data_grants:/workspace/data:ro
       - ../runs/${BIOEVAL_PROBLEM_ID}/${BIOEVAL_RUN_ID:-default}/results:/submit
+      - ${HOME}/.aws:/root/.aws:ro
     working_dir: /workspace
     # Optional egress guardrail (opt-in). Blackhole the hosts that serve the original
     # paper/repository so the UEA cannot pull the solution directly. Leave commented
@@ -64,4 +83,4 @@ services:
     #   - "codeload.github.com:0.0.0.0"
     #   - "www.nature.com:0.0.0.0"
     #   - "doi.org:0.0.0.0"
-    command: ["/bin/bash", "-lc", "check_space; exec bioeval_session"]
+    command: ["/bin/bash", "-lc", "check_space; sleep infinity"]

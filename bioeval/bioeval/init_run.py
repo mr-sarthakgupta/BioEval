@@ -48,6 +48,13 @@ def main() -> None:
         "environment": env_snapshot(
             [
                 "DATA_AGENT_MODEL",
+                "DATA_AGENT_API_BASE",
+                "UEA_BEDROCK_MODEL",
+                "UEA_BEDROCK_API_BASE",
+                "UEA_MAX_STEPS",
+                "UEA_MAX_TOKENS",
+                "BEDROCK_AWS_REGION",
+                "AWS_REGION",
                 "JUDGE_MODEL",
                 "BIOEVAL_DISK_BUDGET_GB",
                 "BIOEVAL_MEM_LIMIT",

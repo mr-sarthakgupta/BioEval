@@ -1,9 +1,10 @@
-"""Drive the data-agent's reasoning with opencode (GPT-5.5), with safe fallbacks.
+"""Drive the data-agent's reasoning with Bedrock/opencode, with safe fallbacks.
 
 The data-agent's *decision* of which datasets to grant is made by an LLM:
-1. opencode running GPT-5.5 in a locked-down per-request workspace (preferred), or
-2. a direct OpenAI Responses call with a structured-output schema, or
-3. deterministic keyword matching over the catalog (no network/keys needed).
+1. AWS Bedrock Claude Sonnet 4.6 via the native Converse API (default), or
+2. opencode in a locked-down per-request workspace for OpenAI-compatible models, or
+3. a direct OpenAI Responses call with a structured-output schema, or
+4. deterministic keyword matching over the catalog (no network/keys needed).
 
 In every case the LLM only ever sees the neutral public catalog and the UEA's
 request. It produces a *plan*; the host executes staging and the leak guard. The
@@ -16,6 +17,7 @@ import json
 import os
 import shutil
 import subprocess
+import configparser
 from pathlib import Path
 
 from bioeval.curation import GrantPlan, StageInstruction
@@ -26,6 +28,59 @@ from bioeval.data_agent_prompt import (
 )
 
 PLAN_FILENAME = "plan.json"
+
+
+def _region_from_api_base(api_base: str | None) -> str | None:
+    if not api_base:
+        return None
+    if api_base.startswith("bedrock:"):
+        return api_base.split(":", 1)[1] or None
+    return None
+
+
+def is_bedrock_api_base(api_base: str | None) -> bool:
+    return bool(api_base and api_base.startswith("bedrock"))
+
+
+def _bedrock_api_key_from_aws_credentials(
+    profile: str | None = None,
+    credentials_path: Path | None = None,
+) -> str | None:
+    """Return a Bedrock API key stored in aws_session_token, matching skydiscover."""
+    credentials_path = credentials_path or Path(
+        os.environ.get("AWS_SHARED_CREDENTIALS_FILE", Path.home() / ".aws" / "credentials")
+    )
+    if not credentials_path.exists():
+        return None
+
+    parser = configparser.RawConfigParser()
+    parser.read(credentials_path)
+    section = profile or os.environ.get("AWS_PROFILE") or "default"
+    if not parser.has_section(section):
+        return None
+
+    token = parser.get(section, "aws_session_token", fallback="").strip()
+    if token.startswith("ABSK"):
+        return token
+    return None
+
+
+def _ensure_bedrock_bearer_token(profile: str | None = None) -> None:
+    if os.environ.get("AWS_BEARER_TOKEN_BEDROCK"):
+        return
+    token = _bedrock_api_key_from_aws_credentials(profile)
+    if token:
+        os.environ["AWS_BEARER_TOKEN_BEDROCK"] = token
+
+
+def _prompt_cache_point() -> dict | None:
+    raw = os.environ.get("BEDROCK_PROMPT_CACHE_TTL", "1h").strip()
+    if raw.lower() in {"", "0", "false", "off", "none"}:
+        return None
+    cache_point = {"type": "default"}
+    if raw:
+        cache_point["ttl"] = raw
+    return {"cachePoint": cache_point}
 
 
 def _plan_from_obj(obj: dict) -> GrantPlan:
@@ -155,6 +210,71 @@ def plan_with_openai(catalog_public: list[dict], request: dict, model: str) -> G
         )
         obj = _extract_json_object(response.output_text)
     except Exception:  # noqa: BLE001 - fall back to keyword matching
+        return None
+    if obj is None:
+        return None
+    return _plan_from_obj(obj)
+
+
+def plan_with_bedrock(
+    catalog_public: list[dict],
+    request: dict,
+    model: str,
+    api_base: str | None = None,
+) -> GrantPlan | None:
+    """Direct AWS Bedrock Converse call, using the same credential style as skydiscover."""
+    try:
+        import boto3  # noqa: PLC0415
+        from botocore.config import Config as BotoConfig  # noqa: PLC0415
+    except ImportError:
+        return None
+
+    try:
+        profile = os.environ.get("AWS_PROFILE")
+        _ensure_bedrock_bearer_token(profile)
+        session_kwargs = {"profile_name": profile} if profile else {}
+        session = boto3.Session(**session_kwargs)
+        region = (
+            _region_from_api_base(api_base)
+            or os.environ.get("BEDROCK_AWS_REGION")
+            or os.environ.get("AWS_REGION")
+            or os.environ.get("AWS_DEFAULT_REGION")
+            or "us-east-1"
+        )
+        client = session.client(
+            "bedrock-runtime",
+            region_name=region,
+            config=BotoConfig(
+                connect_timeout=int(os.environ.get("BEDROCK_CONNECT_TIMEOUT", "10")),
+                read_timeout=int(os.environ.get("BEDROCK_READ_TIMEOUT", "300")),
+                retries={"mode": "standard", "total_max_attempts": 1},
+            ),
+        )
+        system_blocks = [{"text": DATA_AGENT_SYSTEM_PROMPT}]
+        cache_point = _prompt_cache_point()
+        if cache_point:
+            system_blocks.append(cache_point)
+        response = client.converse(
+            modelId=model.removeprefix("bedrock/"),
+            system=system_blocks,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [{"text": render_user_message(catalog_public, request)}],
+                }
+            ],
+            inferenceConfig={
+                "maxTokens": int(os.environ.get("DATA_AGENT_MAX_TOKENS", "4096")),
+                "temperature": float(os.environ.get("DATA_AGENT_TEMPERATURE", "0")),
+            },
+        )
+        text = "\n".join(
+            item.get("text", "")
+            for item in response.get("output", {}).get("message", {}).get("content", [])
+            if isinstance(item, dict) and item.get("text")
+        )
+        obj = _extract_json_object(text)
+    except Exception:  # noqa: BLE001 - fall back to the next planner
         return None
     if obj is None:
         return None

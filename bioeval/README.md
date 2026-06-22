@@ -11,7 +11,7 @@ statement, internet access, analysis tools, and a guarded data-agent.
   benchmark problem folder.
 - The UEA calls `request_data "..."` to ask the data-agent for measurements or datasets,
   works in a recorded shell session, and calls `submit_answer` when it is done.
-- The data-agent reasons with **opencode + GPT-5.5**. For each request it reads a hidden,
+- The data-agent reasons with **AWS Bedrock Claude Sonnet 4.6** by default. For each request it reads a hidden,
   host-only per-problem `data_catalog.yaml` (neutral dataset descriptions only) and
   produces a grant plan: which datasets to stage locally, which to subset, and which to
   fetch from public sources online.
@@ -27,7 +27,7 @@ statement, internet access, analysis tools, and a guarded data-agent.
   disqualifying.
 
 ```
-request_data --> data-agent (opencode/GPT-5.5) --> grant plan
+request_data --> data-agent (Bedrock Claude Sonnet 4.6) --> grant plan
    --> stage local subset / fetch online --> leak guard --> /workspace/data (read-only)
 ```
 
@@ -50,8 +50,9 @@ pip install -e .
 cp .env.example .env
 ```
 
-Set `OPENAI_API_KEY` in `.env`. By default, both the data-agent and judge use
-`gpt-5.5`.
+Set Bedrock credentials in `.env` or `~/.aws/credentials`. By default, the data-agent
+uses `us.anthropic.claude-sonnet-4-6` in `us-east-1`, matching the skydiscover Bedrock
+setup; the judge still uses `OPENAI_API_KEY` and `gpt-5.5`.
 
 ## Run One Evaluation Sandbox
 
@@ -108,6 +109,24 @@ DOI, repository, author code, solution, or expected conclusions.
 
 The command prints a grant manifest with sandbox paths such as
 `/workspace/data/<request_id>/dataset_001/file_001.csv`.
+
+## Run Bedrock Sonnet UEA
+
+To run an autonomous agent-under-evaluation with AWS Bedrock Claude Sonnet 4.6:
+
+```bash
+cd /home/mrsar/paper-invert/bioeval
+bioeval-run-bedrock-uea \
+  s41467-026-73635-7_butterfly-longevity-pollen-feeding \
+  s41467-026-73844-0_f1-atpase-markov-model
+```
+
+Use `--all` to run every problem spec. The runner creates a fresh recorded run per
+problem, starts the Docker Compose sandbox, copies the visible task into `/workspace`,
+and executes `uea_bedrock_agent` inside the UEA container. The UEA model defaults to
+`us.anthropic.claude-sonnet-4-6` with `UEA_BEDROCK_API_BASE=bedrock:us-east-1`, using
+the same Bedrock credential path as skydiscover (`AWS_BEARER_TOKEN_BEDROCK` or an
+`ABSK...` token in `~/.aws/credentials` as `aws_session_token`).
 
 For very large datasets, ask for a subset, e.g.:
 
@@ -198,9 +217,10 @@ by the hidden `data_catalog.yaml` inside each problem folder.
 
 ## Notes And Guardrails
 
-- The data-agent uses opencode + GPT-5.5 to choose datasets. If opencode is unavailable,
-  it falls back to a direct OpenAI structured-output call, then to deterministic keyword
-  matching over the catalog, so the pipeline always runs.
+- The data-agent uses AWS Bedrock Claude Sonnet 4.6 to choose datasets. OpenAI-compatible
+  configs still use opencode first, then a direct OpenAI structured-output call. If no
+  LLM planner is available, it falls back to deterministic keyword matching over the
+  catalog, so the pipeline always runs.
 - Online acquisition is real (Zenodo / figshare / direct URL via `bioeval/providers.py`).
   Everything fetched still passes through the leak guard.
 - The leak guard (`bioeval/guard.py`) is the enforced boundary. To add a new problem,

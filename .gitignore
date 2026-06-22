@@ -1,3 +1,11 @@
 # Downloaded datasets for benchmark problems (regenerate via scripts/setup_problems.py)
 problems_complete/*/data/
 problems_imcomplete/*/data/
+
+# Generated BioEval run artifacts.
+bioeval/runs/
+
+# Python caches and editable-install metadata.
+__pycache__/
+*.py[cod]
+*.egg-info/
