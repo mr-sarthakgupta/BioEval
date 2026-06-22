@@ -102,12 +102,17 @@ def run_command(argv: list[str], *, timeout: int = 600) -> tuple[int, str]:
 def tool_config() -> dict[str, Any]:
     string = {"type": "string"}
     integer = {"type": "integer"}
+    string_array = {"type": "array", "items": string}
     return {
         "tools": [
             {
                 "toolSpec": {
                     "name": "request_data",
-                    "description": "Ask the guarded data-agent to grant datasets into /workspace/data.",
+                    "description": (
+                        "Ask the guarded data-agent to grant specific measurements or datasets into "
+                        "/workspace/data. Do not ask what data exists; name the measurement, organism, "
+                        "condition, modality, or scope you need."
+                    ),
                     "inputSchema": {
                         "json": {
                             "type": "object",
@@ -159,11 +164,16 @@ def tool_config() -> dict[str, Any]:
             {
                 "toolSpec": {
                     "name": "web_search",
-                    "description": "Search the web with benchmark leakage guards.",
+                    "description": "Search the web with benchmark leakage guards and academic-search fallback.",
                     "inputSchema": {
                         "json": {
                             "type": "object",
-                            "properties": {"query": string, "limit": integer},
+                            "properties": {
+                                "query": string,
+                                "limit": integer,
+                                "allowed_domains": string_array,
+                                "blocked_domains": string_array,
+                            },
                             "required": ["query"],
                         }
                     },
@@ -172,7 +182,11 @@ def tool_config() -> dict[str, Any]:
             {
                 "toolSpec": {
                     "name": "research_papers",
-                    "description": "Search literature metadata for background methods and datasets.",
+                    "description": (
+                        "Search literature metadata or passages for background methods and related "
+                        "datasets. Uses Semantic Scholar with retries/fallbacks; direct target-paper "
+                        "retrieval is blocked."
+                    ),
                     "inputSchema": {
                         "json": {
                             "type": "object",
@@ -260,6 +274,10 @@ def execute_tool(name: str, payload: dict[str, Any]) -> tuple[bool, str, bool]:
             argv.extend(["--max-matches", str(payload["max_matches"])])
     elif name == "web_search":
         argv = ["web_search", str(payload["query"])]
+        for domain in payload.get("allowed_domains") or []:
+            argv.extend(["--allowed-domain", str(domain)])
+        for domain in payload.get("blocked_domains") or []:
+            argv.extend(["--blocked-domain", str(domain)])
         if payload.get("limit"):
             argv.extend(["--limit", str(payload["limit"])])
     elif name == "research_papers":
@@ -301,6 +319,22 @@ scientific conclusions.
 
 Do not ask for the original paper, DOI, author code, repository, solution, answer key,
 or expected conclusions. Ask for measurements or datasets instead.
+
+Data requests must be specific. The data-agent may deny broad inventory-style requests
+such as "do you have any datasets?" or "give me all available data." Ask for concrete
+data by measurement, organism/sample, condition, modality, cohort, rows/columns, or file
+type, and make follow-up requests when you need additional data.
+
+Installed environment:
+- Python 3.11 with boto3, biopython, jupyter, lifelines, matplotlib, numpy, openpyxl,
+  pandas, pyarrow, requests, scikit-learn, scipy, and statsmodels.
+- Rscript from R base is available for reading .rds files and running compact R one-liners.
+- Common read-only CLI tools include ls, find, rg, grep, awk, sed, sort, uniq, wc, head,
+  tail, cut, paste, join, diff, comm, file, xxd, jq, tar, unzip, zipinfo, env, pwd, and df.
+- run_command executes commands directly without a shell. Shell pipelines, redirects,
+  command substitution, package installation, network transfer commands, and destructive
+  filesystem commands are blocked. Prefer short Python/R one-liners or read_file/search
+  for data inspection.
 
 Use tools as needed. When finished, call submit_answer with a concise but complete final
 answer including evidence, caveats, and uncertainty.

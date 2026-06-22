@@ -15,7 +15,7 @@ ALLOWED = {
     "python", "python3", "Rscript",
     "cat", "head", "tail", "wc", "grep", "rg", "find", "ls", "du", "df", "stat",
     "sort", "uniq", "cut", "awk", "sed", "tr", "paste", "join", "diff", "comm",
-    "xxd", "jq", "tar", "unzip", "zipinfo", "echo", "printf", "date", "whoami",
+    "file", "which", "xxd", "jq", "tar", "unzip", "zipinfo", "echo", "printf", "date", "whoami",
     "uname", "env", "pwd",
 }
 BLOCKED = {
@@ -23,19 +23,23 @@ BLOCKED = {
     "nc", "kill", "pkill", "mv", "cp", "dd", "mkdir", "rmdir", "touch", "ln",
     "install", "apt", "apt-get", "pip", "npm", "conda",
 }
-SHELL_PATTERNS = [re.compile(r"[|&;`]"), re.compile(r"\$[({]"), re.compile(r">{1,2}"), re.compile(r"<\(")]
+SHELL_CONTROL_TOKENS = {"|", "||", "&", "&&", ";", ">", ">>", "<", "2>", "2>>"}
+SHELL_SUBSTITUTION_PATTERNS = [re.compile(r"`"), re.compile(r"\$[({]")]
 
 
 def safety_error(command: str) -> str | None:
-    for pattern in SHELL_PATTERNS:
-        if pattern.search(command):
-            return "shell operators, redirects, substitutions, and pipelines are blocked"
     try:
         tokens = shlex.split(command)
     except ValueError as exc:
         return f"could not parse command: {exc}"
     if not tokens:
         return "empty command"
+    for token in tokens:
+        if token in SHELL_CONTROL_TOKENS or re.fullmatch(r"\d?>{1,2}", token):
+            return "shell operators, redirects, substitutions, and pipelines are blocked"
+    for pattern in SHELL_SUBSTITUTION_PATTERNS:
+        if pattern.search(command):
+            return "shell substitutions are blocked"
     exe = os.path.basename(tokens[0])
     if exe in BLOCKED:
         return f"'{exe}' is blocked"

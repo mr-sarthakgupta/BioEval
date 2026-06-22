@@ -6,11 +6,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
     ca-certificates \
     curl \
+    file \
     git \
+    jq \
     nodejs \
     npm \
     procps \
+    r-base-core \
+    ripgrep \
+    unzip \
     util-linux \
+    vim-common \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir \

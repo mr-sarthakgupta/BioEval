@@ -25,6 +25,12 @@ DENIED_RE = re.compile(
     r"\brepo\b|solution|answer key|ground truth|expected (?:result|conclusion)|doi)\b",
     re.IGNORECASE,
 )
+INVENTORY_REQUEST_RE = re.compile(
+    r"\b(do you have|what (?:data|datasets)|which (?:data|datasets)|any datasets?|"
+    r"all (?:data|datasets)|everything|anything related|available (?:data|datasets)|"
+    r"datasets? on)\b",
+    re.IGNORECASE,
+)
 
 
 @dataclass
@@ -47,8 +53,23 @@ def _tokens(text: str) -> set[str]:
     return {t for t in re.findall(r"[a-z0-9]{3,}", text.lower())}
 
 
+def is_inventory_request(question: str) -> bool:
+    """Return True for broad catalog-discovery requests that should be clarified."""
+    return bool(INVENTORY_REQUEST_RE.search(question))
+
+
+def clarification_message() -> str:
+    return (
+        "Please make a specific data request: name the measurement/data type plus the "
+        "organism/sample, condition/treatment, modality, cohort, or desired rows/columns. "
+        "I cannot answer broad inventory requests or dump all related datasets."
+    )
+
+
 def select_instructions_by_keywords(catalog: DataCatalog, request: DatasetRequest) -> list[StageInstruction]:
     """Deterministic fallback selection when no LLM/opencode planner is available."""
+    if is_inventory_request(request.question):
+        return []
     req_tokens = _tokens(" ".join([request.question, *request.desired_modalities]))
     scored: list[tuple[int, CatalogEntry]] = []
     for entry in catalog.grantable():
@@ -179,6 +200,12 @@ def stage_and_grant(
             "measurements, public source data, or a derived dataset instead."
         )
         return DatasetGrant(request_id=request_id, status="denied", message=reason)
+    if is_inventory_request(request.question):
+        return DatasetGrant(
+            request_id=request_id,
+            status="denied",
+            message=clarification_message(),
+        )
 
     notes: list[str] = []
     tmp_root = Path(tempfile.mkdtemp(prefix=f"bioeval_stage_{request_id}_"))

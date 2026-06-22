@@ -97,15 +97,29 @@ The UEA also has SkyDiscover-style exploration tools, all recorded automatically
 
 - `read_file PATH [--line-start N --line-end M]`: read files under `/workspace`.
 - `search PATTERN [--file-glob GLOB]`: regex search files under `/workspace`.
-- `web_search QUERY`: search the web, with paper/repo/DOI/solution requests blocked.
+- `web_search QUERY`: search the web, with paper/repo/DOI/solution requests blocked
+  and a Semantic Scholar fallback when DuckDuckGo returns nothing.
 - `research_papers search --query QUERY`: search scientific literature metadata for
   background methods and related datasets, with direct target-paper retrieval blocked.
+- `research_papers snippet_search --query QUERY`: search literature passages, falling
+  back to metadata search when the snippet endpoint is unavailable or rate-limited.
 - `fetch_webpage URL`: fetch allowed pages into `/workspace/reference`.
 - `run_command COMMAND`: run constrained read-only commands in `/workspace`.
 
 These tools are intended for open-world analysis while preserving the blind setup. They
 cannot access host problem folders and should not be used to request the original paper,
 DOI, repository, author code, solution, or expected conclusions.
+
+Data requests should be specific. The data-agent is instructed to deny broad inventory
+requests such as "do you have any datasets on this topic?" or "give me all available
+data" and ask for clarification instead. Ask for concrete measurements by organism,
+sample/cohort, condition/treatment, modality, desired table columns, or file type.
+
+The UEA image includes Python 3.11 with the scientific Python stack listed in
+`docker/Dockerfile.uea`, Rscript for `.rds` inspection, and common read-only CLI readers
+such as `rg`, `jq`, `file`, `xxd`, `tar`, and `unzip`. `run_command` executes without a
+shell, so pipes, redirects, command substitution, package installation, network transfer
+commands, and destructive filesystem commands are blocked.
 
 The command prints a grant manifest with sandbox paths such as
 `/workspace/data/<request_id>/dataset_001/file_001.csv`.

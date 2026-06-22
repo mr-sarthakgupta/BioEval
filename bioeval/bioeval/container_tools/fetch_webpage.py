@@ -18,6 +18,11 @@ from bioeval_tool_common import (
     truncate,
 )
 
+USER_AGENT = (
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+)
+
 
 class TextExtractor(HTMLParser):
     skip_tags = {"script", "style", "noscript", "head", "nav", "footer", "header", "aside", "svg"}
@@ -44,7 +49,9 @@ class TextExtractor(HTMLParser):
             self.parts.append(data)
 
     def text(self) -> str:
-        return re.sub(r"\n{3,}", "\n\n", html.unescape("".join(self.parts))).strip()
+        text = html.unescape("".join(self.parts))
+        text = re.sub(r"[ \t]+", " ", text)
+        return re.sub(r"\n{3,}", "\n\n", text).strip()
 
 
 def slug(url: str) -> str:
@@ -66,9 +73,11 @@ def main() -> int:
         print(f"Denied: {reason}", file=sys.stderr)
         return 2
     try:
-        resp = requests.get(args.url, headers={"User-Agent": "BioEval/1.0"}, timeout=30, allow_redirects=True)
+        resp = requests.get(args.url, headers={"User-Agent": USER_AGENT}, timeout=30, allow_redirects=True)
         resp.raise_for_status()
         content_type = resp.headers.get("Content-Type", "")
+        if "pdf" in content_type or "octet-stream" in content_type:
+            raise ValueError("binary/PDF content is not fetchable through this text tool")
         if "html" in content_type or not content_type:
             extractor = TextExtractor()
             extractor.feed(resp.text)

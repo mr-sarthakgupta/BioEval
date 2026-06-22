@@ -24,9 +24,15 @@ def append_tool_event(record: dict) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Ask the benchmark data-agent to place a dataset in /workspace/data."
+        description="Ask the benchmark data-agent to place a specific dataset in /workspace/data."
     )
-    parser.add_argument("question", help="Describe the dataset or experiment you want.")
+    parser.add_argument(
+        "question",
+        help=(
+            "Specifically describe the measurement/data type and scope you want; broad "
+            "inventory requests may be denied."
+        ),
+    )
     parser.add_argument("--modality", action="append", default=[], help="Optional desired modality.")
     parser.add_argument("--max-bytes", type=int, default=200_000_000)
     parser.add_argument(
