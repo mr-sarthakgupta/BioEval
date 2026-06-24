@@ -149,6 +149,10 @@ def create_app(settings: DataAgentSettings) -> FastAPI:
             request_id=request_id,
             plan=plan,
         )
+        if opencode_runner.is_bedrock_api_base(settings.api_base):
+            from bioeval.bedrock_cost import finalize_cost_tracker
+
+            finalize_cost_tracker(component="data-agent", model=settings.model)
         if settings.run_root is not None:
             append_jsonl(
                 settings.run_root / "data_requests.jsonl",

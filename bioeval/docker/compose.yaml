@@ -18,6 +18,7 @@ services:
       BEDROCK_PROMPT_CACHE_TTL: ${BEDROCK_PROMPT_CACHE_TTL:-1h}
       BIOEVAL_PROBLEM_ID: ${BIOEVAL_PROBLEM_ID}
       BIOEVAL_RUN_ID: ${BIOEVAL_RUN_ID:-default}
+      BIOEVAL_LOG_DIR: /run/logs
     command:
       - --problems-root=/problems_complete
       - --staging-root=/run/data_grants
@@ -58,6 +59,7 @@ services:
       BEDROCK_AWS_REGION: ${BEDROCK_AWS_REGION:-us-east-1}
       BEDROCK_PROMPT_CACHE_TTL: ${BEDROCK_PROMPT_CACHE_TTL:-1h}
       BIOEVAL_RUN_ID: ${BIOEVAL_RUN_ID:-default}
+      BIOEVAL_LOG_DIR: /logs
       BIOEVAL_TOOL_LOG: /submit/tool_calls.jsonl
       BIOEVAL_SHELL_COMMAND_LOG: /submit/shell_commands.jsonl
       BIOEVAL_TERMINAL_LOG: /submit/terminal.typescript
@@ -72,6 +74,7 @@ services:
       - ../runs/${BIOEVAL_PROBLEM_ID}/${BIOEVAL_RUN_ID:-default}/uea_workspace:/workspace
       - ../runs/${BIOEVAL_PROBLEM_ID}/${BIOEVAL_RUN_ID:-default}/data_grants:/workspace/data:ro
       - ../runs/${BIOEVAL_PROBLEM_ID}/${BIOEVAL_RUN_ID:-default}/results:/submit
+      - ../runs/${BIOEVAL_PROBLEM_ID}/${BIOEVAL_RUN_ID:-default}/logs:/logs
       - ${HOME}/.aws:/root/.aws:ro
     working_dir: /workspace
     # Optional egress guardrail (opt-in). Blackhole the hosts that serve the original

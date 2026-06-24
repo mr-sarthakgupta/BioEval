@@ -51,6 +51,7 @@ COPY bioeval/container_tools/web_search.py /usr/local/bin/web_search
 COPY bioeval/container_tools/fetch_webpage.py /usr/local/bin/fetch_webpage
 COPY bioeval/container_tools/research_papers.py /usr/local/bin/research_papers
 COPY bioeval/container_tools/run_command.py /usr/local/bin/run_command
+COPY bioeval/bedrock_cost.py /usr/local/bin/bedrock_cost.py
 COPY bioeval/container_tools/uea_bedrock_agent.py /usr/local/bin/uea_bedrock_agent
 RUN chmod +x /usr/local/bin/request_data /usr/local/bin/submit_answer /usr/local/bin/check_space /usr/local/bin/record_event /usr/local/bin/record_shell_command /usr/local/bin/bioeval_session /usr/local/bin/read_file /usr/local/bin/search /usr/local/bin/web_search /usr/local/bin/fetch_webpage /usr/local/bin/research_papers /usr/local/bin/run_command /usr/local/bin/uea_bedrock_agent
 

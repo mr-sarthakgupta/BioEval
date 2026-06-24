@@ -268,6 +268,9 @@ def plan_with_bedrock(
                 "temperature": float(os.environ.get("DATA_AGENT_TEMPERATURE", "0")),
             },
         )
+        from bioeval.bedrock_cost import record_bedrock_usage
+
+        record_bedrock_usage(response.get("usage", {}) or {}, component="data-agent", model=model)
         text = "\n".join(
             item.get("text", "")
             for item in response.get("output", {}).get("message", {}).get("content", [])

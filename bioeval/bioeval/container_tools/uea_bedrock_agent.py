@@ -14,6 +14,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from bedrock_cost import BedrockCostTracker
+
 
 DEFAULT_MODEL = "us.anthropic.claude-sonnet-4-6"
 DEFAULT_API_BASE = "bedrock:us-east-1"
@@ -71,6 +73,28 @@ def prompt_cache_point() -> dict[str, Any] | None:
     if raw:
         cache_point["ttl"] = raw
     return {"cachePoint": cache_point}
+
+
+def messages_with_cache_point(
+    messages: list[dict[str, Any]],
+    cache_point: dict[str, Any] | None,
+) -> list[dict[str, Any]]:
+    if not cache_point or os.environ.get("BEDROCK_CACHE_CONVERSATION", "1").lower() in {
+        "0",
+        "false",
+        "off",
+        "none",
+    }:
+        return messages
+    if not messages:
+        return messages
+
+    request_messages = [
+        {"role": message["role"], "content": list(message.get("content", []))}
+        for message in messages
+    ]
+    request_messages[-1]["content"].append(cache_point)
+    return request_messages
 
 
 def truncate(text: str, max_chars: int = 20000) -> str:
@@ -407,23 +431,36 @@ def run_agent(args: argparse.Namespace) -> int:
     ]
     submitted = False
     trace: list[dict[str, Any]] = []
+    cost_tracker = BedrockCostTracker(component="uea", model=args.model)
 
     for step in range(1, args.max_steps + 1):
+        current_tool_config = tool_config()
+        if cache_point:
+            current_tool_config["tools"].append(cache_point)
         response = client.converse(
             modelId=args.model.removeprefix("bedrock/"),
             system=system_blocks,
-            messages=messages,
-            toolConfig=tool_config(),
+            messages=messages_with_cache_point(messages, cache_point),
+            toolConfig=current_tool_config,
             inferenceConfig={
                 "maxTokens": args.max_tokens,
                 "temperature": args.temperature,
             },
         )
+        usage = response.get("usage", {}) or {}
+        call_cost = cost_tracker.record(usage)
         assistant_message = response.get("output", {}).get("message", {})
         content = assistant_message.get("content", [])
         text, tool_uses = extract_text_and_tools(content)
         messages.append({"role": "assistant", "content": content})
-        trace.append({"step": step, "assistant": content, "usage": response.get("usage", {})})
+        trace.append(
+            {
+                "step": step,
+                "assistant": content,
+                "usage": usage,
+                "cost_usd": round(call_cost, 6),
+            }
+        )
         if text:
             append_transcript(f"Assistant Step {step}", text)
 
@@ -461,6 +498,7 @@ def run_agent(args: argparse.Namespace) -> int:
         submitted = ok
         print(output)
 
+    cost_tracker.finalize()
     TRACE.write_text(json.dumps(trace, indent=2, ensure_ascii=False), encoding="utf-8")
     return 0 if submitted else 1
 

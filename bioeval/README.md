@@ -216,6 +216,8 @@ Each run directory contains:
 - `results/transcript.txt`: submitted analysis transcript.
 - `results/judge_result.json`: full judge result with metadata.
 - `results/score_history.jsonl`: append-only judge score/feedback history.
+- `logs/uea_bedrock_cost.log` and `logs/data-agent_bedrock_cost.log`: per-call Bedrock cost lines and end-of-run summaries (also printed to stderr during `bioeval-run-bedrock-uea`).
+- `logs/uea_bedrock_cost.json` and `logs/data-agent_bedrock_cost.json`: machine-readable cost totals.
 
 ## Current Problems
 
