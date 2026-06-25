@@ -56,9 +56,12 @@ def main() -> None:
                 "BEDROCK_AWS_REGION",
                 "AWS_REGION",
                 "JUDGE_MODEL",
+                "JUDGE_API_BASE",
                 "BIOEVAL_DISK_BUDGET_GB",
                 "BIOEVAL_MEM_LIMIT",
                 "BIOEVAL_CPUS",
+                "BIOEVAL_STRICT_DATA_REQUESTS",
+                "BIOEVAL_MAX_DATASET_GRANTS_PER_REQUEST",
             ]
         ),
         "prompt": {

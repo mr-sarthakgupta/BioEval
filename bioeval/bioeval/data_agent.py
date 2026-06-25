@@ -32,6 +32,30 @@ class DataAgentSettings(BaseModel):
     run_root: Path | None = None
 
 
+UEA_VISIBLE_PATHS = (
+    Path("/workspace"),
+    Path("/submit"),
+    Path("/logs"),
+)
+
+
+def _is_relative_to(path: Path, parent: Path) -> bool:
+    try:
+        path.resolve().relative_to(parent.resolve())
+        return True
+    except ValueError:
+        return False
+
+
+def _private_audit_log_path(run_root: Path) -> Path:
+    path = run_root / "data_requests.jsonl"
+    if any(_is_relative_to(path, visible) for visible in UEA_VISIBLE_PATHS):
+        raise RuntimeError(
+            "Refusing to write data-agent planner log inside a UEA-visible mount."
+        )
+    return path
+
+
 def _plan_record(plan: GrantPlan) -> dict:
     return {
         "deny": plan.deny,
@@ -155,7 +179,7 @@ def create_app(settings: DataAgentSettings) -> FastAPI:
             finalize_cost_tracker(component="data-agent", model=settings.model)
         if settings.run_root is not None:
             append_jsonl(
-                settings.run_root / "data_requests.jsonl",
+                _private_audit_log_path(settings.run_root),
                 {
                     "event": "data_request",
                     "timestamp": utc_now(),

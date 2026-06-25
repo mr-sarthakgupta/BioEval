@@ -100,7 +100,7 @@ class DataCatalog(BaseModel):
 
 
 class GrantedFile(BaseModel):
-    source_path: str
+    source_path: str = Field(exclude=True)
     sandbox_path: str
     bytes: int
     reason: str

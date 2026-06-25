@@ -8,6 +8,7 @@ dependencies = [
   "fastapi",
   "openai",
   "pydantic>=2",
+  "pyreadr",
   "python-dotenv",
   "pyyaml",
   "requests",

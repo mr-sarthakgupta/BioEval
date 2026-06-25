@@ -127,6 +127,11 @@ def run_problem(problem_id: str, args: argparse.Namespace, root: Path, env_file:
             "AWS_REGION": os.environ.get("AWS_REGION", "us-east-1"),
             "AWS_DEFAULT_REGION": os.environ.get("AWS_DEFAULT_REGION", "us-east-1"),
             "BEDROCK_AWS_REGION": os.environ.get("BEDROCK_AWS_REGION", "us-east-1"),
+            "BIOEVAL_STRICT_DATA_REQUESTS": os.environ.get("BIOEVAL_STRICT_DATA_REQUESTS", "1"),
+            "BIOEVAL_MAX_DATASET_GRANTS_PER_REQUEST": os.environ.get(
+                "BIOEVAL_MAX_DATASET_GRANTS_PER_REQUEST",
+                "1",
+            ),
         }
     )
     if os.environ.get("AWS_BEARER_TOKEN_BEDROCK"):

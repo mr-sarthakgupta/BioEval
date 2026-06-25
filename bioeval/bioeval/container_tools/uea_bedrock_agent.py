@@ -453,14 +453,13 @@ def run_agent(args: argparse.Namespace) -> int:
         content = assistant_message.get("content", [])
         text, tool_uses = extract_text_and_tools(content)
         messages.append({"role": "assistant", "content": content})
-        trace.append(
-            {
-                "step": step,
-                "assistant": content,
-                "usage": usage,
-                "cost_usd": round(call_cost, 6),
-            }
-        )
+        step_record: dict[str, Any] = {
+            "step": step,
+            "assistant": content,
+            "usage": usage,
+            "cost_usd": round(call_cost, 6),
+        }
+        trace.append(step_record)
         if text:
             append_transcript(f"Assistant Step {step}", text)
 
@@ -474,21 +473,34 @@ def run_agent(args: argparse.Namespace) -> int:
             break
 
         tool_results = []
+        trace_tool_results: list[dict[str, Any]] = []
         for tool_use in tool_uses:
             name = tool_use["name"]
             payload = tool_use.get("input") or {}
             ok, output, did_submit = execute_tool(name, payload)
             print(output)
-            tool_results.append(
+            status = "success" if ok else "error"
+            tool_result = {
+                "toolResult": {
+                    "toolUseId": tool_use["toolUseId"],
+                    "status": status,
+                    "content": [{"text": output}],
+                }
+            }
+            tool_results.append(tool_result)
+            trace_tool_results.append(
                 {
-                    "toolResult": {
-                        "toolUseId": tool_use["toolUseId"],
-                        "status": "success" if ok else "error",
-                        "content": [{"text": output}],
-                    }
+                    "toolUseId": tool_use["toolUseId"],
+                    "name": name,
+                    "input": payload,
+                    "status": status,
+                    "output": output,
+                    "submitted": did_submit,
+                    "bedrock_tool_result": tool_result,
                 }
             )
             submitted = submitted or did_submit
+        step_record["tool_results"] = trace_tool_results
         messages.append({"role": "user", "content": tool_results})
         if submitted:
             break

@@ -57,7 +57,8 @@ entries:
       Precomputed per-sample pathway-enrichment feature table that can be used as
       model input features.
     kind: processed
-    grantable: true
+    grantable: false
+    reason: Precomputed feature tables encode part of the study's modeling pipeline.
     modalities: [parquet, features]
     source_paths:
       - figshare/31268542/precily_pes_dataset.parquet
@@ -66,25 +67,29 @@ entries:
     description: >-
       Pointer/README for the public DepMap portal (gene dependency + expression).
     kind: raw
-    grantable: true
+    grantable: false
+    reason: Pointer files reveal source/provenance rather than providing measurements.
     modalities: [readme]
     source_paths:
       - external/depmap/README.md
 
   - id: public_figshare_record
     description: >-
-      Public deposited datasets for this study (raw data matrices only; trained
-      models and precomputed analysis outputs are excluded).
+      Public deposited raw data matrices for gene dependency, expression, and
+      drug-sensitivity measurements; trained models and precomputed analysis
+      outputs are excluded.
     kind: online
     grantable: true
-    modalities: [csv, parquet]
+    modalities: [csv]
     online:
       provider: figshare
       article_id: 31268542
-      include: ["*.csv", "*.parquet"]
+      include: ["*.csv"]
       exclude:
         - "*FORGE.pkl"
         - "*.hdf5"
+        - "*.parquet"
+        - "precily_pes_dataset.parquet"
         - "*geneImp.csv"
         - "*keyCluster_deg.csv"
         - "*steinerTree.graphml"

@@ -1,23 +1,24 @@
 problem_id: s41589-026-02251-9_idr-condensate-serine-charge
 # Hidden, host-only. Never mounted into the UEA container.
 entries:
-  - id: supplementary_data_tables
+  - id: idr_miscibility_assay_tables
     description: >-
-      Supplementary experimental data tables (spreadsheets): per-construct
-      measurements, sequence compositions, and assay readouts behind the study.
+      Experimental spreadsheet tables containing per-construct IDR miscibility
+      measurements, sequence compositions, and perturbation assay readouts.
     kind: raw
     grantable: true
-    modalities: [xlsx, tabular]
+    modalities: [xlsx, tabular, miscibility, sequence-composition]
     source_paths:
       - nature-supplementary/*.xlsx
 
   - id: public_zenodo_record
     description: >-
-      Public deposited datasets for this study (data tables only; the simulation
-      results archive, code archive, and supplementary-information PDFs are excluded).
+      Public deposited data tables for IDR miscibility and sequence-composition
+      measurements; simulation result archives, code archives, and documents are
+      excluded.
     kind: online
     grantable: true
-    modalities: [xlsx]
+    modalities: [xlsx, miscibility, sequence-composition]
     online:
       provider: zenodo
       record_id: 19565235

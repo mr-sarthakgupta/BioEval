@@ -69,7 +69,8 @@ def search_url(query: str) -> str:
     return urlunparse(parsed._replace(query=urlencode({"q": query})))
 
 
-def s2_fallback_search(query: str, limit: int) -> list[dict[str, str]]:
+def s2_fallback_search(query: str, limit: int) -> tuple[list[dict[str, str]], list[str]]:
+    diagnostics: list[str] = []
     try:
         resp = requests.get(
             "https://api.semanticscholar.org/graph/v1/paper/search/bulk",
@@ -94,7 +95,10 @@ def s2_fallback_search(query: str, limit: int) -> list[dict[str, str]]:
                 timeout=15,
             )
         if resp.status_code != 200:
-            return []
+            diagnostics.append(f"Semantic Scholar fallback returned HTTP {resp.status_code}")
+            if not S2_API_KEY:
+                diagnostics.append("S2_API_KEY is not set; fallback searches may be rate-limited")
+            return [], diagnostics
         rows = []
         for paper in resp.json().get("data", []):
             title = paper.get("title") or ""
@@ -112,9 +116,14 @@ def s2_fallback_search(query: str, limit: int) -> list[dict[str, str]]:
             year = paper.get("year") or ""
             suffix = f" ({venue}, {year})" if venue and year else f" ({year})" if year else ""
             rows.append({"title": title + suffix, "url": url})
-        return rows
-    except Exception:
-        return []
+        if not rows:
+            diagnostics.append("Semantic Scholar fallback returned 0 usable results")
+            if not S2_API_KEY:
+                diagnostics.append("S2_API_KEY is not set; fallback searches may be rate-limited")
+        return rows, diagnostics
+    except Exception as exc:
+        diagnostics.append(f"Semantic Scholar fallback failed: {exc}")
+        return [], diagnostics
 
 
 def main() -> int:
@@ -133,9 +142,15 @@ def main() -> int:
         return 2
     try:
         rows = []
+        diagnostics: list[str] = []
+        duckduckgo_error = None
         for attempt in range(2):
-            resp = requests.get(search_url(args.query), headers={"User-Agent": USER_AGENT}, timeout=20)
-            resp.raise_for_status()
+            try:
+                resp = requests.get(search_url(args.query), headers={"User-Agent": USER_AGENT}, timeout=20)
+                resp.raise_for_status()
+            except Exception as exc:  # noqa: BLE001 - report and try fallback
+                duckduckgo_error = str(exc)
+                break
             parser_obj = LinkParser()
             parser_obj.feed(resp.text)
             for raw_url, title in parser_obj.links:
@@ -146,33 +161,75 @@ def main() -> int:
             if rows or attempt:
                 break
             time.sleep(1)
+        duckduckgo_count = len(rows)
+        used_s2_fallback = False
         if not rows:
-            rows = s2_fallback_search(args.query, args.limit)
+            if duckduckgo_error:
+                diagnostics.append(f"DuckDuckGo search failed: {duckduckgo_error}")
+            else:
+                diagnostics.append("DuckDuckGo returned 0 parsable external results")
+            rows, s2_diagnostics = s2_fallback_search(args.query, args.limit)
+            diagnostics.extend(s2_diagnostics)
+            used_s2_fallback = bool(rows)
         seen = set()
         allowed = {d.lower() for d in args.allowed_domain}
         blocked = {d.lower() for d in args.blocked_domain}
         filtered = []
-        used_s2_fallback = bool(rows) and any("semanticscholar.org" in row["url"] or "doi.org" in row["url"] or "arxiv.org" in row["url"] for row in rows)
+        blocked_by_guard = 0
+        blocked_by_request = 0
+        blocked_by_allowed = 0
+        used_s2_fallback = used_s2_fallback or (
+            bool(rows)
+            and any("semanticscholar.org" in row["url"] or "doi.org" in row["url"] or "arxiv.org" in row["url"] for row in rows)
+        )
         for row in rows:
             url = row["url"]
             if url in seen:
                 continue
             if blocked_url_reason(url):
+                blocked_by_guard += 1
                 continue
             if allowed and not host_matches(url, allowed):
+                blocked_by_allowed += 1
                 continue
             if blocked and host_matches(url, blocked):
+                blocked_by_request += 1
                 continue
             seen.add(url)
             filtered.append(row)
             if len(filtered) >= max(1, min(args.limit, 20)):
                 break
+        if rows and not filtered:
+            diagnostics.append(
+                "Search returned candidate results, but none survived filtering "
+                f"(blind-setup guard blocked {blocked_by_guard}, allowed-domain filter blocked "
+                f"{blocked_by_allowed}, request blocked-domain filter blocked {blocked_by_request})."
+            )
+        elif blocked_by_guard or blocked_by_allowed or blocked_by_request:
+            diagnostics.append(
+                f"Filtered candidates: blind-setup guard={blocked_by_guard}, "
+                f"allowed-domain={blocked_by_allowed}, blocked-domain={blocked_by_request}."
+            )
         source_note = "\n(via Semantic Scholar academic fallback)" if used_s2_fallback else ""
         text = "\n".join(f"{idx}. {row['title']}\n   {row['url']}" for idx, row in enumerate(filtered, start=1))
         if text and source_note:
             text += source_note
+        if not text and diagnostics:
+            text = "No search results.\nDiagnostics:\n" + "\n".join(f"- {item}" for item in diagnostics)
         output = truncate(text or "No search results.")
-        response = {"results": filtered, "content": output}
+        response = {
+            "results": filtered,
+            "counts": {
+                "duckduckgo_candidates": duckduckgo_count,
+                "total_candidates": len(rows),
+                "returned": len(filtered),
+                "blocked_by_guard": blocked_by_guard,
+                "blocked_by_allowed_domain": blocked_by_allowed,
+                "blocked_by_requested_domain": blocked_by_request,
+            },
+            "diagnostics": diagnostics,
+            "content": output,
+        }
         append_tool_event("web_search", request, response, "ok")
         print(output)
         return 0

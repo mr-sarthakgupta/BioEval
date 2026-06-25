@@ -7,12 +7,22 @@ import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
-from openai import OpenAI
 
+from bioeval.bedrock_client import (
+    DEFAULT_BEDROCK_API_BASE,
+    create_bedrock_client,
+    ensure_bedrock_bearer_token,
+    messages_with_cache_point,
+    prompt_cache_point,
+    extract_text_from_response,
+)
+from bioeval.bedrock_cost import BedrockCostTracker
 from bioeval.problems import load_problem_spec
 from bioeval.run_record import append_jsonl, utc_now, write_json
 from bioeval.schemas import JudgeResult
 
+
+DEFAULT_JUDGE_MODEL = "us.anthropic.claude-sonnet-4-6"
 
 JUDGE_SYSTEM_PROMPT = """You are a strict scientific-discovery benchmark judge.
 
@@ -48,7 +58,7 @@ Leakage check:
   blind-setup violation. Leakage is disqualifying: set `verdict` to "fail" and keep
   `score` at or below 0.25 even if the scientific claims are otherwise correct.
 
-Return ONLY JSON matching the provided schema.
+Return ONLY JSON matching the provided output_schema.
 """
 
 
@@ -118,14 +128,20 @@ def judge_with_llm(
     final_answer: str,
     transcript: str | None,
     model: str,
+    api_base: str,
+    log_dir: Path | None = None,
 ) -> JudgeResult:
-    if not os.getenv("OPENAI_API_KEY"):
-        raise RuntimeError("OPENAI_API_KEY must be set for LLM judging.")
+    ensure_bedrock_bearer_token()
+    if not os.environ.get("AWS_BEARER_TOKEN_BEDROCK") and not os.environ.get("AWS_PROFILE"):
+        raise RuntimeError(
+            "Bedrock credentials required for judging. Set AWS_BEARER_TOKEN_BEDROCK or "
+            "an ABSK... aws_session_token in ~/.aws/credentials."
+        )
 
     spec = load_problem_spec(problem_id)
-    client = OpenAI()
     user_payload = {
         "task": "anonymized_biology_discovery_task",
+        "output_schema": JUDGE_JSON_SCHEMA,
         "hidden_expected_conclusions": spec.expected_conclusions,
         "hidden_expected_caveats": spec.expected_caveats,
         "hidden_judge_rubric": spec.judge_rubric,
@@ -133,22 +149,33 @@ def judge_with_llm(
         "uea_final_answer": final_answer,
         "uea_transcript_excerpt": transcript[-40_000:] if transcript else None,
     }
-    response = client.responses.create(
-        model=model,
-        input=[
-            {"role": "system", "content": JUDGE_SYSTEM_PROMPT},
-            {"role": "user", "content": json.dumps(user_payload)},
-        ],
-        text={
-            "format": {
-                "type": "json_schema",
-                "name": "judge_result",
-                "schema": JUDGE_JSON_SCHEMA,
-                "strict": True,
-            }
+
+    client = create_bedrock_client(api_base)
+    system_blocks = [{"text": JUDGE_SYSTEM_PROMPT}]
+    cache_point = prompt_cache_point()
+    if cache_point:
+        system_blocks.append(cache_point)
+
+    messages = messages_with_cache_point(
+        [{"role": "user", "content": [{"text": json.dumps(user_payload)}]}],
+        cache_point,
+    )
+
+    cost_tracker = BedrockCostTracker(component="judge", model=model, log_dir=log_dir)
+    response = client.converse(
+        modelId=model.removeprefix("bedrock/"),
+        system=system_blocks,
+        messages=messages,
+        inferenceConfig={
+            "maxTokens": int(os.getenv("JUDGE_MAX_TOKENS", "8192")),
+            "temperature": float(os.getenv("JUDGE_TEMPERATURE", "0")),
         },
     )
-    result = JudgeResult.model_validate(parse_json_object(response.output_text))
+    cost_tracker.record(response.get("usage", {}) or {})
+    cost_tracker.finalize()
+
+    text = extract_text_from_response(response)
+    result = JudgeResult.model_validate(parse_json_object(text))
     if result.leakage_suspected:
         result.score = min(result.score, 0.25)
         result.verdict = "fail"
@@ -160,7 +187,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--problem-id", required=True)
     parser.add_argument("--final-answer-file", type=Path, required=True)
     parser.add_argument("--transcript-file", type=Path, required=True)
-    parser.add_argument("--model", default=os.getenv("JUDGE_MODEL", "gpt-5.5"))
+    parser.add_argument("--model", default=os.getenv("JUDGE_MODEL", DEFAULT_JUDGE_MODEL))
+    parser.add_argument(
+        "--api-base",
+        default=os.getenv("JUDGE_API_BASE", DEFAULT_BEDROCK_API_BASE),
+    )
     parser.add_argument("--run-id", default=os.getenv("BIOEVAL_RUN_ID"))
     parser.add_argument("--output-file", type=Path)
     parser.add_argument("--score-log", type=Path)
@@ -170,11 +201,16 @@ def build_arg_parser() -> argparse.ArgumentParser:
 def main() -> None:
     load_dotenv()
     args = build_arg_parser().parse_args()
+    output_file = args.output_file or (args.final_answer_file.parent / "judge_result.json")
+    log_dir = output_file.parent.parent / "logs" if output_file.parent.name == "results" else output_file.parent
+
     result = judge_with_llm(
         problem_id=args.problem_id,
         final_answer=args.final_answer_file.read_text(errors="replace"),
         transcript=read_optional(args.transcript_file),
         model=args.model,
+        api_base=args.api_base,
+        log_dir=log_dir,
     )
     result_dict = result.model_dump()
     record = {
@@ -183,12 +219,12 @@ def main() -> None:
         "run_id": args.run_id,
         "problem_id": args.problem_id,
         "judge_model": args.model,
+        "judge_api_base": args.api_base,
         "final_answer_file": str(args.final_answer_file),
         "transcript_file": str(args.transcript_file),
         "result": result_dict,
     }
 
-    output_file = args.output_file or (args.final_answer_file.parent / "judge_result.json")
     score_log = args.score_log or (args.final_answer_file.parent / "score_history.jsonl")
     write_json(output_file, record)
     append_jsonl(score_log, record)

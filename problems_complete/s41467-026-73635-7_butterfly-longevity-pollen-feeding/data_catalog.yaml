@@ -2,19 +2,38 @@ problem_id: s41467-026-73635-7_butterfly-longevity-pollen-feeding
 # Hidden, host-only. Never mounted into the UEA container.
 # source_paths are globs relative to this problem's data/ directory.
 entries:
-  - id: survival_lifespan_records
+  - id: species_max_lifespan_records
     description: >-
-      Individual- and cohort-level longevity and survival records for multiple
-      butterfly species reared under laboratory conditions (R .rds objects).
+      Per-species maximum adult lifespan records for heliconiine butterflies,
+      including feeding habit labels (R .rds tables).
     kind: raw
     grantable: true
     modalities: [rds, survival]
     source_paths:
       - figshare/31081597/lifespan_data.rds
-      - figshare/31081597/longsurv.rds
-      - figshare/31081597/totalcogsurv.RDS
       - figshare/31081597/table_1_data.rds
-      - figshare/31081597/basta_summary.rds
+
+  - id: hecale_dryas_diet_survival
+    description: >-
+      Individual adult survival and weight records for a controlled captive
+      diet experiment comparing H. hecale and Dryas iulia under pollen-fed and
+      pollen-deprived treatments (R .rds table).
+    kind: raw
+    grantable: true
+    modalities: [rds, survival, diet]
+    source_paths:
+      - figshare/31081597/longsurv.rds
+
+  - id: five_species_lab_survival
+    description: >-
+      Individual captive adult survival records for Agraulis vanillae,
+      Dryadula phaetusa, Dryas iulia, H. hecale, and H. melpomene
+      (R .rds table).
+    kind: raw
+    grantable: true
+    modalities: [rds, survival]
+    source_paths:
+      - figshare/31081597/totalcogsurv.RDS
 
   - id: markrecapture_sightings
     description: >-
@@ -27,18 +46,95 @@ entries:
       - figshare/31081597/sightings*.rds
       - figshare/31081597/IDdata*.rds
 
-  - id: physiology_with_age
+  - id: locomotor_activity_with_age
     description: >-
-      Age-resolved physiological measurements: locomotor activity, grip strength,
-      and body-weight trajectories per species and treatment (R .rds objects).
+      Combined age-resolved locomotor activity measurements for H. hecale and
+      Dryas iulia butterflies by treatment (R .rds object).
     kind: raw
     grantable: true
-    modalities: [rds, physiology]
+    modalities: [rds, physiology, locomotor]
     source_paths:
-      - figshare/31081597/locomotordata*.rds
-      - figshare/31081597/fullGSdata*.rds
-      - figshare/31081597/*weightdata*.rds
-      - figshare/31081597/pred.new_*.rds
+      - figshare/31081597/locomotordata.rds
+
+  - id: locomotor_activity_hecale
+    description: >-
+      Age-resolved locomotor activity measurements for H. hecale butterflies
+      by treatment (R .rds object).
+    kind: raw
+    grantable: true
+    modalities: [rds, physiology, locomotor]
+    source_paths:
+      - figshare/31081597/locomotordata_H.rds
+
+  - id: locomotor_activity_dryas
+    description: >-
+      Age-resolved locomotor activity measurements for Dryas iulia butterflies
+      by treatment (R .rds object).
+    kind: raw
+    grantable: true
+    modalities: [rds, physiology, locomotor]
+    source_paths:
+      - figshare/31081597/locomotordata_D.rds
+
+  - id: gut_score_with_age
+    description: >-
+      Combined age-resolved gut score measurements for H. hecale and Dryas
+      iulia butterflies by treatment (R .rds object).
+    kind: raw
+    grantable: true
+    modalities: [rds, physiology, gut-score]
+    source_paths:
+      - figshare/31081597/fullGSdata.rds
+
+  - id: gut_score_hecale
+    description: >-
+      Age-resolved gut score measurements for H. hecale butterflies by
+      treatment (R .rds object).
+    kind: raw
+    grantable: true
+    modalities: [rds, physiology, gut-score]
+    source_paths:
+      - figshare/31081597/fullGSdata_H.rds
+
+  - id: gut_score_dryas
+    description: >-
+      Age-resolved gut score measurements for Dryas iulia butterflies by
+      treatment (R .rds object).
+    kind: raw
+    grantable: true
+    modalities: [rds, physiology, gut-score]
+    source_paths:
+      - figshare/31081597/fullGSdata_D.rds
+
+  - id: body_weight_with_age
+    description: >-
+      Combined age-resolved body-weight measurements for H. hecale and Dryas
+      iulia butterflies by treatment (R .rds object).
+    kind: raw
+    grantable: true
+    modalities: [rds, physiology, weight]
+    source_paths:
+      - figshare/31081597/fullweightdata2.rds
+
+  - id: body_weight_hecale
+    description: >-
+      Normalized age-resolved body-weight measurements for H. hecale butterflies
+      by treatment (R .rds object).
+    kind: raw
+    grantable: true
+    modalities: [rds, physiology, weight]
+    source_paths:
+      - figshare/31081597/hecaleweightdata_norm.rds
+
+  - id: body_weight_dryas
+    description: >-
+      Normalized age-resolved body-weight measurements for Dryas iulia
+      butterflies by treatment (R .rds object).
+    kind: raw
+    grantable: true
+    modalities: [rds, physiology, weight]
+    source_paths:
+      - figshare/31081597/dryasweightdata_norm.rds
 
   - id: supplementary_tables
     description: >-
@@ -73,7 +169,7 @@ entries:
       provider: figshare
       article_id: 31081597
       include: ["*.csv", "*.rds", "*.RDS", "*.tree"]
-      exclude: ["*.R", "README*", "metadata.json"]
+      exclude: ["*.R", "README*", "metadata.json", "basta_summary.rds", "pred.new_*.rds"]
 
   # ---- explicitly blocked (leak vectors) ----
   - id: author_analysis_code
@@ -83,6 +179,15 @@ entries:
     reason: R analysis scripts encode the study's methods and conclusions.
     source_paths:
       - figshare/31081597/*.R
+
+  - id: processed_analysis_outputs
+    description: Fitted survival summaries and model-predicted physiology trajectories.
+    kind: processed
+    grantable: false
+    reason: Precomputed summaries and prediction objects encode the study's analyses.
+    source_paths:
+      - figshare/31081597/basta_summary.rds
+      - figshare/31081597/pred.new_*.rds
 
   - id: dataset_readme
     description: Figshare dataset README.

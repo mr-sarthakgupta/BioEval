@@ -50,9 +50,9 @@ pip install -e .
 cp .env.example .env
 ```
 
-Set Bedrock credentials in `.env` or `~/.aws/credentials`. By default, the data-agent
-uses `us.anthropic.claude-sonnet-4-6` in `us-east-1`, matching the skydiscover Bedrock
-setup; the judge still uses `OPENAI_API_KEY` and `gpt-5.5`.
+Set Bedrock credentials in `.env` or `~/.aws/credentials`. By default, the data-agent,
+UEA, and judge all use `us.anthropic.claude-sonnet-4-6` in `us-east-1` with Bedrock
+prompt caching, matching the skydiscover Bedrock setup.
 
 ## Run One Evaluation Sandbox
 
@@ -110,10 +110,25 @@ These tools are intended for open-world analysis while preserving the blind setu
 cannot access host problem folders and should not be used to request the original paper,
 DOI, repository, author code, solution, or expected conclusions.
 
-Data requests should be specific. The data-agent is instructed to deny broad inventory
-requests such as "do you have any datasets on this topic?" or "give me all available
-data" and ask for clarification instead. Ask for concrete measurements by organism,
-sample/cohort, condition/treatment, modality, desired table columns, or file type.
+Data requests must be specific. The data-agent denies broad inventory or topic requests
+such as "do you have any datasets on this topic?", "give me all available data", or
+"survival data for a genus in captivity or field." Ask for one concrete existing dataset
+or one concrete experiment/assay output, naming the measurement, exact species/sample or
+cohort/accession, condition/treatment/environment, data type, and scope. By default the
+data-agent grants only one exact-match dataset per request and does not bundle adjacent
+tables, phylogenies, supplementary files, or public deposits merely because they may help
+with the larger task.
+
+The strict grant policy is controlled by:
+
+```bash
+BIOEVAL_STRICT_DATA_REQUESTS=1
+BIOEVAL_MAX_DATASET_GRANTS_PER_REQUEST=1
+```
+
+Set `BIOEVAL_STRICT_DATA_REQUESTS=0` only for debugging older problem catalogs. Raise
+`BIOEVAL_MAX_DATASET_GRANTS_PER_REQUEST` only when the UEA explicitly requests multiple
+named datasets, cohorts, or experiment components in a single request.
 
 The UEA image includes Python 3.11 with the scientific Python stack listed in
 `docker/Dockerfile.uea`, Rscript for `.rds` inspection, and common read-only CLI readers
@@ -208,12 +223,16 @@ Each run directory contains:
 - `TASK.md`: the UEA-visible task text for the run.
 - `uea_workspace/`: the UEA scratch workspace.
 - `data_grants/`: neutral-path data grants mounted at `/workspace/data`.
-- `data_requests.jsonl`: host-side data-agent request, planner, and grant log.
+- `data_requests.jsonl`: host-side data-agent request, planner, and grant log. This is
+  intentionally not mounted into the UEA container; it may contain evaluator-only planner
+  details about hidden holdings and grant decisions.
 - `results/terminal.typescript`: full interactive terminal I/O transcript.
 - `results/shell_commands.jsonl`: structured shell command ledger.
 - `results/tool_calls.jsonl`: UEA-side BioEval tool calls and optional `record_event` entries.
 - `results/final_answer.txt`: submitted answer.
 - `results/transcript.txt`: submitted analysis transcript.
+- `uea_workspace/uea_bedrock_trace.json`: Bedrock assistant messages plus the tool
+  outputs returned to the model for each step, useful for compact trace review.
 - `results/judge_result.json`: full judge result with metadata.
 - `results/score_history.jsonl`: append-only judge score/feedback history.
 - `logs/uea_bedrock_cost.log` and `logs/data-agent_bedrock_cost.log`: per-call Bedrock cost lines and end-of-run summaries (also printed to stderr during `bioeval-run-bedrock-uea`).
@@ -239,6 +258,19 @@ by the hidden `data_catalog.yaml` inside each problem folder.
   catalog, so the pipeline always runs.
 - Online acquisition is real (Zenodo / figshare / direct URL via `bioeval/providers.py`).
   Everything fetched still passes through the leak guard.
+- Open-world realism depends on raw-first catalogs and exact grants. Do not mark fitted
+  summaries, model predictions, figure/source-data tables, author analysis outputs, or
+  paper-specific README/metadata files as grantable raw data. Avoid whole public-deposit
+  grants unless the UEA names the specific accession/source. Catalog descriptions should
+  be neutral and sparse enough that the data-agent cannot act like an expert curator of
+  the hidden paper.
+- Search tools report diagnostics when possible. Empty results can mean no index hits,
+  Semantic Scholar rate limiting or unauthenticated search limitations, DuckDuckGo parse
+  failure, or all candidates being filtered by the blind-setup domain guard. For very new
+  papers, target-adjacent queries may fail because the paper is not indexed yet, while
+  DOI/Nature/GitHub results are intentionally blocked to preserve the blind setup. If
+  data access then compensates by handing over the decisive paper dataset, the benchmark
+  is testing curated data analysis more than open-world discovery.
 - The leak guard (`bioeval/guard.py`) is the enforced boundary. To add a new problem,
   write its `data_catalog.yaml` and a problem spec; mark code/models/results/PDFs/archives
   non-grantable and set `leak_markers` (title, authors, repo) so the guard can catch them.
