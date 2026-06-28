@@ -26,5 +26,13 @@ expected_caveats:
   - Findings from a limited set of IDRs may not generalize to all condensates.
 leak_markers:
   - "Opposing Roles of Serine and Charge"
+  - "Opposing roles of serine and charge in IDR condensate miscibility"
+  - "Sequence Composition Dictates Condensate Miscibility"
+  - "Asymmetric oligomerization state and sequence patterning can tune multiphase condensate miscibility"
+  - "Fare and Villani"
+  - "Pei et al"
+  - "Pei G"
+  - "42260147"
   - GFP12345
+  - "idr-condensate-serine-charge"
   - "s41589-026-02251-9"

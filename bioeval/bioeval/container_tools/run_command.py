@@ -25,6 +25,10 @@ BLOCKED = {
 }
 SHELL_CONTROL_TOKENS = {"|", "||", "&", "&&", ";", ">", ">>", "<", "2>", "2>>"}
 SHELL_SUBSTITUTION_PATTERNS = [re.compile(r"`"), re.compile(r"\$[({]")]
+NETWORK_ACCESS_PATTERNS = [
+    re.compile(r"https?://", re.IGNORECASE),
+    re.compile(r"\b(requests|urllib|httpx|aiohttp|socket|ftplib|httplib|curl|wget)\b", re.IGNORECASE),
+]
 
 
 def safety_error(command: str) -> str | None:
@@ -45,6 +49,10 @@ def safety_error(command: str) -> str | None:
         return f"'{exe}' is blocked"
     if exe not in ALLOWED:
         return f"'{exe}' is not allowed"
+    if exe in {"python", "python3", "Rscript"}:
+        for pattern in NETWORK_ACCESS_PATTERNS:
+            if pattern.search(command):
+                return "network access from run_command is blocked; use web_search or fetch_webpage"
     for token in tokens[1:]:
         if token.startswith("/") and not token.startswith("/workspace"):
             return "absolute paths outside /workspace are blocked"

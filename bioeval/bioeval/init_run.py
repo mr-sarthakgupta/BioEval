@@ -62,6 +62,10 @@ def main() -> None:
                 "BIOEVAL_CPUS",
                 "BIOEVAL_STRICT_DATA_REQUESTS",
                 "BIOEVAL_MAX_DATASET_GRANTS_PER_REQUEST",
+                "BIOEVAL_TRAFFIC_GUARD_ENABLED",
+                "BIOEVAL_TRAFFIC_GUARD_FAIL_CLOSED",
+                "BIOEVAL_TRAFFIC_GUARD_MODEL",
+                "BIOEVAL_TRAFFIC_GUARD_API_BASE",
             ]
         ),
         "prompt": {

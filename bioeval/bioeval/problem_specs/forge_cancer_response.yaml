@@ -25,7 +25,9 @@ expected_caveats:
   - External validation in PDX or single-cell perturbation data is largely correlational.
   - Clinical benefit cannot be concluded directly from cell-line and preclinical models.
 leak_markers:
+  - "Gene dependency-informed inference of response to targeted cancer therapies"
   - Bhattacharjee
   - FORGE
   - sreerampeela
+  - "forge-cancer-drug-response"
   - "s41467-026-73977-2"

@@ -15,6 +15,14 @@ from bioeval.catalog import load_catalog
 from bioeval.curation import GrantPlan, select_instructions_by_keywords, stage_and_grant
 from bioeval.problems import load_problem_spec
 from bioeval.run_record import append_jsonl, utc_now
+from bioeval.search_proxy import (
+    PUBLIC_GUARD_DENIAL,
+    deny_leaky_query,
+    restricted_fetch_webpage,
+    restricted_research_papers,
+    restricted_web_search,
+    traffic_guard_blocks,
+)
 from bioeval.schemas import DatasetGrant, DatasetRequest
 
 DEFAULT_DATA_AGENT_MODEL = "us.anthropic.claude-sonnet-4-6"
@@ -30,6 +38,24 @@ class DataAgentSettings(BaseModel):
     api_base: str = DEFAULT_DATA_AGENT_API_BASE
     run_id: str = "default"
     run_root: Path | None = None
+
+
+class ResearchPapersToolRequest(BaseModel):
+    operation: str
+    query: str
+    limit: int = 10
+
+
+class WebSearchToolRequest(BaseModel):
+    query: str
+    limit: int = 8
+    allowed_domain: list[str] = []
+    blocked_domain: list[str] = []
+
+
+class FetchWebpageToolRequest(BaseModel):
+    url: str
+    max_chars: int = 80000
 
 
 UEA_VISIBLE_PATHS = (
@@ -152,6 +178,61 @@ def create_app(settings: DataAgentSettings) -> FastAPI:
 
         request = request.model_copy(update={"problem_id": problem_id})
         request_id = uuid.uuid4().hex[:12]
+        identifiers = _identifiers_for(problem_id)
+        guard_model = os.getenv("BIOEVAL_TRAFFIC_GUARD_MODEL") or settings.model
+        guard_api_base = os.getenv("BIOEVAL_TRAFFIC_GUARD_API_BASE") or settings.api_base
+
+        deterministic_deny = deny_leaky_query(request.question, identifiers)
+        guard_reason = deterministic_deny or traffic_guard_blocks(
+            kind="data_request",
+            candidate={
+                "question": request.question,
+                "desired_modalities": request.desired_modalities,
+                "max_bytes": request.max_bytes,
+            },
+            identifiers=identifiers,
+            model=guard_model,
+            api_base=guard_api_base,
+        )
+        if opencode_runner.is_bedrock_api_base(guard_api_base):
+            from bioeval.bedrock_cost import finalize_cost_tracker
+
+            finalize_cost_tracker(component="traffic-guard", model=guard_model)
+        if guard_reason:
+            grant = DatasetGrant(
+                request_id=request_id,
+                status="denied",
+                message=(
+                    "This data request appears to target the held-out paper, a derivative "
+                    "work, or a source/record of it. Please ask for independently named "
+                    "measurements, cohorts, assays, or background datasets."
+                ),
+                denial_reason=f"traffic_guard: {guard_reason}",
+            )
+            if settings.run_root is not None:
+                append_jsonl(
+                    _private_audit_log_path(settings.run_root),
+                    {
+                        "event": "data_request",
+                        "timestamp": utc_now(),
+                        "run_id": settings.run_id,
+                        "problem_id": problem_id,
+                        "request_id": request_id,
+                        "data_agent_model": settings.model,
+                        "data_agent_api_base": settings.api_base,
+                        "request": request.model_dump(),
+                        "planner_error": None,
+                        "plan": {
+                            "deny": True,
+                            "deny_reason": "traffic guard blocked held-out/derivative data request",
+                            "message": PUBLIC_GUARD_DENIAL if not deterministic_deny else deterministic_deny,
+                            "instructions": [],
+                        },
+                        "grant": grant.model_dump(),
+                        "stager": {"denial_reason": grant.denial_reason},
+                    },
+                )
+            return grant
 
         planner_error = None
         try:
@@ -166,7 +247,7 @@ def create_app(settings: DataAgentSettings) -> FastAPI:
         grant = stage_and_grant(
             problem_root=problem_root,
             catalog=catalog,
-            identifiers=_identifiers_for(problem_id),
+            identifiers=identifiers,
             staging_root=settings.staging_root,
             sandbox_data_root=settings.sandbox_data_root,
             request=request,
@@ -192,9 +273,77 @@ def create_app(settings: DataAgentSettings) -> FastAPI:
                     "planner_error": planner_error,
                     "plan": _plan_record(plan),
                     "grant": grant.model_dump(),
+                    "stager": {"denial_reason": grant.denial_reason},
                 },
             )
         return grant
+
+    @app.post("/tools/research-papers")
+    def research_papers_tool(request: ResearchPapersToolRequest) -> dict:
+        problem_id = settings.default_problem_id
+        if not problem_id:
+            raise HTTPException(status_code=400, detail="No problem_id configured for data-agent.")
+        if request.operation not in {"search", "snippet_search"}:
+            raise HTTPException(status_code=400, detail="Unsupported research_papers operation.")
+        guard_model = os.getenv("BIOEVAL_TRAFFIC_GUARD_MODEL") or settings.model
+        try:
+            return restricted_research_papers(
+                operation=request.operation,
+                query=request.query,
+                limit=request.limit,
+                identifiers=_identifiers_for(problem_id),
+                guard_model=guard_model,
+                guard_api_base=os.getenv("BIOEVAL_TRAFFIC_GUARD_API_BASE") or settings.api_base,
+            )
+        finally:
+            if opencode_runner.is_bedrock_api_base(os.getenv("BIOEVAL_TRAFFIC_GUARD_API_BASE") or settings.api_base):
+                from bioeval.bedrock_cost import finalize_cost_tracker
+
+                finalize_cost_tracker(component="traffic-guard", model=guard_model)
+
+    @app.post("/tools/web-search")
+    def web_search_tool(request: WebSearchToolRequest) -> dict:
+        problem_id = settings.default_problem_id
+        if not problem_id:
+            raise HTTPException(status_code=400, detail="No problem_id configured for data-agent.")
+        guard_model = os.getenv("BIOEVAL_TRAFFIC_GUARD_MODEL") or settings.model
+        try:
+            return restricted_web_search(
+                query=request.query,
+                limit=request.limit,
+                allowed_domain=request.allowed_domain,
+                blocked_domain=request.blocked_domain,
+                identifiers=_identifiers_for(problem_id),
+                guard_model=guard_model,
+                guard_api_base=os.getenv("BIOEVAL_TRAFFIC_GUARD_API_BASE") or settings.api_base,
+            )
+        finally:
+            if opencode_runner.is_bedrock_api_base(os.getenv("BIOEVAL_TRAFFIC_GUARD_API_BASE") or settings.api_base):
+                from bioeval.bedrock_cost import finalize_cost_tracker
+
+                finalize_cost_tracker(component="traffic-guard", model=guard_model)
+
+    @app.post("/tools/fetch-webpage")
+    def fetch_webpage_tool(request: FetchWebpageToolRequest) -> dict:
+        problem_id = settings.default_problem_id
+        if not problem_id:
+            raise HTTPException(status_code=400, detail="No problem_id configured for data-agent.")
+        guard_model = os.getenv("BIOEVAL_TRAFFIC_GUARD_MODEL") or settings.model
+        try:
+            return restricted_fetch_webpage(
+                url=request.url,
+                max_chars=request.max_chars,
+                identifiers=_identifiers_for(problem_id),
+                guard_model=guard_model,
+                guard_api_base=os.getenv("BIOEVAL_TRAFFIC_GUARD_API_BASE") or settings.api_base,
+            )
+        except Exception as exc:  # noqa: BLE001 - preserve tool-style errors
+            return {"status": "error", "error": str(exc)}
+        finally:
+            if opencode_runner.is_bedrock_api_base(os.getenv("BIOEVAL_TRAFFIC_GUARD_API_BASE") or settings.api_base):
+                from bioeval.bedrock_cost import finalize_cost_tracker
+
+                finalize_cost_tracker(component="traffic-guard", model=guard_model)
 
     return app
 

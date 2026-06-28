@@ -3,55 +3,24 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import html
+import os
 import re
 import sys
-from html.parser import HTMLParser
 
 import requests
 
 from bioeval_tool_common import (
     REFERENCE_DIR,
     append_tool_event,
-    blocked_url_reason,
     relative_workspace_path,
     truncate,
 )
 
-USER_AGENT = (
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-    "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-)
+DATA_AGENT_URL = os.getenv("DATA_AGENT_URL", "http://data-agent:8765/request-data")
 
 
-class TextExtractor(HTMLParser):
-    skip_tags = {"script", "style", "noscript", "head", "nav", "footer", "header", "aside", "svg"}
-
-    def __init__(self) -> None:
-        super().__init__(convert_charrefs=True)
-        self.skip_depth = 0
-        self.parts: list[str] = []
-
-    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        if self.skip_depth or tag.lower() in self.skip_tags:
-            self.skip_depth += 1
-        elif tag.lower() in {"p", "div", "section", "article", "li", "br", "h1", "h2", "h3", "tr"}:
-            self.parts.append("\n")
-
-    def handle_endtag(self, tag: str) -> None:
-        if self.skip_depth:
-            self.skip_depth -= 1
-        elif tag.lower() in {"p", "div", "section", "article", "li", "h1", "h2", "h3", "tr"}:
-            self.parts.append("\n")
-
-    def handle_data(self, data: str) -> None:
-        if not self.skip_depth:
-            self.parts.append(data)
-
-    def text(self) -> str:
-        text = html.unescape("".join(self.parts))
-        text = re.sub(r"[ \t]+", " ", text)
-        return re.sub(r"\n{3,}", "\n\n", text).strip()
+def proxy_url(path: str) -> str:
+    return DATA_AGENT_URL.rsplit("/", 1)[0] + path
 
 
 def slug(url: str) -> str:
@@ -66,34 +35,32 @@ def main() -> int:
     parser.add_argument("--max-chars", type=int, default=80000)
     args = parser.parse_args()
     request = vars(args)
-    reason = blocked_url_reason(args.url)
-    if reason:
-        response = {"error": reason}
-        append_tool_event("fetch_webpage", request, response, "denied")
-        print(f"Denied: {reason}", file=sys.stderr)
-        return 2
     try:
-        resp = requests.get(args.url, headers={"User-Agent": USER_AGENT}, timeout=30, allow_redirects=True)
+        resp = requests.post(
+            proxy_url("/tools/fetch-webpage"),
+            json={"url": args.url, "max_chars": args.max_chars},
+            timeout=90,
+        )
         resp.raise_for_status()
-        content_type = resp.headers.get("Content-Type", "")
-        if "pdf" in content_type or "octet-stream" in content_type:
-            raise ValueError("binary/PDF content is not fetchable through this text tool")
-        if "html" in content_type or not content_type:
-            extractor = TextExtractor()
-            extractor.feed(resp.text)
-            text = extractor.text()
-        else:
-            text = resp.text
-        text = truncate(text, args.max_chars)
+        result = resp.json()
+        if result.get("status") == "denied":
+            append_tool_event("fetch_webpage", request, result, "denied")
+            print(f"Denied: {result.get('error', 'blocked by blind-setup fetch filter')}", file=sys.stderr)
+            return 2
+        if result.get("status") == "error":
+            raise ValueError(result.get("error", "fetch failed"))
+        text = truncate(result.get("text", ""), args.max_chars)
+        fetched_url = result.get("url", args.url)
+        content_type = result.get("content_type", "")
         REFERENCE_DIR.mkdir(parents=True, exist_ok=True)
-        path = REFERENCE_DIR / f"web_{slug(args.url)}.txt"
+        path = REFERENCE_DIR / f"web_{slug(fetched_url)}.txt"
         path.write_text(
-            f"# Fetched page: {args.url}\n# Content-Type: {content_type}\n\n{text}\n",
+            f"# Fetched page: {fetched_url}\n# Content-Type: {content_type}\n\n{text}\n",
             encoding="utf-8",
             errors="replace",
         )
         rel = relative_workspace_path(path)
-        response = {"saved_path": rel, "url": args.url, "chars": len(text)}
+        response = {"saved_path": rel, "url": fetched_url, "chars": len(text)}
         append_tool_event("fetch_webpage", request, response, "ok")
         print(f"Saved to: {rel}")
         print(f"Use: read_file {rel}")

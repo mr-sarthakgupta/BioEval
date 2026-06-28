@@ -126,6 +126,17 @@ BIOEVAL_STRICT_DATA_REQUESTS=1
 BIOEVAL_MAX_DATASET_GRANTS_PER_REQUEST=1
 ```
 
+Search and page-fetch tools are proxied through the host-side data-agent. Deterministic
+domain and hidden-marker filters run first; then a traffic guard-agent reviews any
+remaining query/result/page. Its instruction is to block the held-out paper, preprints,
+repositories, data deposits, records, summaries, and derivative works, while allowing
+independent predecessor/background literature and datasets. For benchmark runs keep:
+
+```bash
+BIOEVAL_TRAFFIC_GUARD_ENABLED=1
+BIOEVAL_TRAFFIC_GUARD_FAIL_CLOSED=1
+```
+
 Set `BIOEVAL_STRICT_DATA_REQUESTS=0` only for debugging older problem catalogs. Raise
 `BIOEVAL_MAX_DATASET_GRANTS_PER_REQUEST` only when the UEA explicitly requests multiple
 named datasets, cohorts, or experiment components in a single request.

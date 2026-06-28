@@ -26,8 +26,13 @@ expected_caveats:
   - Model selection depends on the chosen model family and the available constraints.
   - Several rate constants are inferred indirectly rather than measured directly.
 leak_markers:
+  - "A minimal chemo-mechanical Markov model for rotary catalysis of F1-ATPase"
+  - "Towards a minimal Markov model for rotary catalysis of F1-ATPase"
   - Grubmuller
   - "Grubmüller"
+  - "Chen & Grubmuller"
+  - "Chen and Grubmüller"
   - MarkovianF1
   - YixinChen95
+  - "f1-atpase-markov-model"
   - "s41467-026-73844-0"

@@ -205,7 +205,18 @@ def _tokens(text: str) -> set[str]:
 
 def is_inventory_request(question: str) -> bool:
     """Return True for broad catalog-discovery requests that should be clarified."""
-    return bool(INVENTORY_REQUEST_RE.search(question))
+    if not INVENTORY_REQUEST_RE.search(question):
+        return False
+
+    # "Do you have X measurements for Y under Z?" is phrased as a question, but
+    # it is not catalog discovery. Treat inventory language as broad only when the
+    # request lacks enough concrete scientific scope for a grant decision.
+    text = question.strip()
+    has_measurement = bool(MEASUREMENT_RE.search(text))
+    has_scope = _has_specific_scope(text)
+    has_context = bool(CONDITION_RE.search(text) or DATA_TYPE_RE.search(text))
+    asks_experiment = bool(re.search(r"\b(experiment|assay|measure|test|derive|generate|compare)\b", text, re.I))
+    return not (has_measurement and has_scope and (has_context or asks_experiment))
 
 
 def is_public_source_request(question: str) -> bool:
@@ -767,10 +778,21 @@ def stage_and_grant(
     plan: GrantPlan,
 ) -> DatasetGrant:
     if plan.deny or DENIED_RE.search(request.question):
-        return DatasetGrant(request_id=request_id, status="denied", message=generic_denial_message())
+        reason = "planner_denied" if plan.deny else "restricted_request_terms"
+        return DatasetGrant(
+            request_id=request_id,
+            status="denied",
+            message=generic_denial_message(),
+            denial_reason=reason,
+        )
     issue = specificity_issue(request)
     if issue:
-        return DatasetGrant(request_id=request_id, status="denied", message=issue)
+        return DatasetGrant(
+            request_id=request_id,
+            status="denied",
+            message=issue,
+            denial_reason=f"specificity_issue: {issue}",
+        )
 
     notes: list[str] = []
     tmp_root = Path(tempfile.mkdtemp(prefix=f"bioeval_stage_{request_id}_"))
@@ -879,6 +901,13 @@ def stage_and_grant(
             request_id=request_id,
             status=status,
             message=message,
+            denial_reason=(
+                "no_files_survived_staging"
+                if not granted_files and notes
+                else "no_exact_grantable_match"
+                if not granted_files
+                else None
+            ),
             files=granted_files,
             rejected=rejected_notes,
             manifest_path=(

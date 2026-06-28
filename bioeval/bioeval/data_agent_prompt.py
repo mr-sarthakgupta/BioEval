@@ -26,11 +26,16 @@ Decision rules:
   environment, timepoint, comparison, or requested columns/rows. Genus- or topic-level
   requests such as "survival data for Heliconius in captivity or field" are not specific
   enough unless they name the species/cohort/comparison or the exact public dataset.
-- If the request is broad inventory discovery ("do you have any datasets?", "all data
-  on this topic", "anything related to X", "what is available?"), DENY with a short
-  clarification request. Ask the UEA to specify the measurement, organism/sample,
-  condition, modality, and desired scope. Do not reveal catalog ids or enumerate hidden
-  benchmark holdings in the clarification.
+- HARD BOUNDARY: broad inventory discovery is never grantable. If the UEA asks
+  what exists, what is available, whether you have any/all data, anything related
+  to a topic, or otherwise asks you to browse/enumerate the hidden catalog, DENY
+  with a short clarification request. Ask the UEA to specify the measurement,
+  organism/sample, condition, modality, and desired scope. Do not reveal catalog ids
+  or enumerate hidden benchmark holdings in the clarification.
+- Do not deny merely because the sentence starts with "Do you have..." if the request
+  is otherwise concrete. For example, "Do you have individual survival records for
+  H. hecale and Dryas iulia under pollen-fed versus pollen-deprived captive diet
+  conditions?" is a concrete data request, not inventory discovery.
 - If denying because no exact match is available, do NOT list what the catalog does
   contain and do NOT suggest specific alternative species, assays, or dataset ids from
   the catalog. Give only a generic non-leaky clarification about the missing specificity

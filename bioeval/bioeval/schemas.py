@@ -110,6 +110,11 @@ class DatasetGrant(BaseModel):
     request_id: str
     status: Literal["granted", "partial", "denied"]
     message: str
+    denial_reason: str | None = Field(
+        default=None,
+        exclude=True,
+        description="Non-leaky policy reason when a request is denied before files are granted.",
+    )
     files: list[GrantedFile] = Field(default_factory=list)
     rejected: list[str] = Field(
         default_factory=list,
