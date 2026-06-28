@@ -21,7 +21,7 @@ def main() -> None:
     )
     print("  web_search QUERY                               Search web with blind-setup blocks and academic fallback.")
     print("  research_papers search --query QUERY           Search scientific literature metadata.")
-    print("  research_papers snippet_search --query QUERY   Search paper passages with fallback.")
+    print("  research_papers snippet_search --query QUERY   Search paper abstract excerpts with fallback.")
     print("  fetch_webpage URL                              Fetch allowed pages into reference/.")
     print("  run_command COMMAND                            Run constrained read-only commands.")
     print("  check_space            Show disk usage against your budget.")

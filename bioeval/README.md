@@ -98,11 +98,11 @@ The UEA also has SkyDiscover-style exploration tools, all recorded automatically
 - `read_file PATH [--line-start N --line-end M]`: read files under `/workspace`.
 - `search PATTERN [--file-glob GLOB]`: regex search files under `/workspace`.
 - `web_search QUERY`: search the web, with paper/repo/DOI/solution requests blocked
-  and a Semantic Scholar fallback when DuckDuckGo returns nothing.
+  and an OpenAlex fallback when DuckDuckGo returns nothing.
 - `research_papers search --query QUERY`: search scientific literature metadata for
   background methods and related datasets, with direct target-paper retrieval blocked.
-- `research_papers snippet_search --query QUERY`: search literature passages, falling
-  back to metadata search when the snippet endpoint is unavailable or rate-limited.
+- `research_papers snippet_search --query QUERY`: search literature abstract excerpts,
+  falling back to metadata search when excerpts are unavailable.
 - `fetch_webpage URL`: fetch allowed pages into `/workspace/reference`.
 - `run_command COMMAND`: run constrained read-only commands in `/workspace`.
 
@@ -276,7 +276,7 @@ by the hidden `data_catalog.yaml` inside each problem folder.
   be neutral and sparse enough that the data-agent cannot act like an expert curator of
   the hidden paper.
 - Search tools report diagnostics when possible. Empty results can mean no index hits,
-  Semantic Scholar rate limiting or unauthenticated search limitations, DuckDuckGo parse
+  OpenAlex rate limiting or authentication limitations, DuckDuckGo parse
   failure, or all candidates being filtered by the blind-setup domain guard. For very new
   papers, target-adjacent queries may fail because the paper is not indexed yet, while
   DOI/Nature/GitHub results are intentionally blocked to preserve the blind setup. If

@@ -45,7 +45,7 @@ def main() -> int:
         result = resp.json()
         if result.get("status") == "denied":
             append_tool_event("fetch_webpage", request, result, "denied")
-            print(f"Denied: {result.get('error', 'blocked by blind-setup fetch filter')}", file=sys.stderr)
+            print(f"Denied: {result.get('error', 'No results found.')}", file=sys.stderr)
             return 2
         if result.get("status") == "error":
             raise ValueError(result.get("error", "fetch failed"))

@@ -77,8 +77,8 @@ def relative_workspace_path(path: Path) -> str:
 def deny_leaky_query(text: str) -> str | None:
     if DENIED_QUERY_RE.search(text):
         return (
-            "Denied: this benchmark cannot request papers, repositories, DOIs, author code, "
-            "solutions, or expected conclusions. Ask for general background, methods, or data."
+            "This request cannot be fulfilled. Please ask for general background, "
+            "methods, or specific data instead."
         )
     return None
 
@@ -96,5 +96,5 @@ def blocked_url_reason(url: str) -> str | None:
     extra = os.getenv("BIOEVAL_BLOCKED_WEB_DOMAINS", "")
     blocked.update(domain.strip().lower() for domain in extra.split(",") if domain.strip())
     if host_matches(url, blocked):
-        return "URL domain is blocked to preserve the blind setup."
+        return "This URL cannot be fetched."
     return None

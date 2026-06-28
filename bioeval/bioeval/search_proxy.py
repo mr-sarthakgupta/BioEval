@@ -7,9 +7,8 @@ import os
 import re
 import time
 import unicodedata
-from collections import deque
+import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
-from threading import Lock
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import requests
@@ -26,11 +25,17 @@ USER_AGENT = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 )
-S2_API = "https://api.semanticscholar.org"
-S2_API_KEY = os.getenv("S2_API_KEY")
-S2_HEADERS = {"x-api-key": S2_API_KEY} if S2_API_KEY else {}
-_S2_UNAUTH_CALLS: deque[float] = deque()
-_S2_RATE_LIMIT_LOCK = Lock()
+FETCH_HEADERS = {
+    "User-Agent": USER_AGENT,
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,text/plain;q=0.8,*/*;q=0.5",
+    "Accept-Language": "en-US,en;q=0.9",
+}
+OPENALEX_API = "https://api.openalex.org"
+OPENALEX_API_KEY_FILE = os.getenv("OPENALEX_API_KEY_FILE", "/home/mrsar/openalex_key.txt")
+OPENALEX_WORK_SELECT = (
+    "id,doi,title,display_name,publication_year,primary_location,"
+    "cited_by_count,ids,abstract_inverted_index"
+)
 
 DENIED_QUERY_RE = re.compile(
     r"\b(paper|manuscript|article|authors'? code|source code|github|repository|"
@@ -60,7 +65,7 @@ summarizes, identifies, or retrieves:
   repository, author code, trained model, README, metadata, or record page;
 - a derivative of the held-out work, including preprint versions, conference abstracts, dataset
   records for that paper, repository mirrors/forks, author/project pages about that paper, press
-  releases, news/blog/social posts, Semantic Scholar/PubMed/Europe PMC records, citation pages,
+  releases, news/blog/social posts, OpenAlex/PubMed/Europe PMC records, citation pages,
   review snippets, or any search result that reveals the title, authors, identifiers, central
   claims, or paper-specific datasets of the held-out work;
 - a source that would let the research agent directly navigate to the held-out work or its
@@ -144,7 +149,7 @@ TRAFFIC_GUARD_TYPE_INSTRUCTIONS = {
     "web_search_result": (
         "Review one web-search result before showing it to the research agent. BLOCK if "
         "the title or URL points to the held-out paper, preprint, journal landing page, "
-        "PubMed/PMC/Semantic Scholar/Europe PMC/citation page, public data deposit, source "
+        "PubMed/PMC/OpenAlex/Europe PMC/citation page, public data deposit, source "
         "data, author repository, press/news/social derivative, or any page revealing the "
         "held-out title, authors, identifiers, or conclusions. ALLOW independent background "
         "resources, database documentation, methods pages, and predecessor work. At this "
@@ -173,10 +178,7 @@ TRAFFIC_GUARD_TYPE_INSTRUCTIONS = {
 
 _GUARD_DECISION_CACHE: dict[str, dict[str, str]] = {}
 _GUARD_TEXT_RESOURCES: dict[str, str] = {}
-PUBLIC_GUARD_DENIAL = (
-    "Denied by traffic guard: candidate appears to target the held-out work "
-    "or a derivative/source of it."
-)
+PUBLIC_GUARD_DENIAL = "No results found."
 
 
 class LinkParser(HTMLParser):
@@ -209,6 +211,22 @@ class LinkParser(HTMLParser):
 
 class TextExtractor(HTMLParser):
     skip_tags = {"script", "style", "noscript", "head", "nav", "footer", "header", "aside", "svg"}
+    void_tags = {
+        "area",
+        "base",
+        "br",
+        "col",
+        "embed",
+        "hr",
+        "img",
+        "input",
+        "link",
+        "meta",
+        "param",
+        "source",
+        "track",
+        "wbr",
+    }
 
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
@@ -216,9 +234,18 @@ class TextExtractor(HTMLParser):
         self.parts: list[str] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        if self.skip_depth or tag.lower() in self.skip_tags:
+        tag = tag.lower()
+        if tag in self.void_tags:
+            if not self.skip_depth and tag == "br":
+                self.parts.append("\n")
+            return
+        if self.skip_depth or tag in self.skip_tags:
             self.skip_depth += 1
-        elif tag.lower() in {"p", "div", "section", "article", "li", "br", "h1", "h2", "h3", "tr"}:
+        elif tag in {"p", "div", "section", "article", "li", "h1", "h2", "h3", "tr"}:
+            self.parts.append("\n")
+
+    def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if not self.skip_depth and tag.lower() == "br":
             self.parts.append("\n")
 
     def handle_endtag(self, tag: str) -> None:
@@ -629,14 +656,11 @@ def traffic_guard_blocks(
 
 def deny_leaky_query(text: str, identifiers: list[str]) -> str | None:
     if contains_hidden_identifier(text, identifiers):
-        return (
-            "Denied: this query targets the held-out paper or a derivative work. "
-            "Ask for broader background, methods, or independently named data."
-        )
+        return PUBLIC_GUARD_DENIAL
     if DENIED_QUERY_RE.search(text):
         return (
-            "Denied: this benchmark cannot request papers, repositories, DOIs, author code, "
-            "solutions, or expected conclusions. Ask for general background, methods, or data."
+            "This request cannot be fulfilled. Please ask for general background, "
+            "methods, or specific data instead."
         )
     return None
 
@@ -651,12 +675,12 @@ def blocked_url_reason(url: str, identifiers: list[str]) -> str | None:
     if parsed.scheme not in {"http", "https"} or not parsed.netloc:
         return "URL must be http(s)."
     if contains_hidden_identifier(url, identifiers):
-        return "URL targets the held-out paper or a derivative work."
+        return PUBLIC_GUARD_DENIAL
     blocked = set(DEFAULT_BLOCKED_DOMAINS)
     extra = os.getenv("BIOEVAL_BLOCKED_WEB_DOMAINS", "")
     blocked.update(domain.strip().lower() for domain in extra.split(",") if domain.strip())
     if host_matches(url, blocked):
-        return "URL domain is blocked to preserve the blind setup."
+        return "This URL cannot be fetched."
     return None
 
 
@@ -679,32 +703,108 @@ def duckduckgo_search_url(query: str) -> str:
     return urlunparse(parsed._replace(query=urlencode({"q": query})))
 
 
-def wait_for_s2_rate_limit_slot() -> None:
-    """Throttle unauthenticated Semantic Scholar calls to avoid 429 churn."""
-    if S2_API_KEY:
-        return
-    limit = int(os.getenv("S2_UNAUTH_RATE_LIMIT", "100"))
-    window_seconds = float(os.getenv("S2_UNAUTH_RATE_WINDOW_SECONDS", "300"))
-    if limit <= 0 or window_seconds <= 0:
-        return
-
-    while True:
-        with _S2_RATE_LIMIT_LOCK:
-            now = time.monotonic()
-            while _S2_UNAUTH_CALLS and now - _S2_UNAUTH_CALLS[0] >= window_seconds:
-                _S2_UNAUTH_CALLS.popleft()
-            if len(_S2_UNAUTH_CALLS) < limit:
-                _S2_UNAUTH_CALLS.append(now)
-                return
-            sleep_for = max(0.1, window_seconds - (now - _S2_UNAUTH_CALLS[0]))
-        time.sleep(sleep_for)
+def pmc_eutils_url(url: str) -> str | None:
+    parsed = urlparse(url)
+    if parsed.netloc not in {"pmc.ncbi.nlm.nih.gov", "www.ncbi.nlm.nih.gov"}:
+        return None
+    match = re.search(r"/(?:pmc/)?articles/(PMC\d+)/?", parsed.path, flags=re.IGNORECASE)
+    if not match:
+        return None
+    pmc_numeric_id = match.group(1)[3:]
+    return "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?" + urlencode(
+        {"db": "pmc", "id": pmc_numeric_id, "retmode": "xml"}
+    )
 
 
-def s2_get(path: str, params: dict, *, timeout: int = 20) -> tuple[dict | None, str | None]:
-    url = f"{S2_API}{path}"
+def looks_like_bot_challenge(text: str) -> bool:
+    sample = (text or "")[:10000].lower()
+    return any(
+        marker in sample
+        for marker in (
+            "checking your browser",
+            "just a moment",
+            "enable javascript and cookies",
+            "verify you are human",
+            "cloudflare",
+        )
+    )
+
+
+def xml_local_name(tag: str) -> str:
+    return tag.rsplit("}", 1)[-1]
+
+
+def element_text(element: ET.Element) -> str:
+    return re.sub(r"\s+", " ", " ".join(element.itertext())).strip()
+
+
+def find_first(element: ET.Element, name: str) -> ET.Element | None:
+    for child in element.iter():
+        if xml_local_name(child.tag) == name:
+            return child
+    return None
+
+
+def extract_nlm_xml_text(xml_text: str) -> str:
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError:
+        return ""
+
+    parts: list[str] = []
+    title = find_first(root, "article-title")
+    if title is not None:
+        title_text = element_text(title)
+        if title_text:
+            parts.append(title_text)
+
+    abstract = find_first(root, "abstract")
+    if abstract is not None:
+        abstract_parts = [element_text(p) for p in abstract.iter() if xml_local_name(p.tag) == "p"]
+        abstract_text = "\n".join(part for part in abstract_parts if part) or element_text(abstract)
+        if abstract_text:
+            parts.extend(["Abstract", abstract_text])
+
+    body = find_first(root, "body")
+    if body is not None:
+        for element in body.iter():
+            tag = xml_local_name(element.tag)
+            if tag == "title":
+                text = element_text(element)
+                if text:
+                    parts.append(text)
+            elif tag == "p":
+                text = element_text(element)
+                if text:
+                    parts.append(text)
+
+    return "\n\n".join(parts).strip()
+
+
+def openalex_web_search_url(title: str) -> str:
+    return "https://openalex.org/works?" + urlencode({"filter": f"title.search:{title}"})
+
+
+def openalex_api_key() -> str | None:
+    key = os.getenv("OPENALEX_API_KEY")
+    if key:
+        return key.strip()
+    try:
+        with open(OPENALEX_API_KEY_FILE, encoding="utf-8") as key_file:
+            return key_file.read().strip() or None
+    except OSError:
+        return None
+
+
+def openalex_get(path: str, params: dict, *, timeout: int = 20) -> tuple[dict | None, str | None]:
+    api_key = openalex_api_key()
+    if not api_key:
+        return None, "OPENALEX_API_KEY is not set and no OpenAlex key file is readable"
+    url = f"{OPENALEX_API}{path}"
+    request_params = {**params, "api_key": api_key}
+    headers = {"User-Agent": USER_AGENT, "Accept": "application/json"}
     for attempt in range(3):
-        wait_for_s2_rate_limit_slot()
-        resp = requests.get(url, params=params, headers=S2_HEADERS, timeout=timeout)
+        resp = requests.get(url, params=request_params, headers=headers, timeout=timeout)
         if resp.status_code == 429 and attempt < 2:
             time.sleep(5)
             continue
@@ -720,41 +820,77 @@ def s2_get(path: str, params: dict, *, timeout: int = 20) -> tuple[dict | None, 
     return None, f"{path} returned repeated server errors"
 
 
-def semantic_scholar_search(query: str, limit: int) -> tuple[list[dict], list[str]]:
-    params = {
-        "query": query,
-        "limit": max(1, min(limit, 20)),
-        "fields": "title,year,venue,abstract,citationCount,externalIds,tldr",
+def abstract_from_inverted_index(index: dict | None) -> str:
+    if not isinstance(index, dict):
+        return ""
+    positioned_words: list[tuple[int, str]] = []
+    for word, positions in index.items():
+        if not isinstance(positions, list):
+            continue
+        for position in positions:
+            if isinstance(position, int):
+                positioned_words.append((position, str(word)))
+    return " ".join(word for _, word in sorted(positioned_words))
+
+
+def openalex_external_ids(work: dict) -> dict[str, str]:
+    ids = work.get("ids") or {}
+    external_ids: dict[str, str] = {}
+    if work.get("id"):
+        external_ids["OpenAlex"] = str(work["id"])
+    doi = work.get("doi") or ids.get("doi")
+    if doi:
+        external_ids["DOI"] = str(doi)
+    if ids.get("pmid"):
+        external_ids["PMID"] = str(ids["pmid"])
+    if ids.get("pmcid"):
+        external_ids["PMCID"] = str(ids["pmcid"])
+    return external_ids
+
+
+def normalize_openalex_work(work: dict) -> dict:
+    primary_location = work.get("primary_location") or {}
+    source = primary_location.get("source") or {}
+    return {
+        "title": work.get("title") or work.get("display_name") or "",
+        "year": work.get("publication_year"),
+        "venue": source.get("display_name") or "",
+        "abstract": abstract_from_inverted_index(work.get("abstract_inverted_index")),
+        "citationCount": work.get("cited_by_count", 0),
+        "externalIds": openalex_external_ids(work),
+        "openalexId": work.get("id") or "",
+        "url": work.get("id") or "",
+        "landingPageUrl": primary_location.get("landing_page_url") or "",
     }
-    diagnostics: list[str] = []
-    data, error = s2_get("/graph/v1/paper/search", params)
-    if data and data.get("data"):
-        return data.get("data", []), diagnostics
-    diagnostics.append(error or "/graph/v1/paper/search returned 0 results")
-    data, error = s2_get("/graph/v1/paper/search/bulk", params)
-    if data and data.get("data"):
-        return data.get("data", []), diagnostics
-    diagnostics.append(error or "/graph/v1/paper/search/bulk returned 0 results")
-    if not S2_API_KEY:
-        diagnostics.append("S2_API_KEY is not set; unauthenticated Semantic Scholar searches may be rate-limited")
-    return [], diagnostics
 
 
-def semantic_scholar_snippets(query: str, limit: int) -> tuple[list[dict], list[str]]:
-    data, error = s2_get(
-        "/graph/v1/snippet/search",
+def openalex_search(query: str, limit: int) -> tuple[list[dict], list[str]]:
+    params = {
+        "search": query,
+        "per_page": max(1, min(limit, 20)),
+        "select": OPENALEX_WORK_SELECT,
+    }
+    data, error = openalex_get("/works", params)
+    if data and data.get("results"):
+        return [normalize_openalex_work(work) for work in data.get("results", [])], []
+    return [], [error or "/works returned 0 results"]
+
+
+def openalex_snippets(query: str, limit: int) -> tuple[list[dict], list[str]]:
+    papers, diagnostics = openalex_search(query, limit)
+    snippets = [
         {
-            "query": query,
-            "limit": max(1, min(limit, 20)),
-            "fields": "title,externalIds,year,citationCount",
-        },
-    )
-    if data and data.get("data"):
-        return data.get("data", []), []
-    diagnostics = [error or "/graph/v1/snippet/search returned 0 results"]
-    if not S2_API_KEY:
-        diagnostics.append("S2_API_KEY is not set; unauthenticated Semantic Scholar searches may be rate-limited")
-    return [], diagnostics
+            "paper": paper,
+            "snippet": {
+                "text": paper.get("abstract") or "",
+                "section": "Abstract (OpenAlex metadata)",
+            },
+        }
+        for paper in papers
+        if paper.get("abstract")
+    ]
+    diagnostics.append("OpenAlex does not provide passage snippets; using abstract excerpts when available.")
+    return snippets, diagnostics
 
 
 def paper_matches_hidden_work(paper: dict, identifiers: list[str]) -> bool:
@@ -762,7 +898,6 @@ def paper_matches_hidden_work(paper: dict, identifiers: list[str]) -> bool:
     fields = [
         paper.get("title") or "",
         paper.get("abstract") or "",
-        (paper.get("tldr") or {}).get("text") or "",
         " ".join(str(v) for v in ext.values() if v),
     ]
     return contains_hidden_identifier("\n".join(fields), identifiers)
@@ -791,10 +926,9 @@ def format_results(papers: list[dict], query: str, diagnostics: list[str] | None
         year = paper.get("year") or "?"
         venue = paper.get("venue") or ""
         cites = paper.get("citationCount", 0)
-        tldr = (paper.get("tldr") or {}).get("text") or ""
         abstract = paper.get("abstract") or ""
-        summary = tldr or abstract[:500]
-        search_link = "https://www.semanticscholar.org/search?" + urlencode({"q": title})
+        summary = abstract[:500]
+        search_link = paper.get("url") or openalex_web_search_url(title)
         lines.append(f"\n## {idx}. {title}")
         lines.append(f"Year: {year} | Venue: {venue or 'unknown'} | Citations: {cites}")
         lines.append(search_link)
@@ -809,7 +943,7 @@ def format_snippets(snippets: list[dict], query: str, diagnostics: list[str] | N
         if diagnostics:
             suffix = "\nDiagnostics:\n" + "\n".join(f"- {item}" for item in diagnostics)
         return f"No snippets found for {query!r}.{suffix}"
-    lines = [f"# Snippet search results for {query!r}"]
+    lines = [f"# Abstract excerpt search results for {query!r}"]
     for idx, item in enumerate(snippets, start=1):
         paper = item.get("paper") or {}
         title = paper.get("title") or "(untitled)"
@@ -849,7 +983,7 @@ def restricted_research_papers(
     if guard_reason:
         return {"status": "denied", "error": PUBLIC_GUARD_DENIAL}
     if operation == "snippet_search":
-        snippets, diagnostics = semantic_scholar_snippets(query, limit)
+        snippets, diagnostics = openalex_snippets(query, limit)
         filtered = []
         blocked_by_guard_agent = 0
         for item in snippets:
@@ -875,7 +1009,7 @@ def restricted_research_papers(
                     "section": snippet.get("section") or "",
                     "text_resource": make_guard_text_resource(
                         snippet_text,
-                        "Semantic Scholar snippet result metadata and passage text.",
+                        "OpenAlex work metadata and abstract excerpt.",
                     ),
                 },
                 identifiers=identifiers,
@@ -887,9 +1021,9 @@ def restricted_research_papers(
                 continue
             filtered.append(item)
         if snippets and not filtered:
-            diagnostics.append("Target-paper or derivative results were omitted by the blind-setup filter.")
+            diagnostics.append("Some results were filtered and are not available.")
         if blocked_by_guard_agent:
-            diagnostics.append(f"Traffic guard omitted {blocked_by_guard_agent} target-paper or derivative results.")
+            diagnostics.append(f"{blocked_by_guard_agent} result(s) were filtered.")
         if filtered:
             return {
                 "status": "ok",
@@ -898,7 +1032,7 @@ def restricted_research_papers(
                 "diagnostics": diagnostics,
                 "content": format_snippets(filtered, query),
             }
-    papers, diagnostics = semantic_scholar_search(query, limit)
+    papers, diagnostics = openalex_search(query, limit)
     filtered = []
     blocked_by_guard_agent = 0
     for paper in papers:
@@ -909,7 +1043,6 @@ def restricted_research_papers(
                 paper.get("title") or "",
                 paper.get("venue") or "",
                 " ".join(str(v) for v in (paper.get("externalIds") or {}).values() if v),
-                (paper.get("tldr") or {}).get("text") or "",
                 paper.get("abstract") or "",
             ]
         )
@@ -921,11 +1054,10 @@ def restricted_research_papers(
                 "year": paper.get("year"),
                 "venue": paper.get("venue") or "",
                 "external_ids": paper.get("externalIds") or {},
-                "tldr": (paper.get("tldr") or {}).get("text") or "",
                 "abstract": (paper.get("abstract") or "")[:1200],
                 "text_resource": make_guard_text_resource(
                     paper_text,
-                    "Semantic Scholar paper result title, identifiers, TLDR, and abstract.",
+                    "OpenAlex paper result title, identifiers, venue, and abstract.",
                 ),
             },
             identifiers=identifiers,
@@ -937,9 +1069,9 @@ def restricted_research_papers(
             continue
         filtered.append(paper)
     if papers and not filtered:
-        diagnostics.append("Target-paper or derivative results were omitted by the blind-setup filter.")
+        diagnostics.append("Some results were filtered and are not available.")
     if blocked_by_guard_agent:
-        diagnostics.append(f"Traffic guard omitted {blocked_by_guard_agent} target-paper or derivative results.")
+        diagnostics.append(f"{blocked_by_guard_agent} result(s) were filtered.")
     return {
         "status": "ok",
         "operation": operation,
@@ -993,19 +1125,19 @@ def restricted_web_search(
         time.sleep(1)
 
     duckduckgo_count = len(rows)
-    used_s2_fallback = False
+    used_openalex_fallback = False
     if not rows:
         diagnostics.append(f"DuckDuckGo search failed: {duckduckgo_error}" if duckduckgo_error else "DuckDuckGo returned 0 parsable external results")
-        papers, s2_diagnostics = semantic_scholar_search(query, limit)
-        diagnostics.extend(s2_diagnostics)
+        papers, openalex_diagnostics = openalex_search(query, limit)
+        diagnostics.extend(openalex_diagnostics)
         rows = [
             {
                 "title": paper.get("title") or "",
-                "url": "https://www.semanticscholar.org/search?" + urlencode({"q": paper.get("title") or ""}),
+                "url": paper.get("url") or openalex_web_search_url(paper.get("title") or ""),
             }
             for paper in papers
         ]
-        used_s2_fallback = bool(rows)
+        used_openalex_fallback = bool(rows)
 
     seen = set()
     allowed = {d.lower() for d in (allowed_domain or [])}
@@ -1062,11 +1194,10 @@ def restricted_web_search(
 
     if rows and not filtered:
         diagnostics.append(
-            "Search returned candidate results, but none survived filtering "
-            f"(blind-setup guard blocked {blocked_by_guard}, target-paper filter blocked "
-            f"{blocked_by_identifier}, traffic guard blocked {blocked_by_guard_agent}, "
-            f"allowed-domain filter blocked {blocked_by_allowed}, "
-            f"request blocked-domain filter blocked {blocked_by_request})."
+            "Search returned candidate results, but none are available after filtering "
+            f"(policy={blocked_by_guard + blocked_by_identifier + blocked_by_guard_agent}, "
+            f"allowed-domain={blocked_by_allowed}, "
+            f"blocked-domain={blocked_by_request})."
         )
     elif (
         blocked_by_guard
@@ -1076,14 +1207,13 @@ def restricted_web_search(
         or blocked_by_request
     ):
         diagnostics.append(
-            f"Filtered candidates: blind-setup guard={blocked_by_guard}, "
-            f"target-paper={blocked_by_identifier}, traffic-guard={blocked_by_guard_agent}, "
+            f"Filtered candidates: policy={blocked_by_guard + blocked_by_identifier + blocked_by_guard_agent}, "
             f"allowed-domain={blocked_by_allowed}, "
             f"blocked-domain={blocked_by_request}."
         )
     text = "\n".join(f"{idx}. {row['title']}\n   {row['url']}" for idx, row in enumerate(filtered, start=1))
-    if text and used_s2_fallback:
-        text += "\n(via Semantic Scholar academic fallback)"
+    if text and used_openalex_fallback:
+        text += "\n(via OpenAlex academic fallback)"
     if not text and diagnostics:
         text = "No search results.\nDiagnostics:\n" + "\n".join(f"- {item}" for item in diagnostics)
     return {
@@ -1124,9 +1254,21 @@ def restricted_fetch_webpage(
     )
     if guard_reason:
         return {"status": "denied", "error": PUBLIC_GUARD_DENIAL}
-    resp = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=30, allow_redirects=True)
-    resp.raise_for_status()
-    final_url = resp.url
+    fetch_url = pmc_eutils_url(url) or url
+    resp = requests.get(fetch_url, headers=FETCH_HEADERS, timeout=30, allow_redirects=True)
+    if resp.status_code == 403:
+        return {
+            "status": "error",
+            "error": (
+                "remote site returned HTTP 403 Forbidden, likely blocking automated fetches; "
+                "try research_papers/web_search metadata or another accessible source"
+            ),
+        }
+    if resp.status_code == 404:
+        return {"status": "error", "error": "remote site returned HTTP 404 Not Found"}
+    if resp.status_code >= 400:
+        return {"status": "error", "error": f"remote site returned HTTP {resp.status_code}"}
+    final_url = url if fetch_url != url else resp.url
     reason = blocked_url_reason(final_url, identifiers)
     if reason:
         return {"status": "denied", "error": reason}
@@ -1143,16 +1285,31 @@ def restricted_fetch_webpage(
     content_type = resp.headers.get("Content-Type", "")
     if "pdf" in content_type or "octet-stream" in content_type:
         raise ValueError("binary/PDF content is not fetchable through this text tool")
-    if "html" in content_type or not content_type:
+    response_text = resp.text
+    if "xml" in content_type or response_text.lstrip().startswith("<?xml"):
+        text = extract_nlm_xml_text(response_text)
+        if not text:
+            extractor = TextExtractor()
+            extractor.feed(response_text)
+            text = extractor.text()
+    elif "html" in content_type or not content_type:
         extractor = TextExtractor()
-        extractor.feed(resp.text)
+        extractor.feed(response_text)
         text = extractor.text()
     else:
-        text = resp.text
+        text = response_text
+    if looks_like_bot_challenge(text):
+        return {
+            "status": "error",
+            "error": (
+                "remote site returned an anti-bot challenge page instead of readable content; "
+                "try research_papers/web_search metadata or another accessible source"
+            ),
+        }
     if contains_hidden_identifier(f"{final_url}\n{text}", identifiers):
         return {
             "status": "denied",
-            "error": "Fetched page matches the held-out paper or a derivative work.",
+            "error": PUBLIC_GUARD_DENIAL,
         }
     guard_reason = traffic_guard_blocks(
         kind="fetched_page_content",

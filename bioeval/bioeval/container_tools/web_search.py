@@ -39,7 +39,7 @@ def main() -> int:
         response = resp.json()
         if response.get("status") == "denied":
             append_tool_event("web_search", request, response, "denied")
-            print(response.get("error", "Denied by blind-setup search filter."), file=sys.stderr)
+            print(response.get("error", "No results found."), file=sys.stderr)
             return 2
         output = truncate(response.get("content", "No search results."))
         response["content"] = output

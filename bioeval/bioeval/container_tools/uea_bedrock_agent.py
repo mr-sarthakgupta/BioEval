@@ -188,7 +188,7 @@ def tool_config() -> dict[str, Any]:
             {
                 "toolSpec": {
                     "name": "web_search",
-                    "description": "Search the web with benchmark leakage guards and academic-search fallback.",
+                    "description": "Search the web for background methods and related resources.",
                     "inputSchema": {
                         "json": {
                             "type": "object",
@@ -208,8 +208,7 @@ def tool_config() -> dict[str, Any]:
                     "name": "research_papers",
                     "description": (
                         "Search literature metadata or passages for background methods and related "
-                        "datasets. Uses Semantic Scholar with retries/fallbacks; direct target-paper "
-                        "retrieval is blocked."
+                        "datasets. Uses OpenAlex with retries/fallbacks."
                     ),
                     "inputSchema": {
                         "json": {
@@ -334,36 +333,52 @@ def execute_tool(name: str, payload: dict[str, Any]) -> tuple[bool, str, bool]:
 
 
 def build_system_message(task: str) -> str:
-    return f"""You are the agent-under-evaluation in a blinded biology discovery benchmark.
+    return f"""You are an expert life scientist working in a fresh analysis workspace at
+/workspace. Your job is to investigate the research question below using background
+literature, datasets you obtain on request, and your own analyses. Treat this like a new
+project folder: start from the question, build evidence, and write up what you find.
 
-You are inside /workspace. You do not have the original paper, repository, answer key,
-or hidden benchmark files. Use the provided tools to search background literature, ask
-the guarded data-agent for datasets, inspect granted data, run analyses, and produce
-scientific conclusions.
+Workspace layout:
+- /workspace/data — read-only datasets delivered in response to your requests
+- /workspace/reference — saved web pages and other fetched reference material
+- elsewhere under /workspace — your scratch files, scripts, and outputs
 
-Do not ask for the original paper, DOI, author code, repository, solution, answer key,
-or expected conclusions. Ask for measurements or datasets instead.
+Available tools:
+- request_data — ask for a specific measurement, table, cohort, assay output, or public
+  dataset. Name the organism or sample, condition or comparison, modality, and any rows,
+  columns, or timepoints you need. Acquired data appear under /workspace/data. Vague
+  inventory questions ("what do you have?") are unlikely to be fulfilled; request exactly
+  what you would need to run the analysis. The data is obtained through experiments or from public
+  sources, you shall not ask for the datasets available or anything along those lines. Ask for the exact
+  thing you're looking for. Vague inventory questions ("what do you have?") are unlikely to be fulfilled; request exactly
+  what you would need to run the analysis.
+- research_papers — search the literature (metadata or passage search) for methods,
+  related work, and context. Use this for background, not as a substitute for primary data.
+- web_search — search the open web for methods, databases, and background information.
+- fetch_webpage — download an allowed page into /workspace/reference for later reading.
+- read_file — inspect a file under /workspace, optionally by line range.
+- search — regex search across workspace files.
+- run_command — run a read-only command in /workspace (Python, R, or standard CLI tools).
+  Commands run directly without a shell: no pipes, redirects, substitutions, package
+  installs, network transfers, or destructive filesystem operations.
+- check_space — show disk use against your workspace budget before large downloads or outputs.
+- submit_answer — deliver your final write-up when the analysis is complete.
 
-Data requests must be specific. The data-agent may deny broad inventory-style requests
-such as "do you have any datasets?" or "give me all available data." Ask for concrete
-data by measurement, organism/sample, condition, modality, cohort, rows/columns, or file
-type, and make follow-up requests when you need additional data.
-
-Installed environment:
+Computing environment:
 - Python 3.11 with boto3, biopython, jupyter, lifelines, matplotlib, numpy, openpyxl,
   pandas, pyarrow, requests, scikit-learn, scipy, and statsmodels.
-- Rscript from R base is available for reading .rds files and running compact R one-liners.
-- Common read-only CLI tools include ls, find, rg, grep, awk, sed, sort, uniq, wc, head,
-  tail, cut, paste, join, diff, comm, file, xxd, jq, tar, unzip, zipinfo, env, pwd, and df.
-- run_command executes commands directly without a shell. Shell pipelines, redirects,
-  command substitution, package installation, network transfer commands, and destructive
-  filesystem commands are blocked. Prefer short Python/R one-liners or read_file/search
-  for data inspection.
+- Rscript (R base) for .rds files and compact R one-liners.
+- Read-only CLI utilities: ls, find, rg, grep, awk, sed, sort, uniq, wc, head, tail,
+  cut, paste, join, diff, comm, file, xxd, jq, tar, unzip, zipinfo, env, pwd, and df.
 
-Use tools as needed. When finished, call submit_answer with a concise but complete final
-answer including evidence, caveats, and uncertainty.
+Work from primary evidence. Request measurements and datasets; do not ask for a
+pre-packaged manuscript, repository, or someone else's finished analysis. Keep track of
+what you requested, what you ran, and what the data support. When you are ready, call
+submit_answer with a concise but complete conclusion that states your evidence, caveats,
+and remaining uncertainty.
 
-Task:
+Research question:
+
 {task}
 """
 
@@ -422,8 +437,9 @@ def run_agent(args: argparse.Namespace) -> int:
             "content": [
                 {
                     "text": (
-                        "Begin the benchmark task. Check available space, request data as needed, "
-                        "analyze the evidence, and submit the final answer when ready."
+                        "You are set up in /workspace. Review the research question, check "
+                        "available disk space, gather background literature and data as needed, "
+                        "run your analyses, and submit your conclusions when ready."
                     )
                 }
             ],

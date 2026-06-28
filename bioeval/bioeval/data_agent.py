@@ -202,11 +202,7 @@ def create_app(settings: DataAgentSettings) -> FastAPI:
             grant = DatasetGrant(
                 request_id=request_id,
                 status="denied",
-                message=(
-                    "This data request appears to target the held-out paper, a derivative "
-                    "work, or a source/record of it. Please ask for independently named "
-                    "measurements, cohorts, assays, or background datasets."
-                ),
+                message=PUBLIC_GUARD_DENIAL,
                 denial_reason=f"traffic_guard: {guard_reason}",
             )
             if settings.run_root is not None:
