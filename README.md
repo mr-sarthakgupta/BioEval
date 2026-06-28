@@ -4,6 +4,8 @@ This is a minimal scaffold for evaluating whether an under-eval-agent (UEA) can
 rediscover the core conclusions of a biology paper from an open-world problem
 statement, internet access, analysis tools, and a guarded data-agent.
 
+RL environments and evals created by inverting pull requests from real repositories have provided a huge amount of in-distribution data for coding. We believe the same can be done with research papers for automated research.
+
 ## Design
 
 - The UEA starts in an empty `/workspace` with internet access and a fixed disk budget.
