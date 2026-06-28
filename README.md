@@ -52,10 +52,6 @@ pip install -e .
 cp .env.example .env
 ```
 
-Set Bedrock credentials in `.env` or `~/.aws/credentials`. By default, the data-agent,
-UEA, and judge all use `us.anthropic.claude-sonnet-4-6` in `us-east-1` with Bedrock
-prompt caching, matching the skydiscover Bedrock setup.
-
 ## Run One Evaluation Sandbox
 
 Pick a problem:
@@ -95,7 +91,7 @@ Inside the container, the UEA can request data:
 request_data "survival data comparing pollen-feeding and non-pollen-feeding butterflies" --modality csv
 ```
 
-The UEA also has SkyDiscover-style exploration tools, all recorded automatically:
+The UEA also has exploration tools, all recorded automatically:
 
 - `read_file PATH [--line-start N --line-end M]`: read files under `/workspace`.
 - `search PATTERN [--file-glob GLOB]`: regex search files under `/workspace`.
@@ -165,10 +161,7 @@ bioeval-run-bedrock-uea \
 
 Use `--all` to run every problem spec. The runner creates a fresh recorded run per
 problem, starts the Docker Compose sandbox, copies the visible task into `/workspace`,
-and executes `uea_bedrock_agent` inside the UEA container. The UEA model defaults to
-`us.anthropic.claude-sonnet-4-6` with `UEA_BEDROCK_API_BASE=bedrock:us-east-1`, using
-the same Bedrock credential path as skydiscover (`AWS_BEARER_TOKEN_BEDROCK` or an
-`ABSK...` token in `~/.aws/credentials` as `aws_session_token`).
+and executes `uea_bedrock_agent` inside the UEA container. 
 
 For very large datasets, ask for a subset, e.g.:
 
