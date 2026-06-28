@@ -1,4 +1,4 @@
-# BioEval: Biology Paper-Inversion Scaffold
+# BioEval: Biology Paper-Inversion
 
 This is a minimal scaffold for evaluating whether an under-eval-agent (UEA) can
 rediscover the core conclusions of a biology paper from an open-world problem
