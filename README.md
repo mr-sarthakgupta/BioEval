@@ -1,5 +1,7 @@
 # BioEval: Biology Paper-Inversion
 
+![Architecture Diagram](diagram.png)
+
 This is a minimal scaffold for evaluating whether an under-eval-agent (UEA) can
 rediscover the core conclusions of a biology paper from an open-world problem
 statement, internet access, analysis tools, and a guarded data-agent.
