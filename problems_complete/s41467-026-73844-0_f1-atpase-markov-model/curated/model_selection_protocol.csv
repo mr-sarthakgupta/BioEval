@@ -1,0 +1,7 @@
+criterion,value,interpretation
+maximum_training_standardized_rmse,1.5,Each admissible model must fit the calibration observations within this aggregate standardized residual threshold
+maximum_individual_standardized_residual,3.0,No calibration observation may exceed this absolute standardized residual
+required_validation_constraints,9,Every listed independent validation constraint must pass for a model class to be admissible
+complexity_metric,BIC,BIC is n*ln(RSS/n)+k*ln(n) using standardized calibration residuals and fitted parameter count k
+maximum_four_minus_three_bic,10,A passing four-conformation model has an acceptable complexity penalty when its BIC is no more than 10 above the best adequately fitted three-conformation model
+three_state_failure_requirement,1,At least one independent validation constraint must fail for every adequately fitted three-conformation model

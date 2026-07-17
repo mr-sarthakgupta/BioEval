@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from bedrock_cost import BedrockCostTracker
+from experiment_contract import experiment_tool_schema
 
 
 DEFAULT_MODEL = "us.anthropic.claude-sonnet-4-6"
@@ -131,23 +132,15 @@ def tool_config() -> dict[str, Any]:
         "tools": [
             {
                 "toolSpec": {
-                    "name": "request_data",
+                    "name": "design_experiment",
                     "description": (
-                        "Ask the guarded data-agent to grant specific measurements or datasets into "
-                        "/workspace/data. Do not ask what data exists; name the measurement, organism, "
-                        "condition, modality, or scope you need."
+                        "Submit one fully specified, realistic experiment. The experiment-agent first "
+                        "validates feasibility and then attempts to execute feasible designs. Generated "
+                        "measurements are placed in /workspace/data. Include exact entities and "
+                        "identifiers, properties, groups, controls, interventions, doses and units, "
+                        "timing, replication, procedures, measurements, and output fields."
                     ),
-                    "inputSchema": {
-                        "json": {
-                            "type": "object",
-                            "properties": {
-                                "question": string,
-                                "modalities": {"type": "array", "items": string},
-                                "max_bytes": integer,
-                            },
-                            "required": ["question"],
-                        }
-                    },
+                    "inputSchema": {"json": experiment_tool_schema()},
                 }
             },
             {
@@ -259,11 +252,17 @@ def tool_config() -> dict[str, Any]:
             {
                 "toolSpec": {
                     "name": "submit_answer",
-                    "description": "Submit the final answer and end the run.",
+                    "description": (
+                        "Submit the final answer and end the run. Include analysis_manifest "
+                        "when you produced scripts, tables, metrics, or other evidence artifacts."
+                    ),
                     "inputSchema": {
                         "json": {
                             "type": "object",
-                            "properties": {"answer": string},
+                            "properties": {
+                                "answer": string,
+                                "analysis_manifest": string,
+                            },
                             "required": ["answer"],
                         }
                     },
@@ -275,12 +274,8 @@ def tool_config() -> dict[str, Any]:
 
 def execute_tool(name: str, payload: dict[str, Any]) -> tuple[bool, str, bool]:
     submitted = False
-    if name == "request_data":
-        argv = ["request_data", str(payload["question"])]
-        for modality in payload.get("modalities") or []:
-            argv.extend(["--modality", str(modality)])
-        if payload.get("max_bytes"):
-            argv.extend(["--max-bytes", str(payload["max_bytes"])])
+    if name == "design_experiment":
+        argv = ["design_experiment", json.dumps(payload, ensure_ascii=False)]
     elif name == "read_file":
         argv = ["read_file", str(payload["path"])]
         if payload.get("line_start"):
@@ -322,6 +317,8 @@ def execute_tool(name: str, payload: dict[str, Any]) -> tuple[bool, str, bool]:
         FINAL_ANSWER.write_text(answer, encoding="utf-8")
         append_transcript("Final Answer", answer)
         argv = ["submit_answer", "--file", str(FINAL_ANSWER), "--transcript", str(TRANSCRIPT)]
+        if payload.get("analysis_manifest"):
+            argv.extend(["--analysis-manifest", str(payload["analysis_manifest"])])
         submitted = True
     else:
         return False, f"Unknown tool: {name}", False
@@ -333,7 +330,7 @@ def execute_tool(name: str, payload: dict[str, Any]) -> tuple[bool, str, bool]:
 
 
 def build_system_message(task: str) -> str:
-    return f"""You are an expert life scientist working in a fresh analysis workspace at
+    return f"""You are an expert scientific research agent working in a fresh analysis workspace at
 /workspace. Your job is to investigate the research question below using background
 literature, datasets you obtain on request, and your own analyses. Treat this like a new
 project folder: start from the question, build evidence, and write up what you find.
@@ -344,25 +341,30 @@ Workspace layout:
 - elsewhere under /workspace — your scratch files, scripts, and outputs
 
 Available tools:
-- request_data — ask for a specific measurement, table, cohort, assay output, or public
-  dataset. Name the organism or sample, condition or comparison, modality, and any rows,
-  columns, or timepoints you need. Acquired data appear under /workspace/data. Vague
-  inventory questions ("what do you have?") are unlikely to be fulfilled; request exactly
-  what you would need to run the analysis. The data is obtained through experiments or from public
-  sources, you shall not ask for the datasets available or anything along those lines. Ask for the exact
-  thing you're looking for. Vague inventory questions ("what do you have?") are unlikely to be fulfilled; request exactly
-  what you would need to run the analysis.
+- design_experiment — design one reproducible experiment that could realistically produce
+  the evidence you need. Fill every structured section with exact entity identities
+  (species/strain/cell line, chemical identifier and purity, material grade, or equivalent),
+  properties, groups and controls, factors, interventions with values and units, timing,
+  replication, ordered procedures, measurements, and expected data fields. The
+  experiment-agent validates realism before attempting execution. If it returns
+  `needs_revision`, repair every path-specific issue and resubmit; if it returns
+  `unrealistic`, redesign the experiment. Only a `feasible` design is executed.
+  `could_not_execute` means the required facilities or resources were unavailable.
+  Successful experimental measurements appear under /workspace/data.
 - research_papers — search the literature (metadata or passage search) for methods,
   related work, and context. Use this for background, not as a substitute for primary data.
 - web_search — search the open web for methods, databases, and background information.
 - fetch_webpage — download an allowed page into /workspace/reference for later reading.
 - read_file — inspect a file under /workspace, optionally by line range.
 - search — regex search across workspace files.
-- run_command — run a read-only command in /workspace (Python, R, or standard CLI tools).
+- run_command — run a filesystem-isolated analysis command in /workspace (restricted Python or non-executing CLI tools).
   Commands run directly without a shell: no pipes, redirects, substitutions, package
   installs, network transfers, or destructive filesystem operations.
 - check_space — show disk use against your workspace budget before large downloads or outputs.
 - submit_answer — deliver your final write-up when the analysis is complete.
+  When you produce analysis files, also create /workspace/analysis_manifest.json with
+  `artifacts: [{{"path": "relative/path", "description": "...", "sha256": "optional"}}]`
+  and pass that path as analysis_manifest. Only declared artifacts are available to the judge.
 
 Computing environment:
 - Python 3.11 with boto3, biopython, jupyter, lifelines, matplotlib, numpy, openpyxl,
@@ -371,8 +373,8 @@ Computing environment:
 - Read-only CLI utilities: ls, find, rg, grep, awk, sed, sort, uniq, wc, head, tail,
   cut, paste, join, diff, comm, file, xxd, jq, tar, unzip, zipinfo, env, pwd, and df.
 
-Work from primary evidence. Request measurements and datasets; do not ask for a
-pre-packaged manuscript, repository, or someone else's finished analysis. Keep track of
+Work from primary evidence. Design experiments for required measurements; do not ask for
+a pre-packaged manuscript, repository, or someone else's finished analysis. Keep track of
 what you requested, what you ran, and what the data support. When you are ready, call
 submit_answer with a concise but complete conclusion that states your evidence, caveats,
 and remaining uncertainty.

@@ -1,0 +1,12 @@
+problem_id: s41586-026-10588-3_mitochondria-nuclear-pore-interaction
+entries:
+  - id: answer_bearing_supplementary_payload
+    description: Current supplementary spreadsheets, documents, and metadata.
+    kind: processed
+    grantable: false
+    reason: These files are answer-bearing; raw omics observations are not present.
+    source_base: problem
+    source_paths:
+      - data/**/*
+      - paper/**/*
+      - repo/**/*

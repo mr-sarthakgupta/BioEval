@@ -1,0 +1,13 @@
+problem_id: s41586-026-10588-3_mitochondria-nuclear-pore-interaction
+benchmark_status: acquisition_only
+readiness_reason: >-
+  Existing supplementary documents are answer-bearing and raw GEO, SRA, and PRIDE
+  observations have not been acquired or scoped.
+title: Mitochondria and nuclear-pore interaction acquisition stub
+doi: 10.1038/s41586-026-10588-3
+sandbox_prompt: This acquisition-only record is not executable.
+expected_conclusions: []
+judge_rubric: []
+expected_caveats: []
+leak_markers:
+  - "s41586-026-10588-3"

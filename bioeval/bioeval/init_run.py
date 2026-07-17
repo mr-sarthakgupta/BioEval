@@ -6,7 +6,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from bioeval.problems import load_problem_spec
+from bioeval.problems import load_problem_spec, validate_problem_ready
 from bioeval.run_record import default_run_id, env_snapshot, git_commit, git_dirty, utc_now, write_json
 
 
@@ -17,6 +17,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--runs-root", type=Path, default=Path("runs"))
     parser.add_argument("--uea-model", default=os.getenv("UEA_MODEL"))
     parser.add_argument("--notes", default="")
+    parser.add_argument("--allow-conditional", action="store_true")
     return parser
 
 
@@ -27,12 +28,26 @@ def main() -> None:
         raise SystemExit("--problem-id or BIOEVAL_PROBLEM_ID is required")
 
     spec = load_problem_spec(args.problem_id)
+    if spec.benchmark_status == "acquisition_only":
+        raise SystemExit(
+            f"{args.problem_id} is acquisition-only: {spec.readiness_reason or 'not runnable'}"
+        )
+    if spec.benchmark_status == "conditional" and not args.allow_conditional:
+        raise SystemExit(
+            f"{args.problem_id} is conditional; pass --allow-conditional after reviewing: "
+            f"{spec.readiness_reason or 'readiness is incomplete'}"
+        )
+    repo_root = Path(__file__).resolve().parents[2]
+    readiness_errors = validate_problem_ready(spec, repo_root)
+    if readiness_errors:
+        raise SystemExit(
+            "Problem is not ready:\n- " + "\n- ".join(readiness_errors)
+        )
     run_id = args.run_id or default_run_id(args.problem_id)
     run_root = args.runs_root / args.problem_id / run_id
     for child in ["uea_workspace", "data_grants", "results", "logs"]:
         (run_root / child).mkdir(parents=True, exist_ok=True)
 
-    repo_root = Path(__file__).resolve().parents[2]
     metadata = {
         "run_id": run_id,
         "problem_id": args.problem_id,
@@ -47,8 +62,8 @@ def main() -> None:
         },
         "environment": env_snapshot(
             [
-                "DATA_AGENT_MODEL",
-                "DATA_AGENT_API_BASE",
+                "EXPERIMENT_AGENT_MODEL",
+                "EXPERIMENT_AGENT_API_BASE",
                 "UEA_BEDROCK_MODEL",
                 "UEA_BEDROCK_API_BASE",
                 "UEA_MAX_STEPS",
@@ -66,6 +81,9 @@ def main() -> None:
                 "BIOEVAL_TRAFFIC_GUARD_FAIL_CLOSED",
                 "BIOEVAL_TRAFFIC_GUARD_MODEL",
                 "BIOEVAL_TRAFFIC_GUARD_API_BASE",
+                "BIOEVAL_OPENALEX_DESCENDANT_DEPTH",
+                "BIOEVAL_OPENALEX_DESCENDANT_MAX_NODES",
+                "BIOEVAL_OPENALEX_GRAPH_CACHE_TTL",
             ]
         ),
         "prompt": {

@@ -1,27 +1,43 @@
 problem_id: s41467-026-73977-2_forge-cancer-drug-response
 title: Gene dependency-informed targeted therapy response
 doi: 10.1038/s41467-026-73977-2
+target_footprint_date: 2026-02-05
+external_source_cutoff: 2026-02-04T23:59:59Z
 sandbox_prompt: |
   You are investigating how to predict and interpret response to targeted cancer
-  therapies from cancer-cell molecular profiles. Using public datasets and data-agent
-  requests, examine which measurements are informative, how they relate to drug
-  sensitivity and perturbation response, and whether an interpretable computational
-  strategy can make useful sample-level predictions. Compare against simpler
-  alternatives where possible, and assess whether any conclusions generalize beyond
-  the discovery data.
+  therapies from cancer-cell molecular profiles. Using public datasets and structured experiment-agent
+  requests, examine whether target-gene dependency adds predictive information beyond
+  basal expression alone. You may use any statistically defensible model: reproducing
+  a particular latent representation, matrix factorization, or author architecture is
+  not required.
+
+  Use the supplied fixed cell-line split for the primary comparison. Fit an
+  expression-only baseline and a dependency-informed model using only the supplied
+  training-response table, then predict every row in the held-out drug/cell-line
+  template. Held-out IC50 labels are evaluator-only: do not search for or reconstruct
+  them from another copy of the full response matrix. Submit `forge_predictions.csv`
+  as a declared analysis artifact with exactly these columns: drug, cell_line_id,
+  baseline_prediction, dependency_informed_prediction, and therapeutic_benefit_score.
+  The evaluator will join hidden labels and recompute coverage, RMSE, and MAE.
+
+  Define the benefit score explicitly; its favorable direction must increase with
+  predicted target dependency and decrease with predicted IC50. Include a prespecified
+  EGFR-erlotinib analysis and assess fixed external PDX or perturbation data where
+  compatible measurements exist. Quantify uncertainty and distinguish preclinical
+  association from clinical benefit.
 expected_conclusions:
-  - Jointly modeling drug response and target-gene dependency is more biologically grounded than modeling drug response alone.
-  - Basal gene expression is a useful primary omics layer for this task.
-  - A shared latent representation or matrix-factorization-style model can predict both dependency and drug response.
-  - A benefit score combining high predicted dependency with low predicted IC50 can stratify samples by expected therapeutic potential.
-  - EGFR-erlotinib is a strong illustrative case, and higher benefit scores align with greater dependency and lower IC50.
-  - External validation in patient-derived xenograft or single-cell perturbation data is supportive but mostly correlational/hypothesis-generating.
+  - On the fixed held-out cell lines, adding target-gene dependency improves drug-response prediction over an expression-only baseline under at least one prespecified predictive metric without materially degrading the others.
+  - A method-agnostic benefit score combining greater predicted target dependency with lower predicted IC50 stratifies samples in the intended directions.
+  - In the EGFR-erlotinib case, higher benefit scores are associated with greater EGFR dependency and lower erlotinib IC50 on held-out observations.
+  - Any support from patient-derived xenograft or single-cell perturbation data is external and hypothesis-generating rather than evidence of clinical benefit.
 judge_rubric:
-  - Does the answer connect targeted therapy response to target-gene dependency?
-  - Does it propose a joint or shared-representation model rather than only a black-box drug-response predictor?
-  - Does it define a benefit/stratification score with the correct directionality?
-  - Does it discuss validation on independent datasets and the limits of clinical interpretation?
+  - Does the declared forge_predictions.csv cover the fixed hidden-label rows without duplicate keys or outcome columns?
+  - Do evaluator-recomputed held-out RMSE and MAE support incremental value of dependency information over expression alone?
+  - Is the benefit score defined independently of model architecture, and do recomputed associations have the correct signs with dependency and IC50?
+  - Does the held-out EGFR-erlotinib subset support the stated directionality rather than relying on a selected anecdote?
+  - Are uncertainty, missingness, split integrity, external validation, and the limits of clinical interpretation addressed?
 expected_caveats:
+  - The conclusion is conditional on the fixed split, drug-target mapping, preprocessing choices, and observed cell-line coverage.
   - External validation in PDX or single-cell perturbation data is largely correlational.
   - Clinical benefit cannot be concluded directly from cell-line and preclinical models.
 leak_markers:

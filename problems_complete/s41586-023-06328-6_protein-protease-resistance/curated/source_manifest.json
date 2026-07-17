@@ -1,0 +1,52 @@
+{
+  "provider": "zenodo",
+  "record_id": 7992926,
+  "concept_record_id": 7401274,
+  "files": [
+    {
+      "name": "Pipeline_qPCR_data.zip",
+      "bytes": 161511,
+      "checksum": "md5:f2ec8d0eac9981f947ba71c2ebc6afd0"
+    },
+    {
+      "name": "Pipeline_figure_model.zip",
+      "bytes": 938357,
+      "checksum": "md5:0a4bfc59f30d1cb79e77cda6c6bcca3d"
+    },
+    {
+      "name": "Data_tables_for_figs.zip",
+      "bytes": 24125970,
+      "checksum": "md5:c4b6a64345e30e1b9e2e40a266d14a68"
+    },
+    {
+      "name": "AlphaFold_model_PDBs.zip",
+      "bytes": 13977225,
+      "checksum": "md5:c29317a75f28d008b2718316995902ef"
+    },
+    {
+      "name": "Raw_NGS_count_tables.zip",
+      "bytes": 242934040,
+      "checksum": "md5:f0a2c5882439001dbbb8d81b4e64fe24"
+    },
+    {
+      "name": "Blueprints_for_EEHH.zip",
+      "bytes": 2438,
+      "checksum": "md5:2b0fc2dc5db92f64b545090c09cd2e51"
+    },
+    {
+      "name": "Processed_K50_dG_datasets.zip",
+      "bytes": 1013678473,
+      "checksum": "md5:f7e8c553efee734cf161ee6f2b0a09cf"
+    },
+    {
+      "name": "K50_dG_tables.zip",
+      "bytes": 449818840,
+      "checksum": "md5:1cd1e460db6aa907e17c1249b35fbb82"
+    },
+    {
+      "name": "Pipeline_K50_dG.zip",
+      "bytes": 181224338,
+      "checksum": "md5:fda0397b725c4e45e96e926f08905c34"
+    }
+  ]
+}

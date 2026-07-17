@@ -1,30 +1,52 @@
 problem_id: s41467-026-73844-0_f1-atpase-markov-model
 title: F1-ATPase rotary catalysis mechanism
 doi: 10.1038/s41467-026-73844-0
+target_footprint_date: 2026-03-20
+external_source_cutoff: 2026-03-19T23:59:59Z
 sandbox_prompt: |
   You are investigating the rotary catalysis mechanism of bacterial F1-ATPase, the
   motor that couples ATP turnover to mechanical rotation of its central stalk. A long
-  standing question is how the chemistry at the catalytic subunits is coordinated with
-  stepwise rotation. Using public literature and any datasets you legitimately obtain
-  through the data-agent, assemble the quantitative constraints that matter for this
-  coupling and compare plausible mechanistic explanations. Your goal is to identify
-  the simplest explanation that remains consistent with the available single-molecule,
-  binding, and bulk-kinetic evidence, and to state where the data do or do not rule
-  out alternatives.
+  standing question is how chemistry at the three catalytic beta subunits is
+  coordinated with stepwise gamma-subunit rotation. Using public literature and
+  datasets legitimately obtained through structured experiment-agent requests,
+  compare discrete-state chemo-mechanical models within this declared family:
+  nucleotide states must distinguish empty, ATP-bound, and product-bound sites;
+  gamma rotation must be stepwise; and each beta subunit must use either three
+  functional conformations (open, intermediate, and catalytically active closed) or
+  a four-conformation extension with a second functionally distinct closed state.
+  The implementation and fitting method are unrestricted.
+
+  Fit or calibrate models only to the supplied turnover, coupling-efficiency, and
+  nucleotide-titration observations. Evaluate model classes against the separately
+  supplied constraints on dwell-population shifts, catalytic-step orientations,
+  bound ADP:ATP ratio, and structural/affinity asymmetry. Use declared quantitative
+  tolerances and a complexity penalty. A claim that four conformations are required
+  is justified only if the admissible three-conformation class fails at least one
+  independent validation constraint while a four-conformation model satisfies the
+  same prespecified tests. Report failures and non-identifiability, not only a best
+  model, and state explicitly that any minimum is conditional on this model family
+  and pruning protocol.
+  Submit `f1_model_summary.csv` with one row per fitted model and columns model_id,
+  conformation_count, training_standardized_rmse, maximum_standardized_residual,
+  parameter_count, n_training_observations, bic, validation_constraints_passed,
+  and validation_constraints_total. The evaluator applies the supplied numeric
+  protocol equally to both model classes.
 expected_conclusions:
-  - A quantitative chemo-mechanical Markov model can integrate gamma-subunit rotation, beta-subunit conformations, and nucleotide binding states.
-  - Three functionally distinct beta-subunit conformations are insufficient within the tested model family.
-  - At least four functionally distinct beta-subunit conformations are needed to explain the available constraints.
-  - Bi-site and tri-site catalytic pathways can both contribute, with their relative importance depending on ATP concentration.
-  - Brownian-ratchet-like stochastic rotation can explain large rotations and high apparent efficiency.
+  - Within the declared discrete-state model family and prespecified validation tests, models with only three beta-subunit conformations fail to satisfy all independent constraints.
+  - Within that same family, at least one model with four functionally distinct beta-subunit conformations fits the training observations and satisfies the independent validation constraints with an acceptable complexity penalty.
+  - The evidence supports a conditional minimum of four conformations, not a method-independent biological proof that no other mechanism can work.
+  - Among models that pass validation, bi-site and tri-site pathways can both contribute, with their inferred balance depending on ATP concentration.
+  - Stochastic rotation is compatible with tight chemo-mechanical coupling, but Brownian-ratchet language should be presented as a model-supported interpretation rather than a directly observed fact.
 judge_rubric:
-  - Does the answer propose and justify a Markov/state-based chemo-mechanical model?
-  - Does it recover the need for four beta-subunit conformations rather than three?
-  - Does it discuss concentration-dependent bi-site versus tri-site behavior?
-  - Does it distinguish model-supported conclusions from assumptions and literature-derived constraints?
+  - Does the answer stay within and clearly document the declared state variables, three- versus four-conformation comparison, pruning rules, tolerances, and complexity penalty?
+  - Are turnover, efficiency, and titration data used for fitting while dwell, orientation, occupancy-ratio, structure, and affinity constraints remain independent validation evidence?
+  - Is insufficiency of the three-conformation class demonstrated by explicit failed validation constraints rather than asserted from one failed fit?
+  - Does at least one four-conformation model pass the same tests, and are alternative four-state mechanisms or non-identifiability reported?
+  - Are concentration-dependent bi-site/tri-site behavior and stochastic rotation labeled as conditional model inferences?
 expected_caveats:
-  - Model selection depends on the chosen model family and the available constraints.
+  - The four-conformation minimum depends on the declared model family, candidate-generation and pruning rules, thresholds, and available constraints.
   - Several rate constants are inferred indirectly rather than measured directly.
+  - The paper's source-data archive is dominated by fitted parameters and model predictions; those outputs cannot be used as experimental validation evidence.
 leak_markers:
   - "A minimal chemo-mechanical Markov model for rotary catalysis of F1-ATPase"
   - "Towards a minimal Markov model for rotary catalysis of F1-ATPase"

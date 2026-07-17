@@ -1,0 +1,27 @@
+{
+  "provider": "EDI",
+  "package": "knb-lter-ntl.420.2",
+  "doi": "10.6073/pasta/f48cdb77282598052349e969920356ef",
+  "files": [
+    {
+      "name": "GRiMe_concentrations_v2.csv",
+      "bytes": 8654767,
+      "sha256": "d8272dac55ca04bdf1dd02077c51e3ad203e7e4e8eb78c310af09965a458aa29"
+    },
+    {
+      "name": "GRiMe_fluxes_v2.csv",
+      "bytes": 2660036,
+      "sha256": "c222f3c1cd588c8774879813aedc9a20f4d894feaebefb41ebc651adc5fd35fd"
+    },
+    {
+      "name": "GRiMe_sites_v2.csv",
+      "bytes": 687198,
+      "sha256": "1c73e79f77d1f1dbcdb68186fb3310575e85b9fc14f6cc9f79b3c281ba242a5e"
+    },
+    {
+      "name": "GRiMe_sources_v2.csv",
+      "bytes": 68823,
+      "sha256": "4f640bfa6c9bd74e9d35cbff67880a983557a11335b284283ed3cc5f0b9b0fd1"
+    }
+  ]
+}

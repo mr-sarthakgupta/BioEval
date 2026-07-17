@@ -1,0 +1,91 @@
+{
+  "provider": "dryad",
+  "version_id": 204170,
+  "published": "2022-11-01",
+  "files": [
+    {
+      "file_id": 1902909,
+      "name": "communitydata_2017_nature.txt",
+      "bytes": 6185,
+      "sha256": "ac65bd358c7e3d0fbd299fe0688aa9cf9b676c17ad33a8ca48dd767c92b1101d"
+    },
+    {
+      "file_id": 1902908,
+      "name": "communitydata_2019_nature.txt",
+      "bytes": 6396,
+      "sha256": "9bb421450a5d62acb28056ea14469f7a95dead66a77ca6682c4f2229fa41266b"
+    },
+    {
+      "file_id": 1902906,
+      "name": "humidity_temp_data_means_2019.txt",
+      "bytes": 1678,
+      "sha256": "c6dbf5cdb9ef859d59c20d186eccc080c19c6b318b52b8264900945bdf72f618"
+    },
+    {
+      "file_id": 1902907,
+      "name": "light_data.txt",
+      "bytes": 4166,
+      "sha256": "cfbac490deb9638859e791021aac5f6698537787d9e2537362ca9b6038413200"
+    },
+    {
+      "file_id": 1902920,
+      "name": "prob_increase_CN_traits_2017_nature.txt",
+      "bytes": 113378,
+      "sha256": "168a28747098de33afdbbcf7791cff2b8cbe0c8deffb26e7e0c6950d1142c2cf"
+    },
+    {
+      "file_id": 1902919,
+      "name": "prob_increase_CN_traits_2019_nature.txt",
+      "bytes": 169879,
+      "sha256": "6576ea4157aee4088ddb93cdc03935f120f158865e8132f13427714d121540cd"
+    },
+    {
+      "file_id": 1902918,
+      "name": "prob_increase_height_traits_2017_nature.txt",
+      "bytes": 119240,
+      "sha256": "dfc45613e0ea998b2d2d16066f6cb2c4f864241d73ea9548e56cea214f194df1"
+    },
+    {
+      "file_id": 1902917,
+      "name": "prob_increase_height_traits_2019_nature.txt",
+      "bytes": 176620,
+      "sha256": "4e4591663abcc281b6f2a544c0220bfa01e9b03672e6ea959c9c51c56e61e348"
+    },
+    {
+      "file_id": 1902915,
+      "name": "prob_increase_LWC_traits_2017_nature.txt",
+      "bytes": 122544,
+      "sha256": "8a55423a6a181c82be0f49ccf716e364780c2076513895ae82c8f75b3e098fd0"
+    },
+    {
+      "file_id": 1902916,
+      "name": "prob_increase_LWC_traits_2019_nature.txt",
+      "bytes": 212638,
+      "sha256": "1825b6032718643d7078d1ad7d554a902ee692f5a0d7be152419c6b4a0c3234f"
+    },
+    {
+      "file_id": 1902913,
+      "name": "prob_increase_SLA_traits_2017_nature.txt",
+      "bytes": 122569,
+      "sha256": "a0cec509c0800fe3d4f51c8f862061e47f90e2c8912b92eb955918109de4c0a9"
+    },
+    {
+      "file_id": 1902914,
+      "name": "prob_increase_SLA_traits_2019_nature.txt",
+      "bytes": 208042,
+      "sha256": "87d17e6179f417463fb8e247c0e5a8e9ca9727bb0517659224355d53d2c1c1e9"
+    },
+    {
+      "file_id": 1902924,
+      "name": "README_file.txt",
+      "bytes": 9522,
+      "sha256": "8a193301f2e4cca87d67cb40ba256f2bf0224c7b3721a7210fd5b0c3924068c8"
+    },
+    {
+      "file_id": 1902910,
+      "name": "trait_correlations.txt",
+      "bytes": 3835,
+      "sha256": "2bb2109df50e8782256b5df7d446e853d1ddbeee550f5e9b5c46cd6754ccc9e6"
+    }
+  ]
+}

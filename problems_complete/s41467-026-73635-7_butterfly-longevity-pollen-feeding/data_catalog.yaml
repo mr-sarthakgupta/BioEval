@@ -2,6 +2,16 @@ problem_id: s41467-026-73635-7_butterfly-longevity-pollen-feeding
 # Hidden, host-only. Never mounted into the UEA container.
 # source_paths are globs relative to this problem's data/ directory.
 entries:
+  - id: neutral_observation_tables
+    description: >-
+      Neutral CSV exports of individual survival, diet, physiology, and
+      mark-recapture observations plus species maximum-lifespan records.
+    kind: processed
+    grantable: true
+    source_base: problem
+    modalities: [csv, survival, diet, physiology, capture-recapture]
+    source_paths: [curated/observations/*.csv]
+
   - id: species_max_lifespan_records
     description: >-
       Per-species maximum adult lifespan records for heliconiine butterflies,
@@ -140,8 +150,9 @@ entries:
     description: >-
       Supplementary tabular datasets and sample metadata: per-individual and
       per-species measurements behind the study's analyses (CSV/XLSX).
-    kind: raw
-    grantable: true
+    kind: processed
+    grantable: false
+    reason: The monolithic workbook and supplementary tables broaden the grant surface beyond the scoped observation bundle.
     modalities: [csv, xlsx, metadata]
     source_paths:
       - figshare/31081597/Supplementary_Data_*.csv
@@ -162,8 +173,9 @@ entries:
     description: >-
       The public deposited dataset for this study (raw measurement files only;
       author analysis scripts and dataset README are excluded).
-    kind: online
-    grantable: true
+    kind: processed
+    grantable: false
+    reason: The target deposit mixes observations with author scripts and fitted outputs; curated local observations replace it.
     modalities: [csv, rds]
     online:
       provider: figshare

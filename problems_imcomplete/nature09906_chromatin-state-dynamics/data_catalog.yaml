@@ -1,0 +1,69 @@
+problem_id: nature09906_chromatin-state-dynamics
+# Hidden, host-only. Never mounted into the UEA container.
+entries:
+  - id: core_chromatin_bed_tracks
+    description: Replicate-level BED tracks for core chromatin marks and whole-cell-extract controls across nine cell types in hg18 coordinates.
+    kind: raw
+    grantable: true
+    modalities: [bed-gz, chip-seq, chromatin, hg18]
+    approx_bytes: 44368287353
+    source_paths: [core-bed/*.bed.gz]
+
+  - id: pilot_two_cell_small_chromosomes
+    description: Resource pilot containing chr21 and chr22 intervals from allowlisted H1 and K562 core chromatin tracks.
+    kind: raw
+    grantable: true
+    modalities: [bed-gz, chip-seq, pilot, hg18]
+    source_paths: [pilot-h1-k562-chr21-chr22/*.bed.gz]
+
+  - id: expression_validation_arrays
+    description: Nineteen raw CEL expression-array files for independent state-expression validation.
+    kind: raw
+    grantable: true
+    modalities: [cel-gz, expression-array]
+    approx_bytes: 49106218
+    source_paths: [expression-cel/*.CEL.gz]
+
+  - id: expression_sample_platform_map
+    description: Frozen CEL-to-cell-type, replicate, and Affymetrix platform mapping.
+    kind: processed
+    grantable: true
+    source_base: problem
+    modalities: [csv, expression-array, sample-map]
+    source_paths: [curated/expression_sample_map.csv]
+
+  - id: hg18_reference_and_gene_annotation
+    description: Frozen hg18 two-bit reference and UCSC refGene annotation required for coordinate and expression analyses.
+    kind: raw
+    grantable: true
+    modalities: [2bit, gene-annotation, hg18]
+    source_paths:
+      - reference/hg18.2bit
+      - reference/refGene.txt.gz
+
+  - id: published_state_segmentations
+    description: Published segmentations and state annotations for all nine cell types.
+    kind: processed
+    grantable: false
+    reason: Segment boundaries and state assignments are the primary answer key.
+
+  - id: published_state_labels_and_models
+    description: State mnemonics, emission/transition parameters, posteriors, fitted models, and interpretation tables.
+    kind: processed
+    grantable: false
+    reason: These artifacts directly reveal the target model and biological interpretation.
+
+  - id: extra_noncore_h3k9me3_tracks
+    description: Two K562 H3K9me3 tracks present in the GEO archive but outside the frozen 178-file common-core allowlist.
+    kind: raw
+    grantable: false
+    reason: Excluded to keep the assay panel comparable across cell types.
+    source_paths:
+      - raw/GSM646448_K562_H3K9me3_rep1.bed.gz
+      - raw/GSM646449_K562_H3K9me3_rep2.bed.gz
+
+  - id: target_paper_repository_and_metadata
+    description: Target manuscript, supplementary information, author software, and repository metadata.
+    kind: processed
+    grantable: false
+    reason: These sources reveal the target model, state count, labels, and conclusions.

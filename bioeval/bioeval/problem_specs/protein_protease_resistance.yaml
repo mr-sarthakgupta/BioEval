@@ -1,0 +1,47 @@
+problem_id: s41586-023-06328-6_protein-protease-resistance
+title: Sequence determinants of protein protease resistance
+doi: 10.1038/s41586-023-06328-6
+target_footprint_date: 2022-12-06
+external_source_cutoff: 2022-12-05T23:59:59Z
+sandbox_prompt: |
+  You are investigating how protein sequence changes alter resistance to proteolysis
+  across a very large designed library. Obtain exact-match sequencing count tables
+  spanning no-protease controls, protease dose series, libraries, and replicates.
+
+  Work directly from counts. Normalize for condition-specific sequencing depth,
+  account for compositionality and zero counts, and estimate a method-independent
+  resistance phenotype such as normalized survival area under the log-dose curve.
+  Require adequate no-protease support and report uncertainty from count resampling.
+  Use the supplied frozen construct-family folds: folds 1-4 are development data
+  and fold 0 is the final held-out evaluation set. Never repartition individual
+  sequence rows; all variants assigned to a construct family must remain together.
+  Compare replicate agreement, cross-protease agreement, single-substitution effects,
+  insertion/deletion effects where identifiable, and non-additivity of double mutants.
+
+  These data are exact-match count tables, not FASTQ reads. Do not call resistance
+  an absolute folding free energy and do not attempt to reproduce deposited K50,
+  delta-G, quality-group, or model-output tables.
+expected_conclusions:
+  - Sequence abundance changes monotonically with protease dose for a substantial, quality-controlled subset of the library, enabling a count-based relative resistance phenotype.
+  - Relative mutation effects show reproducible site, substitution, and structural-context dependence across held-out protein domains.
+  - Trypsin- and chymotrypsin-derived resistance measurements are correlated but retain protease-specific effects.
+  - Some double-mutant effects depart from an additive model, providing evidence of context-dependent epistasis on the count-based resistance scale.
+  - Exact-match count tables support relative protease-resistance conclusions but do not independently identify absolute thermodynamic folding free energies.
+judge_rubric:
+  - Are raw counts normalized by condition depth with explicit treatment of compositionality, zeros, and no-protease support?
+  - Are dose-response and uncertainty metrics recomputed from counts rather than copied from fitted K50 or delta-G products?
+  - Is fold 0 used only for final evaluation, with no construct_group appearing in both development and evaluation partitions?
+  - Are mutation, cross-protease, and epistasis claims supported on held-out groups with machine-readable estimates?
+  - Does the answer distinguish protease resistance from global folding stability and state the missing FASTQ/calibration limitations?
+expected_caveats:
+  - Instrument-level FASTQ reads and independently measured sequence-specific protease calibration parameters are not deposited.
+  - Protease cleavage preferences and count compositionality can mimic folding effects.
+  - Absolute delta-G values require additional model assumptions that are outside this benchmark.
+leak_markers:
+  - "Mega-scale experimental analysis of protein folding stability in biology and design"
+  - Tsuboyama
+  - Rocklin
+  - "s41586-023-06328-6"
+  - "7992926"
+  - "7401274"
+  - "K50_dG"

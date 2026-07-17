@@ -1,6 +1,6 @@
 """Leak guard enforced at the staging boundary.
 
-Every file the data-agent wants to expose to the UEA passes through `enforce()`
+Every file the experiment-agent wants to expose to the UEA passes through `enforce()`
 before it is copied into the mounted grant directory. The guard is the last line of
 defense: even if the catalog, the agent prompt, or an online provider misbehaves, a
 file that looks like author code, a trained model, a manuscript/PDF, or any text that
@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import re
 import tarfile
+import xml.etree.ElementTree as ET
 import zipfile
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -20,13 +21,16 @@ from pathlib import Path
 CODE_EXTENSIONS = {
     ".py", ".r", ".ipynb", ".c", ".cc", ".cpp", ".h", ".hpp", ".js", ".ts",
     ".sh", ".bash", ".pl", ".jl", ".m", ".java", ".go", ".rs", ".rb", ".f90",
+    ".rmd", ".qmd",
 }
 MODEL_EXTENSIONS = {
     ".pkl", ".pickle", ".pt", ".pth", ".ckpt", ".joblib", ".onnx", ".pb",
     ".h5", ".hdf5", ".safetensors",
 }
-DOC_EXTENSIONS = {".pdf", ".doc", ".docx", ".ppt", ".pptx", ".tex"}
-METADATA_EXTENSIONS = {".md", ".markdown"}
+DOC_EXTENSIONS = {".pdf", ".doc", ".docx", ".ppt", ".pptx", ".tex", ".xls"}
+METADATA_EXTENSIONS = {
+    ".md", ".markdown", ".html", ".htm", ".json", ".jsonl", ".bib", ".ris", ".enw",
+}
 RESULT_EXTENSIONS = {".graphml"}
 
 # Archives we inspect member-by-member.
@@ -50,8 +54,18 @@ RESULT_NAME_RE = re.compile(
     r"(?:^|[_-])results?(?:[_-]|\.)|pdx[_-]?results)",
     re.IGNORECASE,
 )
+RESULT_WORKSHEET_RE = re.compile(
+    r"("
+    r"\bfig(?:ure)?\.?\s*\d|"
+    r"\bedf\s*\d|"
+    r"\bextended\s*data\b|"
+    r"\bsource\s*data\b"
+    r")",
+    re.IGNORECASE,
+)
 
-_BYTE_SCAN_LIMIT = 6_000_000  # scan up to ~6 MB of head + tail per file
+_SCAN_CHUNK_BYTES = 1024 * 1024
+_MAX_EXPANDED_SCAN_BYTES = 2_000_000_000
 
 
 @dataclass
@@ -92,31 +106,91 @@ def _archive_is_clean(path: Path) -> str | None:
     return None
 
 
-def _read_scan_bytes(path: Path) -> bytes:
-    size = path.stat().st_size
-    with path.open("rb") as fh:
-        if size <= _BYTE_SCAN_LIMIT:
-            return fh.read()
-        head = fh.read(_BYTE_SCAN_LIMIT // 2)
-        fh.seek(-_BYTE_SCAN_LIMIT // 2, 2)
-        tail = fh.read()
-    return head + tail
+def _archive_content_leak(path: Path, markers: list[bytes]) -> str | None:
+    if not markers:
+        return None
+    try:
+        if _has_suffix(path.name, (".zip",)):
+            with zipfile.ZipFile(path) as archive:
+                members = [item for item in archive.infolist() if not item.is_dir()]
+                if sum(item.file_size for item in members) > _MAX_EXPANDED_SCAN_BYTES:
+                    return "archive expands beyond the safe inspection limit"
+                for item in members:
+                    with archive.open(item) as stream:
+                        if _stream_contains_marker(stream, markers):
+                            return "archive content matches a hidden paper/repo identifier"
+        else:
+            with tarfile.open(path) as archive:
+                members = [item for item in archive.getmembers() if item.isfile()]
+                if sum(item.size for item in members) > _MAX_EXPANDED_SCAN_BYTES:
+                    return "archive expands beyond the safe inspection limit"
+                for item in members:
+                    stream = archive.extractfile(item)
+                    if stream is not None:
+                        with stream:
+                            if _stream_contains_marker(stream, markers):
+                                return "archive content matches a hidden paper/repo identifier"
+    except Exception:
+        return "archive could not be fully scanned for identifiers"
+    return None
+
+
+def _stream_contains_marker(stream, markers: list[bytes]) -> bool:
+    overlap = max((len(marker) for marker in markers), default=1) - 1
+    carry = b""
+    while True:
+        chunk = stream.read(_SCAN_CHUNK_BYTES)
+        if not chunk:
+            return False
+        blob = (carry + chunk).lower()
+        if any(marker and marker in blob for marker in markers):
+            return True
+        carry = blob[-overlap:] if overlap else b""
 
 
 def _content_leak(path: Path, markers: list[bytes]) -> str | None:
     if not markers:
         return None
     try:
-        blob = _read_scan_bytes(path).lower()
+        with path.open("rb") as fh:
+            leaked = _stream_contains_marker(fh, markers)
     except Exception:  # noqa: BLE001 - unreadable; do not leak
         return "file could not be scanned for identifiers"
-    for marker in markers:
-        if marker and marker in blob:
-            return f"content matches a hidden paper/repo identifier"
+    if leaked:
+        return "content matches a hidden paper/repo identifier"
+    return None
+
+
+def _xlsx_sheet_names(path: Path) -> list[str]:
+    try:
+        with zipfile.ZipFile(path) as zf:
+            raw = zf.read("xl/workbook.xml")
+    except Exception:
+        return []
+    try:
+        root = ET.fromstring(raw)
+    except ET.ParseError:
+        return []
+    names: list[str] = []
+    for element in root.iter():
+        if element.tag.rsplit("}", 1)[-1] == "sheet":
+            name = element.attrib.get("name")
+            if name:
+                names.append(name)
+    return names
+
+
+def _xlsx_structure_leak(path: Path) -> str | None:
+    for sheet_name in _xlsx_sheet_names(path):
+        if RESULT_WORKSHEET_RE.search(sheet_name):
+            return "spreadsheet contains figure/statistic/result worksheet names"
     return None
 
 
 def _xlsx_content_leak(path: Path, markers: list[bytes]) -> str | None:
+    reason = _xlsx_structure_leak(path)
+    if reason:
+        return reason
     if not markers:
         return None
     try:
@@ -125,15 +199,13 @@ def _xlsx_content_leak(path: Path, markers: list[bytes]) -> str | None:
                 name for name in zf.namelist()
                 if name.endswith(".xml") and not name.startswith("xl/media/")
             ]
-            scanned = 0
+            expanded_bytes = sum(zf.getinfo(name).file_size for name in xml_names)
+            if expanded_bytes > _MAX_EXPANDED_SCAN_BYTES:
+                return "spreadsheet expands beyond the safe inspection limit"
             for name in xml_names:
-                blob = zf.read(name).lower()
-                scanned += len(blob)
-                for marker in markers:
-                    if marker and marker in blob:
+                with zf.open(name) as stream:
+                    if _stream_contains_marker(stream, markers):
                         return "spreadsheet metadata/content matches a hidden paper/repo identifier"
-                if scanned >= _BYTE_SCAN_LIMIT:
-                    break
     except Exception:
         return "spreadsheet could not be scanned for identifiers"
     return None
@@ -178,6 +250,10 @@ def scan_file(path: Path, identifiers: list[str]) -> str | None:
             return reason
 
     markers = _build_markers(identifiers)
+    if _has_suffix(name, INSPECTABLE_ARCHIVE_SUFFIXES):
+        reason = _archive_content_leak(path, markers)
+        if reason:
+            return reason
     # Filename check.
     low_name = name
     for ident in identifiers:

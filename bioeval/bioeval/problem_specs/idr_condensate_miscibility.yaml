@@ -1,14 +1,20 @@
 problem_id: s41589-026-02251-9_idr-condensate-serine-charge
 title: Sequence grammar for IDR condensate miscibility
 doi: 10.1038/s41589-026-02251-9
+target_footprint_date: 2026-04-20
+external_source_cutoff: 2026-04-19T23:59:59Z
 sandbox_prompt: |
   You are studying how biomolecular condensates formed by intrinsically disordered
   protein regions (IDRs) decide whether to mix with one another or remain as separate
-  coexisting phases. Using public literature and data-agent requests, determine which
+  coexisting phases. Using public literature and feasible structured experiment-agent calls, determine which
   measurable properties of IDR sequences and perturbations are associated with mixing
   behavior. Your goal is to infer predictive determinants that could be used to
   anticipate or engineer condensate compatibility, and to assess which claims are
   supported by direct perturbation evidence rather than correlation alone.
+  Use the pair-grouped perturbation training table to predict every row in the
+  held-out template. Submit `idr_predictions.csv` with columns assay, pair, group,
+  replicate, and predicted_pearson_r. The evaluator recomputes hidden coverage,
+  RMSE, and improvement over a training-mean baseline.
 expected_conclusions:
   - Pairwise miscibility among IDR condensates can be related to amino-acid composition.
   - Serine and aromatic residues tend to promote miscibility.
@@ -17,6 +23,7 @@ expected_conclusions:
   - Phosphorylation can shift miscibility by changing charge, acting as a regulatory switch.
   - Miscibility with RNA polymerase II condensates is linked to transcriptional activity; highly charged transcription-factor regions tend to mix less and activate less.
 judge_rubric:
+  - Does idr_predictions.csv cover at least 95% of the pair-grouped hidden rows without duplicate or unknown keys and improve RMSE over the training-mean baseline?
   - Does the answer identify opposing effects of serine/aromatic residues versus charged residues?
   - Does it connect phosphorylation to charge-mediated miscibility changes?
   - Does it relate condensate miscibility to transcription-factor or Pol II function?

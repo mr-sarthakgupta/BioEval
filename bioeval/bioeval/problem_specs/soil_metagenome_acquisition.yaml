@@ -1,0 +1,13 @@
+problem_id: s41467-026-71453-5_soil-metagenome-fticr-integration
+benchmark_status: acquisition_only
+readiness_reason: >-
+  Raw cross-omics inputs, a single pinned deposit version, corrected manifests,
+  and a defensible processed-data scope are not yet available.
+title: Soil metagenome and FTICR integration acquisition stub
+doi: 10.1038/s41467-026-71453-5
+sandbox_prompt: This acquisition-only record is not executable.
+expected_conclusions: []
+judge_rubric: []
+expected_caveats: []
+leak_markers:
+  - "s41467-026-71453-5"

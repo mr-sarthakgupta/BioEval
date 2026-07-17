@@ -79,7 +79,7 @@ def main() -> int:
     if remaining < 0:
         print(
             f"OVER BUDGET by {abs(remaining) / gib:.2f} GiB. Delete intermediates, "
-            "subset large datasets (ask the data-agent for fewer rows/columns), or "
+            "reduce experiment data_product row/field limits, or "
             "stream files instead of materializing them."
         )
         return 1

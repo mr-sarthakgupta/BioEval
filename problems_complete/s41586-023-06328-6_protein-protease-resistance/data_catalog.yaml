@@ -1,0 +1,86 @@
+problem_id: s41586-023-06328-6_protein-protease-resistance
+# Hidden, host-only. Never mounted into the UEA container.
+entries:
+  - id: exact_match_ngs_counts
+    description: Exact-match per-sequence counts across no-protease controls, protease dose conditions, libraries, and replicates.
+    kind: raw
+    grantable: true
+    modalities: [csv, sequencing-counts, dose-response, proteolysis]
+    approx_bytes: 1229590882
+    source_paths:
+      - primary-observations/ngs-counts/NGS_count_lib*.csv
+
+  - id: raw_qpcr_assay_control
+    description: Raw qPCR assay-control measurements for an optional technical validation.
+    kind: raw
+    grantable: true
+    modalities: [csv, qpcr, assay-control]
+    source_paths:
+      - primary-observations/qpcr/Raw_qPCR_data_FigS1.csv
+
+  - id: assay_condition_map
+    description: Neutral mapping from count-column suffixes to protease, replicate, dose rank, concentration, and no-protease controls.
+    kind: processed
+    grantable: true
+    source_base: problem
+    modalities: [csv, assay-design]
+    source_paths: [curated/assay_conditions.csv]
+
+  - id: construct_family_folds
+    description: >-
+      Frozen five-fold assignment keyed by construct family. Mutation suffixes are
+      removed before hashing so named parent constructs and their variants cannot
+      cross folds; fold zero is reserved for final evaluation.
+    kind: processed
+    grantable: true
+    source_base: problem
+    modalities: [csv, split, homology-group]
+    source_paths: [curated/protein_group_folds.csv]
+
+  - id: public_raw_count_archive
+    description: Public data-only archive containing exact-match sequencing count tables for four protein libraries.
+    kind: raw
+    grantable: false
+    reason: The data-only archive expands beyond the leak guard's safe archive-scan limit; run the pinned setup extractor and grant the resulting CSV tables instead.
+    modalities: [zip, sequencing-counts, dose-response]
+    approx_bytes: 242934040
+    online:
+      provider: zenodo
+      record_id: 7992926
+      include: [Raw_NGS_count_tables.zip]
+
+  - id: fitted_stability_tables
+    description: Fitted K50, delta-G, processed stability, and quality-filter tables.
+    kind: processed
+    grantable: false
+    reason: These files encode the authors' inference model, filtered targets, and headline results.
+    source_paths:
+      - zenodo/7992926/K50_dG_tables.zip
+      - zenodo/7992926/Processed_K50_dG_datasets.zip
+
+  - id: author_pipelines
+    description: Author analysis and figure-model pipelines.
+    kind: processed
+    grantable: false
+    reason: Notebooks, fitted calibration parameters, and analysis code constitute the target method and answer.
+    source_paths:
+      - zenodo/7992926/Pipeline_K50_dG.zip
+      - zenodo/7992926/Pipeline_figure_model.zip
+      - zenodo/7992926/Pipeline_qPCR_data.zip
+
+  - id: figure_and_design_outputs
+    description: Figure tables, generated structural models, and design blueprints.
+    kind: processed
+    grantable: false
+    reason: These artifacts encode selected targets, summaries, structural analyses, and design conclusions.
+    source_paths:
+      - zenodo/7992926/Data_tables_for_figs.zip
+      - zenodo/7992926/AlphaFold_model_PDBs.zip
+      - zenodo/7992926/Blueprints_for_EEHH.zip
+
+  - id: record_metadata
+    description: Repository record metadata.
+    kind: processed
+    grantable: false
+    reason: Metadata exposes the paper, authors, preprint, DOI, and file-to-analysis map.
+    source_paths: [zenodo/7992926/metadata.json]

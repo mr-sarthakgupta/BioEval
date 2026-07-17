@@ -1,0 +1,14 @@
+problem_id: s41467-026-73164-3_tracebind-atac-footprinting
+benchmark_status: acquisition_only
+readiness_reason: >-
+  Declared archives and raw benchmark ATAC inputs are absent, and the third-party
+  bias model has not been classified as an allowed input or forbidden output.
+title: TraceBIND ATAC footprinting acquisition stub
+doi: 10.1038/s41467-026-73164-3
+sandbox_prompt: This acquisition-only record is not executable.
+expected_conclusions: []
+judge_rubric: []
+expected_caveats: []
+leak_markers:
+  - "s41467-026-73164-3"
+  - TraceBIND

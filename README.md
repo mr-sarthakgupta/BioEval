@@ -4,7 +4,7 @@
 
 This is a minimal scaffold for evaluating whether an under-eval-agent (UEA) can
 rediscover the core conclusions of a biology paper from an open-world problem
-statement, internet access, analysis tools, and a guarded data-agent.
+statement, internet access, analysis tools, and a guarded experiment-agent.
 
 RL environments and evals created by inverting pull requests from real repositories have provided a huge amount of in-distribution data for coding. We believe the same can be done with research papers for automated research.
 
@@ -13,12 +13,12 @@ RL environments and evals created by inverting pull requests from real repositor
 - The UEA starts in an empty `/workspace` with internet access and a fixed disk budget.
 - The UEA does **not** receive the original paper, paper repository, answer key, or
   benchmark problem folder.
-- The UEA calls `request_data "..."` to ask the data-agent for measurements or datasets,
+- The UEA calls `design_experiment` with a closed, nested experiment specification,
   works in a recorded shell session, and calls `submit_answer` when it is done.
-- The data-agent reasons with **AWS Bedrock Claude Sonnet 4.6** by default. For each request it reads a hidden,
-  host-only per-problem `data_catalog.yaml` (neutral dataset descriptions only) and
-  produces a grant plan: which datasets to stage locally, which to subset, and which to
-  fetch from public sources online.
+- The experiment-agent first validates whether the design is complete and realistic.
+  To the UEA, feasible experiments are then executed and produce measurements. Internally,
+  the host fulfills this simulation from a hidden catalog or guarded public providers;
+  those implementation details are never exposed to the UEA.
 - A **leak guard** scans everything before it reaches the UEA. It withholds source code,
   serialized models, manuscripts/PDFs, archives that contain code, and any file whose
   contents or name match hidden paper/repo identifiers. This is the real boundary: even
@@ -31,8 +31,9 @@ RL environments and evals created by inverting pull requests from real repositor
   disqualifying.
 
 ```
-request_data --> data-agent (Bedrock Claude Sonnet 4.6) --> grant plan
-   --> stage local subset / fetch online --> leak guard --> /workspace/data (read-only)
+design_experiment --> schema/feasibility validation
+   --> exact local match --> guarded online discovery --> leak guard
+   --> /workspace/data (read-only)
 ```
 
 ### Anti-leak layers
@@ -40,7 +41,7 @@ request_data --> data-agent (Bedrock Claude Sonnet 4.6) --> grant plan
 1. The catalog only lists grantable raw/derivable/online data; author code, trained
    models, result/figure files, supplementary-information PDFs, and repository archives
    are marked non-grantable.
-2. The data-agent only ever sees neutral descriptions (the public catalog view), never
+2. The experiment-agent matcher only ever sees neutral descriptions (the public catalog view), never
    host paths, titles, DOIs, or block reasons. It emits a plan; the host executes it.
 3. The leak guard re-checks every staged byte at the boundary.
 
@@ -87,10 +88,11 @@ Print the UEA-visible task:
 bioeval-print-prompt --problem-id "$BIOEVAL_PROBLEM_ID"
 ```
 
-Inside the container, the UEA can request data:
+Inside the container, the Bedrock UEA normally calls the structured `design_experiment`
+tool directly. For manual smoke tests, the equivalent CLI accepts the complete JSON object:
 
 ```bash
-request_data "survival data comparing pollen-feeding and non-pollen-feeding butterflies" --modality csv
+design_experiment '{"schema_version":"1.0", "...":"complete ExperimentRequest fields"}'
 ```
 
 The UEA also has exploration tools, all recorded automatically:
@@ -110,23 +112,21 @@ These tools are intended for open-world analysis while preserving the blind setu
 cannot access host problem folders and should not be used to request the original paper,
 DOI, repository, author code, solution, or expected conclusions.
 
-Data requests must be specific. The data-agent denies broad inventory or topic requests
-such as "do you have any datasets on this topic?", "give me all available data", or
-"survival data for a genus in captivity or field." Ask for one concrete existing dataset
-or one concrete experiment/assay output, naming the measurement, exact species/sample or
-cohort/accession, condition/treatment/environment, data type, and scope. By default the
-data-agent grants only one exact-match dataset per request and does not bundle adjacent
-tables, phylogenies, supplementary files, or public deposits merely because they may help
-with the larger task.
+Every call must specify one reproducible experiment: exact entities and identifiers,
+properties, groups, controls, factors, interventions with values and units, timing,
+replication, ordered procedures, measurements, and expected output fields. Validation
+returns `needs_revision`, `unrealistic`, `restricted`, or `feasible`. The first three
+statuses stop before execution. A feasible design can still return `could_not_execute`
+when the simulated facility cannot supply the required resources.
 
-The strict grant policy is controlled by:
+By default the experiment-agent grants only one exact match and does not bundle adjacent
+tables or deposits. The grant limit is controlled by:
 
 ```bash
-BIOEVAL_STRICT_DATA_REQUESTS=1
 BIOEVAL_MAX_DATASET_GRANTS_PER_REQUEST=1
 ```
 
-Search and page-fetch tools are proxied through the host-side data-agent. Deterministic
+Search and page-fetch tools are proxied through the host-side experiment-agent. Deterministic
 domain and hidden-marker filters run first; then a traffic guard-agent reviews any
 remaining query/result/page. Its instruction is to block the held-out paper, preprints,
 repositories, data deposits, records, summaries, and derivative works, while allowing
@@ -137,9 +137,14 @@ BIOEVAL_TRAFFIC_GUARD_ENABLED=1
 BIOEVAL_TRAFFIC_GUARD_FAIL_CLOSED=1
 ```
 
-Set `BIOEVAL_STRICT_DATA_REQUESTS=0` only for debugging older problem catalogs. Raise
-`BIOEVAL_MAX_DATASET_GRANTS_PER_REQUEST` only when the UEA explicitly requests multiple
-named datasets, cohorts, or experiment components in a single request.
+For OpenAlex results, the host also resolves the hidden DOI and builds a cached incoming
+citation graph. The target work and discovered direct or multi-hop citation descendants
+are blocked by OpenAlex work ID before semantic traffic-guard review. Traversal depth and
+node caps are configured with `BIOEVAL_OPENALEX_DESCENDANT_DEPTH` and
+`BIOEVAL_OPENALEX_DESCENDANT_MAX_NODES`.
+
+Raise `BIOEVAL_MAX_DATASET_GRANTS_PER_REQUEST` only when one experiment genuinely
+produces multiple required data products.
 
 The UEA image includes Python 3.11 with the scientific Python stack listed in
 `docker/Dockerfile.uea`, Rscript for `.rds` inspection, and common read-only CLI readers
@@ -165,11 +170,8 @@ Use `--all` to run every problem spec. The runner creates a fresh recorded run p
 problem, starts the Docker Compose sandbox, copies the visible task into `/workspace`,
 and executes `uea_bedrock_agent` inside the UEA container. 
 
-For very large datasets, ask for a subset, e.g.:
-
-```bash
-request_data "basal gene expression for a few hundred cancer cell lines, first 500 columns" --modality csv
-```
+For very large datasets, set `data_product.max_rows`, `data_product.max_bytes`, and the
+exact `data_product.fields`; these remain hard minimization boundaries.
 
 Before requesting large files or generating outputs, the UEA should run:
 
@@ -231,7 +233,8 @@ Each run directory contains:
 - `TASK.md`: the UEA-visible task text for the run.
 - `uea_workspace/`: the UEA scratch workspace.
 - `data_grants/`: neutral-path data grants mounted at `/workspace/data`.
-- `data_requests.jsonl`: host-side data-agent request, planner, and grant log. This is
+- `experiment_requests.jsonl`: host-side experiment specification, feasibility review,
+  match plan, online-discovery metadata, and grant log. This is
   intentionally not mounted into the UEA container; it may contain evaluator-only planner
   details about hidden holdings and grant decisions.
 - `results/terminal.typescript`: full interactive terminal I/O transcript.
@@ -243,8 +246,8 @@ Each run directory contains:
   outputs returned to the model for each step, useful for compact trace review.
 - `results/judge_result.json`: full judge result with metadata.
 - `results/score_history.jsonl`: append-only judge score/feedback history.
-- `logs/uea_bedrock_cost.log` and `logs/data-agent_bedrock_cost.log`: per-call Bedrock cost lines and end-of-run summaries (also printed to stderr during `bioeval-run-bedrock-uea`).
-- `logs/uea_bedrock_cost.json` and `logs/data-agent_bedrock_cost.json`: machine-readable cost totals.
+- `logs/uea_bedrock_cost.log` and `logs/experiment-agent_bedrock_cost.log`: per-call Bedrock cost lines and end-of-run summaries (also printed to stderr during `bioeval-run-bedrock-uea`).
+- `logs/uea_bedrock_cost.json` and `logs/experiment-agent_bedrock_cost.json`: machine-readable cost totals.
 
 ## Current Problems
 
@@ -252,6 +255,16 @@ Each run directory contains:
 - `s41467-026-73635-7_butterfly-longevity-pollen-feeding`
 - `s41467-026-73977-2_forge-cancer-drug-response`
 - `s41589-026-02251-9_idr-condensate-serine-charge`
+- `s41586-022-05383-9_light-competition-plant-diversity` (runnable; first
+  Dryad download requires `DRYAD_TOKEN`)
+- `s41586-023-06328-6_protein-protease-resistance` (runnable count-based scope)
+
+Conditional candidate specs are indexed separately in `problems_imcomplete/`:
+
+- `s41586-023-06344-6_global-river-methane` (observation scope runnable; global
+  aggregation withheld)
+- `nature09906_chromatin-state-dynamics` (exact manifests and acquisition profiles;
+  full data and pilot gates pending)
 
 Problem specs live in `bioeval/problem_specs`. The UEA-visible prompt is
 `sandbox_prompt`; `expected_conclusions`, `expected_caveats`, `judge_rubric`, and
@@ -260,25 +273,26 @@ by the hidden `data_catalog.yaml` inside each problem folder.
 
 ## Notes And Guardrails
 
-- The data-agent uses AWS Bedrock Claude Sonnet 4.6 to choose datasets. OpenAI-compatible
+- The experiment-agent uses AWS Bedrock Claude Sonnet 4.6 for independent feasibility
+  review and exact dataset matching. OpenAI-compatible
   configs still use opencode first, then a direct OpenAI structured-output call. If no
   LLM planner is available, it falls back to deterministic keyword matching over the
   catalog, so the pipeline always runs.
-- Online acquisition is real (Zenodo / figshare / direct URL via `bioeval/providers.py`).
-  Everything fetched still passes through the leak guard.
+- Online acquisition is real. After local matching fails, metadata-only searches of
+  Zenodo and Figshare provide candidates for the same exact compatibility check.
+  Everything downloaded still passes through byte limits and the leak guard.
 - Open-world realism depends on raw-first catalogs and exact grants. Do not mark fitted
   summaries, model predictions, figure/source-data tables, author analysis outputs, or
   paper-specific README/metadata files as grantable raw data. Avoid whole public-deposit
   grants unless the UEA names the specific accession/source. Catalog descriptions should
-  be neutral and sparse enough that the data-agent cannot act like an expert curator of
+  be neutral and sparse enough that the experiment-agent cannot act like an expert curator of
   the hidden paper.
 - Search tools report diagnostics when possible. Empty results can mean no index hits,
-  OpenAlex rate limiting or authentication limitations, DuckDuckGo parse
-  failure, or all candidates being filtered by the blind-setup domain guard. For very new
-  papers, target-adjacent queries may fail because the paper is not indexed yet, while
-  DOI/Nature/GitHub results are intentionally blocked to preserve the blind setup. If
-  data access then compensates by handing over the decisive paper dataset, the benchmark
-  is testing curated data analysis more than open-world discovery.
+  OpenAlex rate limiting or authentication limitations, DuckDuckGo parse failure, or all
+  candidates being filtered by the traffic guard or hidden-identifier checks. Optional
+  host blocking is available via `BIOEVAL_BLOCKED_WEB_DOMAINS` (comma-separated). If data
+  access compensates by handing over the decisive paper dataset, the benchmark is testing
+  curated data analysis more than open-world discovery.
 - The leak guard (`bioeval/guard.py`) is the enforced boundary. To add a new problem,
   write its `data_catalog.yaml` and a problem spec; mark code/models/results/PDFs/archives
   non-grantable and set `leak_markers` (title, authors, repo) so the guard can catch them.

@@ -70,7 +70,7 @@ def parse_init_output(output: str) -> tuple[str, Path]:
     return run_id, run_root
 
 
-def wait_for_data_agent(timeout: int = 120) -> None:
+def wait_for_experiment_agent(timeout: int = 120) -> None:
     deadline = time.time() + timeout
     last_error = None
     while time.time() < deadline:
@@ -81,28 +81,36 @@ def wait_for_data_agent(timeout: int = 120) -> None:
         except Exception as exc:  # noqa: BLE001 - retry until timeout
             last_error = exc
         time.sleep(2)
-    raise TimeoutError(f"data-agent did not become healthy: {last_error}")
+    raise TimeoutError(f"experiment-agent did not become healthy: {last_error}")
 
 
 def selected_problems(args: argparse.Namespace) -> list[str]:
     if args.all:
-        return [spec.problem_id for spec in list_problem_specs()]
+        statuses = {"active", "conditional"} if args.include_conditional else {"active"}
+        return [
+            spec.problem_id
+            for spec in list_problem_specs()
+            if spec.benchmark_status in statuses
+        ]
     if args.problems:
         return args.problems
     raise SystemExit("Pass one or more problem IDs, or use --all.")
 
 
 def prepare_run(problem_id: str, args: argparse.Namespace, root: Path, env: dict[str, str]) -> tuple[str, Path]:
+    command = [
+        sys.executable,
+        "-m",
+        "bioeval.init_run",
+        "--problem-id",
+        problem_id,
+        "--uea-model",
+        args.model,
+    ]
+    if args.include_conditional or bool(args.problems):
+        command.append("--allow-conditional")
     init = run(
-        [
-            sys.executable,
-            "-m",
-            "bioeval.init_run",
-            "--problem-id",
-            problem_id,
-            "--uea-model",
-            args.model,
-        ],
+        command,
         cwd=root,
         env=env,
         capture=True,
@@ -122,8 +130,10 @@ def run_problem(problem_id: str, args: argparse.Namespace, root: Path, env_file:
             "UEA_BEDROCK_MODEL": args.model,
             "UEA_BEDROCK_API_BASE": args.api_base,
             "UEA_MODEL": args.model,
-            "DATA_AGENT_MODEL": os.environ.get("DATA_AGENT_MODEL", DEFAULT_MODEL),
-            "DATA_AGENT_API_BASE": os.environ.get("DATA_AGENT_API_BASE", DEFAULT_API_BASE),
+            "EXPERIMENT_AGENT_MODEL": os.environ.get("EXPERIMENT_AGENT_MODEL", DEFAULT_MODEL),
+            "EXPERIMENT_AGENT_API_BASE": os.environ.get(
+                "EXPERIMENT_AGENT_API_BASE", DEFAULT_API_BASE
+            ),
             "AWS_REGION": os.environ.get("AWS_REGION", "us-east-1"),
             "AWS_DEFAULT_REGION": os.environ.get("AWS_DEFAULT_REGION", "us-east-1"),
             "BEDROCK_AWS_REGION": os.environ.get("BEDROCK_AWS_REGION", "us-east-1"),
@@ -150,10 +160,10 @@ def run_problem(problem_id: str, args: argparse.Namespace, root: Path, env_file:
         up_cmd = compose + ["up", "-d"]
         if not args.no_build:
             up_cmd.append("--build")
-        up_cmd.extend(["data-agent", "uea"])
+        up_cmd.extend(["experiment-agent", "uea"])
         run(up_cmd, cwd=root, env=env)
         started = True
-        wait_for_data_agent(timeout=args.health_timeout)
+        wait_for_experiment_agent(timeout=args.health_timeout)
 
         agent_cmd = [
             "uea_bedrock_agent",
@@ -171,6 +181,41 @@ def run_problem(problem_id: str, args: argparse.Namespace, root: Path, env_file:
             str(args.temperature),
         ]
         run(compose + ["exec", "-T", "uea", *agent_cmd], cwd=root, env=env)
+        if not args.skip_judge:
+            final_answer = run_root / "results" / "final_answer.txt"
+            transcript = run_root / "results" / "transcript.txt"
+            if not final_answer.is_file() or not transcript.is_file():
+                raise RuntimeError(
+                    "UEA completed without the final answer and transcript required for judging."
+                )
+            judge_cmd = [
+                sys.executable,
+                "-m",
+                "bioeval.judge",
+                "--problem-id",
+                problem_id,
+                "--final-answer-file",
+                str(final_answer),
+                "--transcript-file",
+                str(transcript),
+                "--model",
+                args.judge_model,
+                "--api-base",
+                args.judge_api_base,
+                "--run-id",
+                run_id,
+            ]
+            manifest = run_root / "results" / "analysis_manifest.json"
+            if manifest.is_file():
+                judge_cmd.extend(
+                    [
+                        "--analysis-manifest",
+                        str(manifest),
+                        "--artifact-root",
+                        str(run_root / "results"),
+                    ]
+                )
+            run(judge_cmd, cwd=root, env=env)
         print(f"Run artifacts: {run_root}", flush=True)
     finally:
         if started and not args.keep_up:
@@ -182,12 +227,27 @@ def build_arg_parser() -> argparse.ArgumentParser:
         description="Run selected BioEval problems with a Sonnet 4.6 UEA on AWS Bedrock."
     )
     parser.add_argument("problems", nargs="*", help="Problem IDs to run.")
-    parser.add_argument("--all", action="store_true", help="Run all known problem specs.")
+    parser.add_argument("--all", action="store_true", help="Run all active problem specs.")
+    parser.add_argument(
+        "--include-conditional",
+        action="store_true",
+        help="Include conditional (but never acquisition-only) specs with --all.",
+    )
     parser.add_argument("--model", default=os.getenv("UEA_BEDROCK_MODEL", DEFAULT_MODEL))
     parser.add_argument("--api-base", default=os.getenv("UEA_BEDROCK_API_BASE", DEFAULT_API_BASE))
     parser.add_argument("--max-steps", type=int, default=int(os.getenv("UEA_MAX_STEPS", "40")))
     parser.add_argument("--max-tokens", type=int, default=int(os.getenv("UEA_MAX_TOKENS", "8192")))
     parser.add_argument("--temperature", type=float, default=float(os.getenv("UEA_TEMPERATURE", "0.2")))
+    parser.add_argument("--judge-model", default=os.getenv("JUDGE_MODEL", DEFAULT_MODEL))
+    parser.add_argument(
+        "--judge-api-base",
+        default=os.getenv("JUDGE_API_BASE", DEFAULT_API_BASE),
+    )
+    parser.add_argument(
+        "--skip-judge",
+        action="store_true",
+        help="Do not automatically judge a successfully submitted run.",
+    )
     parser.add_argument("--health-timeout", type=int, default=120)
     parser.add_argument("--no-build", action="store_true", help="Do not rebuild Docker images.")
     parser.add_argument("--keep-up", action="store_true", help="Leave Compose services running after completion.")

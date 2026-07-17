@@ -1,0 +1,70 @@
+problem_id: s41586-022-05383-9_light-competition-plant-diversity
+# Hidden, host-only. Never mounted into the UEA container.
+entries:
+  - id: community_observations_2017
+    description: Plot- and subplot-level grassland community outcomes from the earlier observation year under crossed nutrient, herbivore-access, and light treatments.
+    kind: raw
+    grantable: true
+    modalities: [txt, community, diversity, factorial]
+    source_paths: [dryad/204170/communitydata_2017_nature.txt]
+
+  - id: community_observations_2019
+    description: Plot- and subplot-level grassland community outcomes from the later observation year under crossed nutrient, herbivore-access, and light treatments.
+    kind: raw
+    grantable: true
+    modalities: [txt, community, diversity, factorial]
+    source_paths: [dryad/204170/communitydata_2019_nature.txt]
+
+  - id: understory_light_measurements
+    description: Understory photosynthetically active radiation measurements for treatment plots.
+    kind: raw
+    grantable: true
+    modalities: [txt, light, environment]
+    source_paths: [dryad/204170/light_data.txt]
+
+  - id: temperature_humidity_means
+    description: Plot-level mean temperature and humidity observations associated with the light manipulation.
+    kind: processed
+    grantable: true
+    modalities: [txt, temperature, humidity]
+    source_paths: [dryad/204170/humidity_temp_data_means_2019.txt]
+
+  - id: pinned_dryad_snapshot
+    description: Public repository version containing the experimental community and physical measurements.
+    kind: online
+    grantable: true
+    modalities: [txt, community, environment]
+    approx_bytes: 18425
+    online:
+      provider: dryad
+      version_id: 204170
+      include:
+        - communitydata_2017_nature.txt
+        - communitydata_2019_nature.txt
+        - light_data.txt
+        - humidity_temp_data_means_2019.txt
+
+  - id: derived_trait_response_tables
+    description: Species-trait tables merged with precomputed treatment-response indicators.
+    kind: processed
+    grantable: false
+    reason: The response indicators and merged trait tables encode analysis outcomes rather than primary measurements.
+    source_paths:
+      - dryad/204170/prob_increase_*.txt
+      - dryad/204170/trait_correlations.txt
+
+  - id: dataset_readme
+    description: Paper-linked repository README.
+    kind: processed
+    grantable: false
+    reason: The README maps files to paper analyses and reveals the target framing.
+    source_paths: [dryad/204170/README_file.txt]
+
+  - id: author_analysis_code
+    description: Deposited statistical and figure scripts.
+    kind: processed
+    grantable: false
+    reason: Author scripts expose selected models, contrasts, figures, and conclusions.
+    online:
+      provider: zenodo
+      record_id: 7269719

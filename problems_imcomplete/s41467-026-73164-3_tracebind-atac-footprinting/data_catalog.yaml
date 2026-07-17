@@ -1,0 +1,11 @@
+problem_id: s41467-026-73164-3_tracebind-atac-footprinting
+entries:
+  - id: unvalidated_acquisition_payload
+    description: Current GEO metadata, repository payload, and third-party bias-model artifact.
+    kind: processed
+    grantable: false
+    reason: Raw benchmark ATAC inputs are absent and the model/input boundary is unresolved.
+    source_base: problem
+    source_paths:
+      - data/**/*
+      - repo/**/*

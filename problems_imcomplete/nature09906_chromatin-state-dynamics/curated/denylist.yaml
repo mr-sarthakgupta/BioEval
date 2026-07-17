@@ -1,0 +1,25 @@
+deny:
+  state_segmentations:
+    - GM12878
+    - H1
+    - HepG2
+    - HMEC
+    - HSMM
+    - Huvec
+    - K562
+    - NHEK
+    - NHLF
+  filename_patterns:
+    - "*segment*.bed*"
+    - "*state*.bed*"
+    - "*chromHMM*"
+    - "*emission*"
+    - "*transition*"
+    - "*posterior*"
+    - "*model*"
+    - "*mnemonics*"
+    - "*label*"
+  reasons:
+    - Published segmentations and state labels are the answer key.
+    - Emission, transition, posterior, and fitted model files reveal the target model.
+    - State mnemonics make otherwise label-invariant evaluation answer-bearing.

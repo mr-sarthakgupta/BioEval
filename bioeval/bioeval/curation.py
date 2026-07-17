@@ -23,8 +23,9 @@ from bioeval.schemas import CatalogEntry, DataCatalog, DatasetGrant, DatasetRequ
 
 # Requests for the paper/code/solution itself are refused outright.
 DENIED_RE = re.compile(
-    r"\b(paper|manuscript|article|authors'? code|source code|github|repository|"
-    r"\brepo\b|solution|answer key|ground truth|expected (?:result|conclusion)|doi)\b",
+    r"\b(paper|manuscript|article|authors'? code|source code|github|"
+    r"(?:author|code|software)\s+repository|solution|answer key|ground truth|"
+    r"expected (?:result|conclusion))\b",
     re.IGNORECASE,
 )
 INVENTORY_REQUEST_RE = re.compile(
@@ -56,7 +57,7 @@ MEASUREMENT_RE = re.compile(
 )
 CONDITION_RE = re.compile(
     r"\b(treatment|treated|control|condition|diet|pollen|deprived|fed|dose|timepoint|"
-    r"age|week|day|wild|field|captive|laboratory|insectary|environment|cohort|"
+    r"age|week|day|wild|field|captive|captivity|reared|colony|laboratory|insectary|environment|cohort|"
     r"comparison|versus|vs\.?|between|with|without|knockout|mutant|replicate|"
     r"atp|adp|nucleotide|cell[- ]?line|compound|drug|target|mutation|"
     r"phosphorylated|phosphomimetic)\b",
@@ -175,9 +176,15 @@ MEASUREMENT_FAMILIES: dict[str, set[str]] = {
     "drug_response": {"drug response", "drug sensitivity", "ic50", "compound sensitivity"},
     "pathway_features": {"pathway", "pathway-enrichment", "pathway enrichment", "feature"},
     "miscibility": {"miscibility", "immiscibility", "mixing", "demixing", "condensate"},
+    "chromatin_accessibility": {
+        "accessibility", "chromatin accessibility", "atac", "atac-seq", "scatac",
+        "scatac-seq", "dnase", "dnase-seq", "peak-by-cell", "peak accessibility",
+        "narrowpeak", "bigwig", "bedgraph", "enhancer activity",
+    },
     "sequence_composition": {
-        "sequence", "amino acid", "composition", "serine", "aromatic", "charge",
-        "charged residues", "phosphorylation",
+        "amino acid", "amino-acid", "protein sequence", "idr sequence",
+        "sequence composition", "amino acid sequence", "composition", "serine",
+        "aromatic", "charge", "charged residues", "phosphorylation",
     },
 }
 UNAVAILABLE_FAMILIES = {"oxidative_stress", "immune", "fecundity", "toxin", "metabolic"}
@@ -245,6 +252,8 @@ def _has_specific_scope(question: str) -> bool:
 
 def specificity_issue(request: DatasetRequest) -> str | None:
     """Return a clarification reason if the data request is too broad to grant."""
+    if request.structured_experiment:
+        return None
     if os.getenv("BIOEVAL_STRICT_DATA_REQUESTS", "1").lower() in {"0", "false", "off", "none"}:
         return None
 
@@ -254,10 +263,15 @@ def specificity_issue(request: DatasetRequest) -> str | None:
     if is_public_source_request(question):
         return None
 
-    text = " ".join([question, *request.desired_modalities])
+    text = " ".join([question, *request.desired_modalities, *request.desired_columns])
     has_measurement = bool(MEASUREMENT_RE.search(text) or request.desired_modalities)
     has_scope = _has_specific_scope(question)
-    has_context = bool(CONDITION_RE.search(text) or DATA_TYPE_RE.search(text))
+    has_context = bool(
+        CONDITION_RE.search(text)
+        or DATA_TYPE_RE.search(text)
+        or request.desired_columns
+        or request.max_rows is not None
+    )
     asks_experiment = bool(re.search(r"\b(experiment|assay|measure|test|derive|generate|compare)\b", text, re.I))
 
     if not has_measurement:
@@ -298,7 +312,51 @@ def generic_denial_message() -> str:
 
 def generic_partial_message(file_count: int) -> str:
     noun = "file" if file_count == 1 else "files"
-    return f"Granted {file_count} exact-match {noun}; unrelated data were withheld."
+    return f"The experiment completed partially and produced {file_count} measurement {noun}."
+
+
+def staging_failure_message(notes: list[str]) -> str:
+    """Non-leaking, categorically informative message when the planner matched
+    a dataset but no files survived staging. Gives the UEA a signal about
+    *what kind* of failure occurred without revealing catalog contents."""
+    has_byte_budget = any("byte budget" in n for n in notes)
+    has_scope_mismatch = any(
+        "did not contain" in n or "did not match" in n
+        for n in notes
+    )
+    has_measurement_mismatch = any("measurement type" in n for n in notes)
+    has_leak_guard = any("Withheld" in n for n in notes)
+    has_online_failure = any("Online fetch" in n and "failed" in n for n in notes)
+
+    if has_byte_budget:
+        return (
+            "A candidate dataset matched your request but exceeds the available "
+            "byte budget. Try requesting a specific row or column subset, e.g. "
+            "specifying which cell lines, compounds, or conditions you need."
+        )
+    if has_scope_mismatch:
+        return (
+            "A candidate dataset was considered but did not contain rows or "
+            "columns matching the specific scope of your request. Try adjusting "
+            "the species, cohort, condition, or measurement terms in your request."
+        )
+    if has_measurement_mismatch:
+        return (
+            "A candidate was considered but its measurement type does not match "
+            "what you requested. Try specifying a different measurement or data type."
+        )
+    if has_leak_guard:
+        return (
+            "Data matching your request was identified but could not be provided "
+            "due to data policy restrictions. Try requesting a different measurement "
+            "or a tabular subset with specific columns and rows."
+        )
+    if has_online_failure:
+        return (
+            "An online data source matching your request was identified but the "
+            "download failed. Try requesting local measurements or a different scope."
+        )
+    return generic_denial_message()
 
 
 def select_instructions_by_keywords(catalog: DataCatalog, request: DatasetRequest) -> list[StageInstruction]:
@@ -318,12 +376,7 @@ def select_instructions_by_keywords(catalog: DataCatalog, request: DatasetReques
     local = [(s, e) for s, e in scored if e.source_paths]
     top = [e for s, e in local if s > 0][:1]
     if not top:
-        top = [e for _, e in local][:1]
-    if not top:
-        # No local data at all (e.g. a pure modeling problem): surface the catalog's
-        # online/literature guidance entries without auto-downloading.
-        top = [e for _, e in scored if e.online is None][:1]
-        return [StageInstruction(entry_id=e.id, use_online=False) for e in top]
+        return []
     return [StageInstruction(entry_id=e.id) for e in top]
 
 
@@ -528,7 +581,11 @@ def _filename_relevant_to_request(src: Path, request: DatasetRequest) -> bool:
 
 
 def _derive_table(src: Path, dest: Path, rows: int | None, columns: list[str] | None) -> bool:
-    """Write a row/column subset of a CSV/TSV/parquet. Returns True on success."""
+    """Write an explicit row/column subset of a tabular file.
+
+    RDS data frames are converted to CSV. Workbooks are deliberately excluded:
+    selecting a sheet implicitly is ambiguous and could bypass workbook leak checks.
+    """
     try:
         import pandas as pd  # noqa: PLC0415
     except Exception:
@@ -545,6 +602,21 @@ def _derive_table(src: Path, dest: Path, rows: int | None, columns: list[str] | 
             if rows:
                 df = df.head(rows)
             df.to_parquet(dest)
+        elif suffix == ".rds":
+            import pyreadr  # noqa: PLC0415
+
+            result = pyreadr.read_r(str(src))
+            df = next((value for value in result.values() if isinstance(value, pd.DataFrame)), None)
+            if df is None:
+                return False
+            if columns is not None:
+                if any(column not in df.columns for column in columns):
+                    return False
+                df = df.loc[:, columns]
+            if rows:
+                df = df.head(rows)
+            dest = dest.with_suffix(".csv")
+            df.to_csv(dest, index=False)
         else:
             return False
     except Exception:
@@ -688,6 +760,27 @@ def _stage_local_entry(
         dest = stage_dir / public_entry_id / neutral_name
         dest.parent.mkdir(parents=True, exist_ok=True)
         size = src.stat().st_size
+        requested_rows = request.max_rows if request.max_rows is not None else instr.rows
+        requested_columns = request.desired_columns or instr.columns
+        wants_subset = requested_rows is not None or requested_columns is not None
+        if wants_subset:
+            if _derive_table(src, dest, requested_rows, requested_columns):
+                derived = dest.with_suffix(
+                    ".parquet" if src.suffix.lower() == ".parquet" else ".csv"
+                )
+                staged += derived.stat().st_size
+                notes.append(
+                    f"Derived the explicitly requested table subset for "
+                    f"'{public_entry_id}/{neutral_name}'."
+                )
+            else:
+                notes.append(
+                    f"Skipped '{public_entry_id}/{neutral_name}' because its format or "
+                    "columns could not satisfy the explicit row/column subset."
+                )
+            # An explicit subset is a hard data-minimization boundary. Never fall
+            # through to copying the full source file when derivation fails.
+            continue
         if os.getenv("BIOEVAL_STRICT_DATA_REQUESTS", "1").lower() not in {"0", "false", "off", "none"}:
             subset_status = _derive_rds_subset_for_request(src, dest, request, notes)
             if subset_status == "derived":
@@ -721,11 +814,6 @@ def _stage_local_entry(
                     "did not match the named request scope."
                 )
                 continue
-        wants_subset = instr.rows is not None or instr.columns is not None
-        if wants_subset and _derive_table(src, dest, instr.rows, instr.columns):
-            staged += dest.stat().st_size if dest.exists() else 0
-            notes.append(f"Derived a requested table subset for '{public_entry_id}/{neutral_name}'.")
-            continue
         if size > remaining_bytes - staged:
             notes.append(
                 f"Skipped '{public_entry_id}/{neutral_name}' ({size} bytes) to stay within the "
@@ -777,13 +865,13 @@ def stage_and_grant(
     request_id: str,
     plan: GrantPlan,
 ) -> DatasetGrant:
-    if plan.deny or DENIED_RE.search(request.question):
-        reason = "planner_denied" if plan.deny else "restricted_request_terms"
+    if DENIED_RE.search(request.question):
         return DatasetGrant(
             request_id=request_id,
             status="denied",
             message=generic_denial_message(),
-            denial_reason=reason,
+            denial_category="restricted_request",
+            denial_reason="restricted_request_terms",
         )
     issue = specificity_issue(request)
     if issue:
@@ -791,7 +879,16 @@ def stage_and_grant(
             request_id=request_id,
             status="denied",
             message=issue,
+            denial_category="too_broad",
             denial_reason=f"specificity_issue: {issue}",
+        )
+    if plan.deny:
+        return DatasetGrant(
+            request_id=request_id,
+            status="denied",
+            message=generic_denial_message(),
+            denial_category="no_exact_match",
+            denial_reason="planner_denied",
         )
 
     notes: list[str] = []
@@ -830,6 +927,18 @@ def stage_and_grant(
                 )
                 continue
             if instr.use_online or not entry.source_paths:
+                if (
+                    request.desired_columns
+                    or request.max_rows is not None
+                    or instr.columns is not None
+                    or instr.rows is not None
+                ):
+                    notes.append(
+                        "Skipped an online candidate because an explicit row/column subset "
+                        "cannot be guaranteed before download. Request the source without a "
+                        "subset or use a locally stageable table."
+                    )
+                    continue
                 used = _stage_online_entry(
                     entry,
                     tmp_root,
@@ -874,7 +983,7 @@ def stage_and_grant(
                     source_path=str(rel),
                     sandbox_path=f"{sandbox_data_root.rstrip('/')}/{request_id}/{rel}",
                     bytes=dest.stat().st_size,
-                    reason="Matched the request and cleared the leak guard.",
+                    reason="Produced by the accepted experiment and cleared the safety boundary.",
                 )
             )
 
@@ -889,18 +998,28 @@ def stage_and_grant(
         if granted_files and (notes or rejected_notes):
             status = "partial"
 
-        message = (
-            generic_partial_message(len(granted_files))
-            if granted_files and notes
-            else "Placed the requested exact-match data into the sandbox data directory."
-            if granted_files
-            else generic_denial_message()
-        )
+        if granted_files and notes:
+            message = generic_partial_message(len(granted_files))
+        elif granted_files:
+            message = "The experiment completed and produced the requested measurements."
+        elif notes:
+            message = staging_failure_message(notes)
+        else:
+            message = generic_denial_message()
 
         grant = DatasetGrant(
             request_id=request_id,
             status=status,
             message=message,
+            denial_category=(
+                "policy_blocked"
+                if not granted_files and rejected_notes
+                else "asset_unavailable"
+                if not granted_files and notes
+                else "no_exact_match"
+                if not granted_files
+                else None
+            ),
             denial_reason=(
                 "no_files_survived_staging"
                 if not granted_files and notes
@@ -911,14 +1030,29 @@ def stage_and_grant(
             files=granted_files,
             rejected=rejected_notes,
             manifest_path=(
-                f"{sandbox_data_root.rstrip('/')}/{request_id}/DATA_GRANT_MANIFEST.json"
+                f"{sandbox_data_root.rstrip('/')}/{request_id}/EXPERIMENT_OUTPUT_MANIFEST.json"
                 if granted_files
                 else None
             ),
         )
         if granted_files:
-            (grant_dir / "DATA_GRANT_MANIFEST.json").write_text(
-                json.dumps(grant.model_dump(), indent=2)
+            (grant_dir / "EXPERIMENT_OUTPUT_MANIFEST.json").write_text(
+                json.dumps(
+                    {
+                        "request_id": request_id,
+                        "execution_status": (
+                            "completed" if status == "granted" else "partially_completed"
+                        ),
+                        "message": message,
+                        "files": [item.model_dump() for item in granted_files],
+                        "notes": (
+                            ["Some planned measurements could not be produced."]
+                            if status == "partial"
+                            else []
+                        ),
+                    },
+                    indent=2,
+                )
             )
         return grant
     finally:

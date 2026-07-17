@@ -1,0 +1,51 @@
+problem_id: nature09906_chromatin-state-dynamics
+benchmark_status: conditional
+readiness_reason: >-
+  Full assay, reference, annotation, and cryptographic acquisition locks are not
+  present; only the bounded six-track pilot is currently defined.
+title: Label-invariant chromatin state dynamics
+doi: 10.1038/nature09906
+target_footprint_date: 2011-03-23
+external_source_cutoff: 2011-03-22T23:59:59Z
+sandbox_prompt: |
+  This conditional benchmark asks whether a compact, label-free segmentation learned
+  from core chromatin-mark and whole-cell-extract BED tracks captures reproducible
+  genome organization across nine human cell types. Use hg18 coordinates and only
+  annotations frozen on or before 2011-03-22. Published state segmentations, labels,
+  mnemonics, emissions, transitions, and model files are unavailable.
+
+  Compare candidate state counts using held-out genomic intervals and held-out assay
+  tracks. Align independently fitted states only for evaluation, and report
+  label-invariant held-out likelihood or reconstruction error, segmentation stability,
+  emission separability, spatial coherence, expression association, annotation
+  enrichment, and cross-cell transition patterns. Do not reward a state merely
+  because its numeric label matches another fit.
+
+  The manifest-only profile is not runnable. A two-cell chr21/chr22 profile is a
+  resource pilot, not evidence for nine-cell conclusions. Report full biological
+  conclusions only when all 178 allowlisted core BED tracks, 19 CEL files, and frozen
+  annotations have passed acquisition and resource checks.
+expected_conclusions:
+  - A compact multivariate state model captures recurrent combinations of active, transcribed, poised, and repressed chromatin marks better than single-mark or shuffled baselines.
+  - Learned states show label-invariant emission separation and genomic spatial coherence on held-out intervals.
+  - Promoter- and transcription-associated learned states are positively associated with expression, whereas repressive-mark states show lower expression.
+  - State occupancy differs across cell types at regulatory loci, supporting biologically structured chromatin-state dynamics rather than a universal static segmentation.
+  - The two-cell small-chromosome pilot can validate acquisition and metrics but cannot establish the nine-cell biological conclusions.
+judge_rubric:
+  - Are state comparisons label-invariant and evaluated on held-out intervals or assays?
+  - Are replicate handling, WCE controls, genome assembly, and frozen annotations explicit?
+  - Are stability, emission separability, spatial coherence, expression association, and annotation enrichment all recomputed?
+  - Are cross-cell claims separated from two-cell pilot evidence?
+  - Is any use of published segmentation, state label, mnemonic, model, or downstream annotation treated as disqualifying leakage?
+expected_caveats:
+  - The full core BED input is 44.37 GB compressed and is manifest-only by default.
+  - Array expression measurements cover only the provided validation samples and require platform-aware normalization.
+  - State number and semantics are model-dependent; numerical state labels have no intrinsic correspondence.
+leak_markers:
+  - "Mapping and analysis of chromatin state dynamics in nine human cell types"
+  - Ernst
+  - Kellis
+  - "nature09906"
+  - ChromHMM
+  - "GSE26386"
+  - "15-state"

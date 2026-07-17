@@ -1,14 +1,21 @@
 problem_id: s41467-026-73635-7_butterfly-longevity-pollen-feeding
 title: Heliconiini butterfly longevity and pollen feeding
 doi: 10.1038/s41467-026-73635-7
+target_footprint_date: 2026-06-17
+external_source_cutoff: 2026-06-16T23:59:59Z
 sandbox_prompt: |
   Some closely related neotropical butterflies appear to differ substantially in adult
   lifespan and ageing rate, but the size and cause of these differences are debated.
-  Using public literature and data you obtain through the data-agent, characterize how
+  Using public literature and data obtained from feasible experiments submitted to the experiment-agent, characterize how
   survival and age-associated physiology vary across the sampled species, then infer
   which ecological, dietary, or lineage-level explanations are best supported.
   Distinguish direct environmental effects from evolved differences where the data
   allow it, and state the limits of the comparison.
+  Submit `butterfly_metrics.csv` with columns metric, estimate, ci_lower, and
+  ci_upper. Include median_species_max_ratio, maximum_verified_lifespan_days,
+  hecale_pf_km_median_days, hecale_pd_km_median_days, dryas_pf_km_median_days,
+  and dryas_pd_km_median_days. The evaluator recomputes each point estimate from
+  the neutral observation tables and verifies that every interval brackets it.
 expected_conclusions:
   - Pollen-feeding Heliconius species show substantially longer maximum and median lifespans than non-pollen-feeding Heliconiini outgroups.
   - The data support roughly a three-fold lifespan extension in Heliconius, with some maximum records approaching one year.
@@ -20,6 +27,8 @@ expected_caveats:
   - The transition to pollen feeding occurred once, limiting strong causal phylogenetic inference.
 judge_rubric:
   - Does the answer compare Heliconius with non-pollen-feeding Heliconiini rather than generic butterflies?
+  - Does it report the median-of-species maximum-lifespan ratio with uncertainty (expected central range 2.5-4.0) and identify whether any verified record reaches at least 330 days?
+  - Are median survival, hazard/age slopes, diet contrasts, and confidence intervals recomputed from individual observations rather than copied from fitted author outputs?
   - Does it separate dietary plastic effects from evolved/heritable longevity?
   - Does it use survival/ageing metrics beyond maximum lifespan?
   - Does it acknowledge observational and phylogenetic limitations?

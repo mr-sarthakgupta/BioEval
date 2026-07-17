@@ -1,0 +1,9 @@
+observation_id,measurement,atp_concentration_molar,value,unit,uncertainty,uncertainty_scale,source
+turnover_1,turnover_rate,1e-6,1.951,s^-1,1.0,log10_standard_deviation,Weber_et_al_1996_J_Biol_Chem_271_18711
+turnover_2,turnover_rate,1e-5,16.00,s^-1,1.0,log10_standard_deviation,Weber_et_al_1996_J_Biol_Chem_271_18711
+turnover_3,turnover_rate,1e-4,57.14,s^-1,1.0,log10_standard_deviation,Weber_et_al_1996_J_Biol_Chem_271_18711
+turnover_4,turnover_rate,1e-3,76.92,s^-1,1.0,log10_standard_deviation,Weber_et_al_1996_J_Biol_Chem_271_18711
+coupling_1,chemo_mechanical_coupling_efficiency,1e-6,1.0,ratio,0.2,standard_deviation,Yasuda_et_al_2001_Nature_410_898
+coupling_2,chemo_mechanical_coupling_efficiency,1e-5,1.0,ratio,0.2,standard_deviation,Yasuda_et_al_2001_Nature_410_898
+coupling_3,chemo_mechanical_coupling_efficiency,1e-4,1.0,ratio,0.2,standard_deviation,Yasuda_et_al_2001_Nature_410_898
+coupling_4,chemo_mechanical_coupling_efficiency,1e-3,1.0,ratio,0.2,standard_deviation,Yasuda_et_al_2001_Nature_410_898

@@ -1,0 +1,62 @@
+problem_id: s41586-023-06344-6_global-river-methane
+# Hidden, host-only. Never mounted into the UEA container.
+entries:
+  - id: river_methane_concentrations
+    description: Source- and site-keyed fluvial methane concentrations with concurrent physicochemical observations.
+    kind: raw
+    grantable: true
+    modalities: [csv, methane, concentration, water-temperature]
+    source_paths: [primary-observations/GRiMe_concentrations_v2.csv]
+
+  - id: measured_river_methane_fluxes
+    description: Source- and site-keyed measured diffusive, ebullitive, and total methane flux observations with method fields.
+    kind: raw
+    grantable: true
+    modalities: [csv, methane, flux]
+    source_paths: [primary-observations/GRiMe_fluxes_v2.csv]
+
+  - id: river_site_covariates
+    description: Coordinates and physical attributes for sites represented in the observation tables.
+    kind: raw
+    grantable: true
+    modalities: [csv, site, geospatial]
+    source_paths: [primary-observations/GRiMe_sites_v2.csv]
+
+  - id: observation_source_keys
+    description: Source-key table needed to preserve literature-source groups during validation.
+    kind: raw
+    grantable: true
+    modalities: [csv, provenance-groups]
+    source_paths: [primary-observations/GRiMe_sources_v2.csv]
+
+  - id: fixed_source_folds
+    description: Deterministic five-fold assignment of source identifiers for leakage-resistant validation.
+    kind: processed
+    grantable: true
+    source_base: problem
+    modalities: [csv, cross-validation]
+    source_paths: [curated/source_folds.csv]
+
+  - id: target_mixed_model_archive
+    description: Mixed archive of target-study inputs, predictions, diagnostics, and outputs.
+    kind: processed
+    grantable: false
+    reason: The 9.807 GB archive cannot be separated safely without an audited input-only allowlist and contains decisive target outputs.
+    online:
+      provider: zenodo
+      record_id: 7733604
+
+  - id: target_global_rasters
+    description: Target-study gridded concentration, flux, and uncertainty rasters.
+    kind: processed
+    grantable: false
+    reason: These are model predictions and global aggregation outputs.
+    online:
+      provider: zenodo
+      record_id: 8108959
+
+  - id: target_paper_and_code
+    description: Target manuscript, supplementary information, repository metadata, and author code.
+    kind: processed
+    grantable: false
+    reason: These artifacts reveal target methods, source selection, model diagnostics, and conclusions.

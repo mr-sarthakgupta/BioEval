@@ -1,4 +1,4 @@
-"""CLI tools the opencode data-agent calls to record a grant plan.
+"""CLI tools the opencode experiment-agent matcher calls to record a grant plan.
 
 Each tool appends to `plan.json` in the request workspace (BIOEVAL_REQUEST_DIR or the
 current directory). The host then validates the plan against the hidden catalog and

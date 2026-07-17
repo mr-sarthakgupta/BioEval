@@ -1,6 +1,6 @@
-"""Drive the data-agent's reasoning with Bedrock/opencode, with safe fallbacks.
+"""Drive the experiment-agent's dataset matching with safe fallbacks.
 
-The data-agent's *decision* of which datasets to grant is made by an LLM:
+The experiment-agent's *decision* of which feasible experiment data to grant is made by an LLM:
 1. AWS Bedrock Claude Sonnet 4.6 via the native Converse API (default), or
 2. opencode in a locked-down per-request workspace for OpenAI-compatible models, or
 3. a direct OpenAI Responses call with a structured-output schema, or
@@ -22,7 +22,7 @@ from pathlib import Path
 
 from bioeval.curation import GrantPlan, StageInstruction
 from bioeval.data_agent_prompt import (
-    DATA_AGENT_SYSTEM_PROMPT,
+    EXPERIMENT_AGENT_MATCHING_PROMPT,
     PLAN_JSON_SCHEMA,
     render_user_message,
 )
@@ -121,15 +121,15 @@ def _extract_json_object(text: str) -> dict | None:
 def build_workspace(ws: Path, catalog_public: list[dict], request: dict) -> None:
     ws.mkdir(parents=True, exist_ok=True)
     (ws / "CATALOG.json").write_text(json.dumps(catalog_public, indent=2))
-    (ws / "REQUEST.txt").write_text(json.dumps(request, indent=2))
-    (ws / "AGENTS.md").write_text(DATA_AGENT_SYSTEM_PROMPT)
+    (ws / "EXPERIMENT.json").write_text(json.dumps(request, indent=2))
+    (ws / "AGENTS.md").write_text(EXPERIMENT_AGENT_MATCHING_PROMPT)
     opencode_config = {
         "$schema": "https://opencode.ai/config.json",
         "permission": {"edit": "deny", "bash": "allow", "webfetch": "allow"},
         "agent": {
-            "dataagent": {
+            "experimentagent": {
                 "mode": "primary",
-                "prompt": DATA_AGENT_SYSTEM_PROMPT,
+                "prompt": EXPERIMENT_AGENT_MATCHING_PROMPT,
                 "permission": {"edit": "deny", "bash": "allow", "webfetch": "allow"},
             }
         },
@@ -152,7 +152,7 @@ def plan_with_opencode(ws: Path, model: str) -> GrantPlan | None:
     if not shutil.which("opencode"):
         return None
     prompt = (
-        "Read CATALOG.json and REQUEST.txt in this directory. Decide which datasets to "
+        "Read CATALOG.json and EXPERIMENT.json in this directory. Decide which datasets could "
         "grant and call the stage_local / derive_subset / fetch_online / deny tools to "
         "record your plan. If you cannot call tools, write the JSON plan to ./plan.json."
     )
@@ -160,7 +160,7 @@ def plan_with_opencode(ws: Path, model: str) -> GrantPlan | None:
         "opencode", "run",
         "--dir", str(ws),
         "--model", model,
-        "--agent", "dataagent",
+        "--agent", "experimentagent",
         "--format", "json",
         "--dangerously-skip-permissions",
         prompt,
@@ -171,7 +171,7 @@ def plan_with_opencode(ws: Path, model: str) -> GrantPlan | None:
             cwd=str(ws),
             capture_output=True,
             text=True,
-            timeout=int(os.getenv("DATA_AGENT_OPENCODE_TIMEOUT", "600")),
+            timeout=int(os.getenv("EXPERIMENT_AGENT_OPENCODE_TIMEOUT", "600")),
             env={**os.environ, "BIOEVAL_REQUEST_DIR": str(ws)},
         )
     except Exception:  # noqa: BLE001 - fall back to other planners
@@ -196,7 +196,7 @@ def plan_with_openai(catalog_public: list[dict], request: dict, model: str) -> G
         response = client.responses.create(
             model=model,
             input=[
-                {"role": "system", "content": DATA_AGENT_SYSTEM_PROMPT},
+                {"role": "system", "content": EXPERIMENT_AGENT_MATCHING_PROMPT},
                 {"role": "user", "content": render_user_message(catalog_public, request)},
             ],
             text={
@@ -250,7 +250,7 @@ def plan_with_bedrock(
                 retries={"mode": "standard", "total_max_attempts": 1},
             ),
         )
-        system_blocks = [{"text": DATA_AGENT_SYSTEM_PROMPT}]
+        system_blocks = [{"text": EXPERIMENT_AGENT_MATCHING_PROMPT}]
         cache_point = _prompt_cache_point()
         if cache_point:
             system_blocks.append(cache_point)
@@ -264,19 +264,42 @@ def plan_with_bedrock(
                 }
             ],
             inferenceConfig={
-                "maxTokens": int(os.environ.get("DATA_AGENT_MAX_TOKENS", "4096")),
-                "temperature": float(os.environ.get("DATA_AGENT_TEMPERATURE", "0")),
+                "maxTokens": int(os.environ.get("EXPERIMENT_AGENT_MAX_TOKENS", "4096")),
+                "temperature": float(os.environ.get("EXPERIMENT_AGENT_TEMPERATURE", "0")),
+            },
+            toolConfig={
+                "tools": [
+                    {
+                        "toolSpec": {
+                            "name": "record_grant_plan",
+                            "description": "Record the exact dataset compatibility plan.",
+                            "inputSchema": {"json": PLAN_JSON_SCHEMA},
+                        }
+                    }
+                ],
+                "toolChoice": {"tool": {"name": "record_grant_plan"}},
             },
         )
         from bioeval.bedrock_cost import record_bedrock_usage
 
-        record_bedrock_usage(response.get("usage", {}) or {}, component="data-agent", model=model)
+        record_bedrock_usage(response.get("usage", {}) or {}, component="experiment-agent", model=model)
+        content = response.get("output", {}).get("message", {}).get("content", [])
+        obj = next(
+            (
+                item["toolUse"]["input"]
+                for item in content
+                if isinstance(item, dict)
+                and item.get("toolUse", {}).get("name") == "record_grant_plan"
+            ),
+            None,
+        )
         text = "\n".join(
             item.get("text", "")
-            for item in response.get("output", {}).get("message", {}).get("content", [])
+            for item in content
             if isinstance(item, dict) and item.get("text")
         )
-        obj = _extract_json_object(text)
+        if obj is None:
+            obj = _extract_json_object(text)
     except Exception:  # noqa: BLE001 - fall back to the next planner
         return None
     if obj is None:

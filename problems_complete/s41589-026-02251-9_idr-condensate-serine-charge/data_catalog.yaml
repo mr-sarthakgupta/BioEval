@@ -3,21 +3,42 @@ problem_id: s41589-026-02251-9_idr-condensate-serine-charge
 entries:
   - id: idr_miscibility_assay_tables
     description: >-
-      Experimental spreadsheet tables containing per-construct IDR miscibility
-      measurements, sequence compositions, and perturbation assay readouts.
-    kind: raw
+      Neutral CSV exports of only the experimental miscibility, composition, and
+      perturbation observation sheets. Figure statistics, fitted thresholds, ROC
+      analyses, model summaries, and other answer-bearing sheets are excluded.
+    kind: processed
     grantable: true
-    modalities: [xlsx, tabular, miscibility, sequence-composition]
+    source_base: problem
+    modalities: [csv, tabular, miscibility, sequence-composition, perturbation]
     source_paths:
-      - nature-supplementary/*.xlsx
+      - curated/observations/*.csv
+
+  - id: perturbation_training_labels
+    description: >-
+      Pair-grouped perturbation observations reserved for model development; all
+      replicates for a given assay and IDR pair remain on one side of the split.
+    kind: processed
+    grantable: true
+    source_base: problem
+    modalities: [csv, perturbation, training]
+    source_paths: [curated/perturbation_training.csv]
+
+  - id: perturbation_test_rows
+    description: Prediction template for held-out IDR pairs, without Pearson-r outcomes.
+    kind: processed
+    grantable: true
+    source_base: problem
+    modalities: [csv, perturbation, prediction-template]
+    source_paths: [curated/perturbation_test_rows.csv]
 
   - id: public_zenodo_record
     description: >-
       Public deposited data tables for IDR miscibility and sequence-composition
       measurements; simulation result archives, code archives, and documents are
       excluded.
-    kind: online
-    grantable: true
+    kind: processed
+    grantable: false
+    reason: The target deposit bundles answer-bearing workbooks and author outputs.
     modalities: [xlsx, miscibility, sequence-composition]
     online:
       provider: zenodo
@@ -30,11 +51,32 @@ entries:
       Related public resources on intrinsically disordered region sequences and
       biomolecular condensate behavior, available on the open web.
     kind: online
-    grantable: true
+    grantable: false
+    reason: This placeholder has no pinned provider, accession, version, or file allowlist.
     modalities: [csv, fasta]
     online: null
 
   # ---- explicitly blocked (leak vectors) ----
+  - id: perturbation_holdout_labels
+    description: Evaluator-only outcomes for pair-grouped perturbation tests.
+    kind: processed
+    grantable: false
+    reason: These outcomes are used only for hidden metric recomputation.
+    source_base: problem
+    source_paths:
+      - evaluator/perturbation_test_labels.csv
+      - evaluator/holdout_source/*.csv
+
+  - id: complete_source_workbooks
+    description: Original multi-sheet supplementary workbooks.
+    kind: processed
+    grantable: false
+    reason: >-
+      The workbooks co-package raw observations with fitted statistics, thresholds,
+      ROC/AUC analyses, model summaries, and figure-organized result sheets.
+    source_paths:
+      - nature-supplementary/*.xlsx
+
   - id: supplementary_information_pdf
     description: Supplementary information documents.
     kind: processed

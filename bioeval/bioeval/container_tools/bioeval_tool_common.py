@@ -19,16 +19,6 @@ DENIED_QUERY_RE = re.compile(
     r"\brepo\b|solution|answer key|ground truth|expected (?:result|conclusion)|doi)\b",
     re.IGNORECASE,
 )
-DEFAULT_BLOCKED_DOMAINS = {
-    "doi.org",
-    "nature.com",
-    "www.nature.com",
-    "github.com",
-    "raw.githubusercontent.com",
-    "codeload.github.com",
-}
-
-
 def utc_now() -> str:
     return datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
@@ -92,9 +82,8 @@ def blocked_url_reason(url: str) -> str | None:
     parsed = urlparse(url)
     if parsed.scheme not in {"http", "https"} or not parsed.netloc:
         return "URL must be http(s)."
-    blocked = set(DEFAULT_BLOCKED_DOMAINS)
     extra = os.getenv("BIOEVAL_BLOCKED_WEB_DOMAINS", "")
-    blocked.update(domain.strip().lower() for domain in extra.split(",") if domain.strip())
-    if host_matches(url, blocked):
+    blocked = {domain.strip().lower() for domain in extra.split(",") if domain.strip()}
+    if blocked and host_matches(url, blocked):
         return "This URL cannot be fetched."
     return None

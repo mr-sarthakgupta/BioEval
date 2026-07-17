@@ -11,11 +11,13 @@ from bioeval_tool_common import append_tool_event, truncate
 
 
 ALLOWED_OPERATIONS = {"search", "snippet_search"}
-DATA_AGENT_URL = os.getenv("DATA_AGENT_URL", "http://data-agent:8765/request-data")
+EXPERIMENT_AGENT_URL = os.getenv(
+    "EXPERIMENT_AGENT_URL", "http://experiment-agent:8765/experiments"
+)
 
 
 def proxy_url(path: str) -> str:
-    return DATA_AGENT_URL.rsplit("/", 1)[0] + path
+    return EXPERIMENT_AGENT_URL.rsplit("/", 1)[0] + path
 
 
 def main() -> int:

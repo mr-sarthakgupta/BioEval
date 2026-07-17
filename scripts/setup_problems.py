@@ -3,21 +3,30 @@
 
 from __future__ import annotations
 
+import argparse
 import csv
+import hashlib
 import io
 import json
+import os
 import shutil
 import subprocess
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
+import zipfile
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Literal
 
 ROOT = Path("/home/mrsar/paper-invert")
-PROBLEMS = ROOT / "problems"
+sys.path.insert(0, str(ROOT / "bioeval"))
+from bioeval.providers import _safe_urlopen  # noqa: E402
+
+PROBLEMS_COMPLETE = ROOT / "problems_complete"
+PROBLEMS_INCOMPLETE = ROOT / "problems_imcomplete"
 PAPERS = ROOT / "papers"
 
 UA = "paper-invert/1.0"
@@ -27,6 +36,13 @@ UA = "paper-invert/1.0"
 class ZenodoAsset:
     record_id: str
     subdir: str | None = None
+    include: tuple[str, ...] = ()
+
+
+@dataclass
+class DryadAsset:
+    version_id: int
+    subdir: str = "dryad"
 
 
 @dataclass
@@ -34,6 +50,8 @@ class UrlAsset:
     url: str
     filename: str
     subdir: str = "nature-supplementary"
+    expected_bytes: int | None = None
+    sha256: str | None = None
 
 
 @dataclass
@@ -47,9 +65,11 @@ class Problem:
     problem_id: str
     title: str
     doi: str
-    pdf_name: str
+    pdf_name: str | None
     repos: list[tuple[str, str]]  # (submodule_path_relative_to_problem, git_url)
+    destination: Literal["complete", "incomplete"] = "complete"
     zenodo: list[ZenodoAsset] = field(default_factory=list)
+    dryad: list[DryadAsset] = field(default_factory=list)
     figshare: list[FigshareAsset] = field(default_factory=list)
     urls: list[UrlAsset] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
@@ -76,6 +96,7 @@ PROBLEM_DEFS: list[Problem] = [
             ("repo/analysis", "https://github.com/EMSL-MONet/The-1000-Soil-ICR-Metagenome.git"),
             ("repo/preprocessing", "https://github.com/osumpcheng/FTICR_preprocess.git"),
         ],
+        destination="incomplete",
         zenodo=[
             ZenodoAsset("18747539"),
             ZenodoAsset("7406532"),
@@ -120,6 +141,7 @@ PROBLEM_DEFS: list[Problem] = [
         doi="10.1038/s41467-026-73164-3",
         pdf_name="s41467-026-73164-3.pdf",
         repos=[("repo", "https://github.com/lyx-lin/TraceBIND.git")],
+        destination="incomplete",
         zenodo=[ZenodoAsset("19446219")],
         notes=[
             "Benchmark GEO series: GSE195460, GSE151302, GSE115098, GSE232222, GSE195443, GSE220289",
@@ -138,6 +160,81 @@ PROBLEM_DEFS: list[Problem] = [
         notes=[
             "DepMap Public 24Q4: https://depmap.org/portal/ — see data/external/depmap/",
             "CREAMMIST: https://creammist.mtms.dev/ — curated subset included in Figshare bundle",
+        ],
+    ),
+    Problem(
+        problem_id="s41586-022-05383-9_light-competition-plant-diversity",
+        title="Light competition drives herbivore and nutrient effects on plant diversity",
+        doi="10.1038/s41586-022-05383-9",
+        pdf_name=None,
+        repos=[],
+        dryad=[DryadAsset(204170)],
+        notes=[
+            "Pinned Dryad version 204170; author scripts and paper-specific README are blocked.",
+            "Analysis-ready quadrat observations support treatment contrasts but not formal mediation.",
+        ],
+    ),
+    Problem(
+        problem_id="s41586-023-06328-6_protein-protease-resistance",
+        title="Mega-scale experimental analysis of protein folding stability in biology and design",
+        doi="10.1038/s41586-023-06328-6",
+        pdf_name=None,
+        repos=[],
+        zenodo=[
+            ZenodoAsset(
+                "7992926",
+                include=("Raw_NGS_count_tables.zip", "Pipeline_qPCR_data.zip"),
+            )
+        ],
+        notes=[
+            "The runnable scope is count-based protease resistance, not absolute thermodynamic stability.",
+            "Only raw NGS count tables and the optional raw qPCR control are downloaded.",
+        ],
+    ),
+    Problem(
+        problem_id="s41586-023-06344-6_global-river-methane",
+        title="Global methane emissions from rivers and streams",
+        doi="10.1038/s41586-023-06344-6",
+        pdf_name=None,
+        repos=[],
+        destination="incomplete",
+        urls=[
+            UrlAsset(
+                "https://pasta.lternet.edu/package/data/eml/knb-lter-ntl/420/2/ba3e270bcab8ace5d157c995e4b791e4",
+                "GRiMe_concentrations_v2.csv",
+                "primary-observations",
+            ),
+            UrlAsset(
+                "https://pasta.lternet.edu/package/data/eml/knb-lter-ntl/420/2/1a559f00566ed9f9f33ccb0daab0bef5",
+                "GRiMe_fluxes_v2.csv",
+                "primary-observations",
+            ),
+            UrlAsset(
+                "https://pasta.lternet.edu/package/data/eml/knb-lter-ntl/420/2/3faa64303d5f5bcd043bb88f6768e603",
+                "GRiMe_sites_v2.csv",
+                "primary-observations",
+            ),
+            UrlAsset(
+                "https://pasta.lternet.edu/package/data/eml/knb-lter-ntl/420/2/3615386d27a2d148be09e70ac22799e4",
+                "GRiMe_sources_v2.csv",
+                "primary-observations",
+            ),
+        ],
+        notes=[
+            "Scoped to held-out concentration, temperature-response and measured diffusive flux.",
+            "The mixed 9.807 GB target archive and all gridded output rasters remain manifest-only and blocked.",
+        ],
+    ),
+    Problem(
+        problem_id="nature09906_chromatin-state-dynamics",
+        title="Mapping and analysis of chromatin state dynamics in nine human cell types",
+        doi="10.1038/nature09906",
+        pdf_name=None,
+        repos=[],
+        destination="incomplete",
+        notes=[
+            "GEO GSE26386 core ChIP/WCE data remain manifest-only by default.",
+            "All deposited state segmentations, labels and model outputs are blocked.",
         ],
     ),
 ]
@@ -176,22 +273,89 @@ def fmt_bytes(n: int | float | None) -> str:
 
 def fetch_json(url: str) -> dict:
     req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=120) as resp:
+    with _safe_urlopen(req, timeout=120) as resp:
         return json.load(resp)
 
 
-def download_file(url: str, dest: Path) -> int:
+def _verify_file(
+    path: Path,
+    *,
+    expected_bytes: int | None = None,
+    sha256: str | None = None,
+    checksum: str | None = None,
+) -> int:
+    size = path.stat().st_size
+    if expected_bytes is not None and size != expected_bytes:
+        raise ValueError(f"Size mismatch for {path}: expected {expected_bytes}, got {size}")
+    checks = [("sha256", sha256)] if sha256 else []
+    if checksum:
+        algorithm, separator, expected = checksum.partition(":")
+        if not separator or algorithm not in hashlib.algorithms_available:
+            raise ValueError(f"Unsupported checksum declaration for {path}: {checksum}")
+        checks.append((algorithm, expected))
+    for algorithm, expected in checks:
+        digest = hashlib.new(algorithm)
+        with path.open("rb") as handle:
+            while chunk := handle.read(1024 * 1024):
+                digest.update(chunk)
+        actual = digest.hexdigest()
+        if actual.casefold() != expected.casefold():
+            raise ValueError(
+                f"{algorithm} mismatch for {path}: expected {expected}, got {actual}"
+            )
+    return size
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        while chunk := handle.read(1024 * 1024):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def download_file(
+    url: str,
+    dest: Path,
+    *,
+    expected_bytes: int | None = None,
+    sha256: str | None = None,
+    checksum: str | None = None,
+    headers: dict[str, str] | None = None,
+) -> int:
     dest.parent.mkdir(parents=True, exist_ok=True)
     if dest.exists() and dest.stat().st_size > 0:
-        return dest.stat().st_size
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=600) as resp:
-        data = resp.read()
-    dest.write_bytes(data)
-    return len(data)
+        return _verify_file(
+            dest,
+            expected_bytes=expected_bytes,
+            sha256=sha256,
+            checksum=checksum,
+        )
+    request_headers = {"User-Agent": UA, **(headers or {})}
+    req = urllib.request.Request(url, headers=request_headers)
+    temporary = dest.with_suffix(dest.suffix + ".part")
+    try:
+        with _safe_urlopen(req, timeout=600) as resp, temporary.open("wb") as target:
+            shutil.copyfileobj(resp, target, length=1024 * 1024)
+        temporary.replace(dest)
+    except Exception:
+        temporary.unlink(missing_ok=True)
+        raise
+    return _verify_file(
+        dest,
+        expected_bytes=expected_bytes,
+        sha256=sha256,
+        checksum=checksum,
+    )
 
 
-def download_zenodo(record_id: str, dest_dir: Path) -> list[dict]:
+def download_zenodo(
+    asset: ZenodoAsset,
+    dest_dir: Path,
+    *,
+    profile: Literal["metadata", "selective", "full"],
+) -> list[dict]:
+    record_id = asset.record_id
     meta = fetch_json(f"https://zenodo.org/api/records/{record_id}")
     out: list[dict] = []
     target = dest_dir / record_id
@@ -200,8 +364,81 @@ def download_zenodo(record_id: str, dest_dir: Path) -> list[dict]:
     for f in meta.get("files", []):
         url = f["links"]["self"]
         name = f["key"]
-        size = download_file(url, target / name)
-        out.append({"source": "zenodo", "record_id": record_id, "file": name, "bytes": size})
+        selected = profile == "full" or (profile == "selective" and (not asset.include or name in asset.include))
+        if selected:
+            size = download_file(
+                url,
+                target / name,
+                expected_bytes=f.get("size"),
+                checksum=f.get("checksum"),
+            )
+        else:
+            size = int(f.get("size", 0))
+        out.append(
+            {
+                "source": "zenodo",
+                "record_id": record_id,
+                "file": name,
+                "bytes": size,
+                "downloaded": selected,
+                "checksum": f.get("checksum"),
+                "sha256": _sha256_file(target / name) if selected else None,
+            }
+        )
+    return out
+
+
+def download_dryad(
+    asset: DryadAsset,
+    dest_dir: Path,
+    *,
+    profile: Literal["metadata", "selective", "full"],
+) -> list[dict]:
+    files_url = f"https://datadryad.org/api/v2/versions/{asset.version_id}/files"
+    payload = fetch_json(files_url)
+    files = payload.get("_embedded", {}).get("stash:files", [])
+    target = dest_dir / str(asset.version_id)
+    target.mkdir(parents=True, exist_ok=True)
+    (target / "files.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    out: list[dict] = []
+    for item in files:
+        name = item["path"]
+        links = item.get("_links", {})
+        download = links.get("stash:download", {}).get("href")
+        if download:
+            download = urllib.parse.urljoin("https://datadryad.org", download)
+        selected = profile in {"selective", "full"}
+        downloaded = False
+        if selected and download:
+            token = os.getenv("DRYAD_TOKEN")
+            headers = {"Authorization": f"Bearer {token}"} if token else {}
+            try:
+                size = download_file(
+                    download,
+                    target / name,
+                    expected_bytes=item.get("size"),
+                    sha256=item.get("digest") if item.get("digestType") == "sha-256" else None,
+                    headers=headers,
+                )
+                downloaded = True
+            except urllib.error.HTTPError as exc:
+                if exc.code != 401 or token:
+                    raise
+                size = int(item.get("size", 0))
+        else:
+            size = int(item.get("size", 0))
+        out.append(
+            {
+                "source": "dryad",
+                "version_id": asset.version_id,
+                "file": name,
+                "bytes": size,
+                "downloaded": downloaded,
+                "authentication_required": bool(selected and download and not downloaded),
+                "digest": item.get("digest"),
+                "sha256": _sha256_file(target / name) if downloaded else None,
+            }
+        )
     return out
 
 
@@ -214,12 +451,29 @@ def download_figshare(article_id: int, dest_dir: Path) -> list[dict]:
     for f in meta.get("files", []):
         url = f["download_url"]
         name = f["name"]
-        size = download_file(url, target / name)
-        out.append({"source": "figshare", "article_id": article_id, "file": name, "bytes": size})
+        supplied_md5 = f.get("supplied_md5") or f.get("computed_md5")
+        size = download_file(
+            url,
+            target / name,
+            expected_bytes=f.get("size"),
+            checksum=f"md5:{supplied_md5}" if supplied_md5 else None,
+        )
+        out.append(
+            {
+                "source": "figshare",
+                "article_id": article_id,
+                "file": name,
+                "bytes": size,
+                "checksum": f"md5:{supplied_md5}" if supplied_md5 else None,
+                "sha256": _sha256_file(target / name),
+            }
+        )
     return out
 
 
 def write_readme(problem: Problem, path: Path) -> None:
+    if path.exists():
+        return
     lines = [
         f"# {problem.problem_id}",
         "",
@@ -264,10 +518,67 @@ def write_manifest(problem_dir: Path, entries: list[dict]) -> None:
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "entries": entries,
         "total_bytes": sum(e.get("bytes", 0) for e in entries if isinstance(e.get("bytes"), int)),
+        "downloaded_bytes": sum(
+            e.get("bytes", 0)
+            for e in entries
+            if e.get("downloaded", True) and isinstance(e.get("bytes"), int)
+        ),
     }
     (problem_dir / "data" / "MANIFEST.json").write_text(
         json.dumps(manifest, indent=2), encoding="utf-8"
     )
+
+
+def extract_zip_members(
+    archive_path: Path,
+    output_dir: Path,
+    *,
+    allowed_basenames: set[str],
+) -> list[dict]:
+    if not archive_path.exists():
+        return []
+    output_dir.mkdir(parents=True, exist_ok=True)
+    entries: list[dict] = []
+    with zipfile.ZipFile(archive_path) as archive:
+        for member in archive.infolist():
+            basename = Path(member.filename).name
+            if member.is_dir() or basename not in allowed_basenames:
+                continue
+            destination = output_dir / basename
+            if not destination.exists() or destination.stat().st_size != member.file_size:
+                with archive.open(member) as source, destination.open("wb") as target:
+                    shutil.copyfileobj(source, target, length=1024 * 1024)
+            entries.append(
+                {
+                    "source": "extracted",
+                    "archive": archive_path.name,
+                    "file": str(destination),
+                    "bytes": destination.stat().st_size,
+                    "downloaded": True,
+                    "sha256": _sha256_file(destination),
+                }
+            )
+    return entries
+
+
+def postprocess_problem(problem: Problem, problem_dir: Path) -> list[dict]:
+    if problem.problem_id != "s41586-023-06328-6_protein-protease-resistance":
+        return []
+    source = problem_dir / "data" / "zenodo" / "7992926"
+    extracted = problem_dir / "data" / "primary-observations"
+    entries = extract_zip_members(
+        source / "Raw_NGS_count_tables.zip",
+        extracted / "ngs-counts",
+        allowed_basenames={f"NGS_count_lib{i}.csv" for i in range(1, 5)},
+    )
+    entries.extend(
+        extract_zip_members(
+            source / "Pipeline_qPCR_data.zip",
+            extracted / "qpcr",
+            allowed_basenames={"Raw_qPCR_data_FigS1.csv"},
+        )
+    )
+    return entries
 
 
 def build_sra_manifest(problem_dir: Path) -> list[dict]:
@@ -275,9 +586,11 @@ def build_sra_manifest(problem_dir: Path) -> list[dict]:
     out_dir = problem_dir / "data" / "sra" / project
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    with urllib.request.urlopen(
-        f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term={project}&retmax=200&retmode=json"
-    ) as resp:
+    search_request = urllib.request.Request(
+        f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term={project}&retmax=200&retmode=json",
+        headers={"User-Agent": UA},
+    )
+    with _safe_urlopen(search_request, timeout=120) as resp:
         ids = json.load(resp)["esearchresult"]["idlist"]
 
     runs: list[dict] = []
@@ -288,7 +601,8 @@ def build_sra_manifest(problem_dir: Path) -> list[dict]:
             "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
             f"?db=sra&id={batch}&rettype=runinfo&retmode=csv"
         )
-        with urllib.request.urlopen(url, timeout=120) as resp:
+        request = urllib.request.Request(url, headers={"User-Agent": UA})
+        with _safe_urlopen(request, timeout=120) as resp:
             for line in resp.read().decode().strip().splitlines():
                 parts = line.split(",")
                 if not parts[0].startswith("SRR"):
@@ -371,7 +685,7 @@ def build_geo_manifest(problem_dir: Path) -> list[dict]:
     for gse in TRACE_BIND_GEO:
         url = f"https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc={gse}&targ=self&form=text&view=brief"
         req = urllib.request.Request(url, headers={"User-Agent": UA})
-        with urllib.request.urlopen(req, timeout=60) as resp:
+        with _safe_urlopen(req, timeout=60) as resp:
             text = resp.read().decode("utf-8", "replace")
         path = out_dir / f"{gse}.soft"
         path.write_text(text, encoding="utf-8")
@@ -455,43 +769,96 @@ def build_external_manifests(problem: Problem, problem_dir: Path) -> list[dict]:
     return entries
 
 
-def setup_problem(problem: Problem) -> list[dict]:
-    problem_dir = PROBLEMS / problem.problem_id
+def problem_root(problem: Problem) -> Path:
+    return PROBLEMS_COMPLETE if problem.destination == "complete" else PROBLEMS_INCOMPLETE
+
+
+def setup_problem(
+    problem: Problem,
+    *,
+    profile: Literal["metadata", "selective", "full"] = "selective",
+) -> list[dict]:
+    root = problem_root(problem)
+    problem_dir = root / problem.problem_id
     (problem_dir / "paper").mkdir(parents=True, exist_ok=True)
     (problem_dir / "data").mkdir(parents=True, exist_ok=True)
 
-    src_pdf = PAPERS / problem.pdf_name
-    dst_pdf = problem_dir / "paper" / problem.pdf_name
-    if src_pdf.exists():
-        shutil.copy2(src_pdf, dst_pdf)
-    elif not dst_pdf.exists():
-        raise FileNotFoundError(f"Missing PDF: {src_pdf}")
+    dst_pdf: Path | None = None
+    if problem.pdf_name:
+        src_pdf = PAPERS / problem.pdf_name
+        dst_pdf = problem_dir / "paper" / problem.pdf_name
+        if src_pdf.exists():
+            shutil.copy2(src_pdf, dst_pdf)
 
     write_readme(problem, problem_dir / "README.md")
 
-    entries: list[dict] = [
-        {
-            "source": "paper",
-            "file": f"paper/{problem.pdf_name}",
-            "bytes": dst_pdf.stat().st_size,
-        }
-    ]
+    entries: list[dict] = []
+    if dst_pdf and dst_pdf.exists():
+        entries.append(
+            {
+                "source": "paper",
+                "file": f"paper/{problem.pdf_name}",
+                "bytes": dst_pdf.stat().st_size,
+            }
+        )
+    elif problem.pdf_name:
+        entries.append(
+            {
+                "source": "paper",
+                "file": f"paper/{problem.pdf_name}",
+                "bytes": 0,
+                "downloaded": False,
+            }
+        )
 
     for asset in problem.zenodo:
-        sub = PROBLEMS / problem.problem_id / "data" / "zenodo"
-        entries.extend(download_zenodo(asset.record_id, sub))
+        sub = problem_dir / "data" / "zenodo"
+        entries.extend(download_zenodo(asset, sub, profile=profile))
+
+    for asset in problem.dryad:
+        sub = problem_dir / "data" / asset.subdir
+        entries.extend(download_dryad(asset, sub, profile=profile))
 
     for asset in problem.figshare:
-        sub = PROBLEMS / problem.problem_id / "data" / "figshare"
-        entries.extend(download_figshare(asset.article_id, sub))
+        sub = problem_dir / "data" / "figshare"
+        if profile == "metadata":
+            meta = fetch_json(f"https://api.figshare.com/v2/articles/{asset.article_id}")
+            target = sub / str(asset.article_id)
+            target.mkdir(parents=True, exist_ok=True)
+            (target / "metadata.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+            entries.extend(
+                {
+                    "source": "figshare",
+                    "article_id": asset.article_id,
+                    "file": f["name"],
+                    "bytes": int(f.get("size", 0)),
+                    "downloaded": False,
+                }
+                for f in meta.get("files", [])
+            )
+        else:
+            entries.extend(download_figshare(asset.article_id, sub))
 
     for asset in problem.urls:
         if asset.filename.endswith(".html"):
             continue
         dest = problem_dir / "data" / asset.subdir / asset.filename
         try:
-            size = download_file(asset.url, dest)
-            entries.append({"source": asset.subdir, "file": str(dest.relative_to(problem_dir)), "bytes": size, "url": asset.url})
+            size = download_file(
+                asset.url,
+                dest,
+                expected_bytes=asset.expected_bytes,
+                sha256=asset.sha256,
+            )
+            entries.append(
+                {
+                    "source": asset.subdir,
+                    "file": str(dest.relative_to(problem_dir)),
+                    "bytes": size,
+                    "url": asset.url,
+                    "sha256": _sha256_file(dest),
+                }
+            )
         except Exception as exc:  # noqa: BLE001
             entries.append({"source": asset.subdir, "file": asset.filename, "bytes": 0, "url": asset.url, "error": str(exc)})
 
@@ -504,23 +871,53 @@ def setup_problem(problem: Problem) -> list[dict]:
     if "forge" in problem.problem_id:
         entries.extend(build_external_manifests(problem, problem_dir))
 
+    entries.extend(postprocess_problem(problem, problem_dir))
     write_manifest(problem_dir, entries)
     return entries
 
 
 def main() -> int:
-    PROBLEMS.mkdir(parents=True, exist_ok=True)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--problem-id", action="append", default=[])
+    parser.add_argument(
+        "--profile",
+        choices=("metadata", "selective", "full"),
+        default="selective",
+        help="metadata writes manifests only; selective honors per-asset allowlists.",
+    )
+    args = parser.parse_args()
+    PROBLEMS_COMPLETE.mkdir(parents=True, exist_ok=True)
+    PROBLEMS_INCOMPLETE.mkdir(parents=True, exist_ok=True)
+    selected = [
+        problem
+        for problem in PROBLEM_DEFS
+        if not args.problem_id or problem.problem_id in set(args.problem_id)
+    ]
+    unknown = set(args.problem_id) - {problem.problem_id for problem in selected}
+    if unknown:
+        parser.error(f"Unknown problem id(s): {', '.join(sorted(unknown))}")
     summary = []
-    for problem in PROBLEM_DEFS:
+    for problem in selected:
         print(f"Setting up {problem.problem_id} ...")
-        entries = setup_problem(problem)
-        total = sum(e.get("bytes", 0) for e in entries if isinstance(e.get("bytes"), int))
-        summary.append((problem.problem_id, total, len(entries)))
-        print(f"  manifest entries: {len(entries)}, downloaded: {fmt_bytes(total)}")
+        entries = setup_problem(problem, profile=args.profile)
+        declared = sum(e.get("bytes", 0) for e in entries if isinstance(e.get("bytes"), int))
+        downloaded = sum(
+            e.get("bytes", 0)
+            for e in entries
+            if e.get("downloaded", True) and isinstance(e.get("bytes"), int)
+        )
+        summary.append((problem.problem_id, declared, downloaded, len(entries)))
+        print(
+            f"  manifest entries: {len(entries)}, "
+            f"downloaded: {fmt_bytes(downloaded)}, declared: {fmt_bytes(declared)}"
+        )
 
     print("\nSummary:")
-    for pid, total, n in summary:
-        print(f"  {pid}: {fmt_bytes(total)} across {n} manifest entries")
+    for pid, declared, downloaded, n in summary:
+        print(
+            f"  {pid}: {fmt_bytes(downloaded)} downloaded / "
+            f"{fmt_bytes(declared)} declared across {n} manifest entries"
+        )
     return 0
 
 

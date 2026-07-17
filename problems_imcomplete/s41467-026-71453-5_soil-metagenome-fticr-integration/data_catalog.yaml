@@ -1,0 +1,11 @@
+problem_id: s41467-026-71453-5_soil-metagenome-fticr-integration
+entries:
+  - id: unvalidated_acquisition_payload
+    description: Current mixed Zenodo payloads, CoreMS outputs, repository samples, and metadata.
+    kind: processed
+    grantable: false
+    reason: No raw cross-omics scope or single pinned deposit version has been validated.
+    source_base: problem
+    source_paths:
+      - data/**/*
+      - repo/**/*

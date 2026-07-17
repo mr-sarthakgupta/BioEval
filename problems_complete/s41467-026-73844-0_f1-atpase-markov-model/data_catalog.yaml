@@ -1,65 +1,49 @@
 problem_id: s41467-026-73844-0_f1-atpase-markov-model
 # Hidden, host-only. Never mounted into the UEA container.
 entries:
-  - id: atp_binding_titration_curve
+  - id: nucleotide_binding_titration_curves
     description: >-
-      Experimental ATP-only nucleotide-binding titration curve for bacterial
-      F1-ATPase. This measurement can constrain catalytic-site occupancy under
-      one named nucleotide condition.
+      Neutral combined export of predecessor ATP-only, ADP-only, and mixed-nucleotide
+      binding titration observations for bacterial F1-ATPase.
     kind: raw
     grantable: true
     source_base: problem
     modalities: [csv, binding, kinetics]
     source_paths:
-      - repo/MarkovModelPrediction/PlotScripts/include/ExpDataLib/F1-ATPase_ATP.bind.csv
+      - curated/nucleotide_binding_titrations.csv
 
-  - id: adp_binding_titration_curve
+  - id: turnover_and_coupling_training_observations
     description: >-
-      Experimental ADP-only nucleotide-binding titration curve for bacterial
-      F1-ATPase. This measurement can constrain catalytic-site occupancy under
-      one named nucleotide condition.
+      Neutral table of ATP-dependent turnover-rate and chemo-mechanical coupling
+      observations with the uncertainty scales used for calibration. Values originate
+      in predecessor experiments and contain no fitted parameters or author predictions.
     kind: raw
     grantable: true
     source_base: problem
-    modalities: [csv, binding, kinetics]
+    modalities: [csv, kinetics, rotation]
     source_paths:
-      - repo/MarkovModelPrediction/PlotScripts/include/ExpDataLib/F1-ATPase_ADP.bind.csv
+      - curated/training_observations.csv
 
-  - id: mixed_nucleotide_binding_titration_curve
+  - id: independent_mechanistic_validation_constraints
     description: >-
-      Experimental mixed ATP/ADP nucleotide-binding titration curve for bacterial
-      F1-ATPase under a named mixed-nucleotide condition.
+      Curated predecessor evidence reserved for validation: ATP-dependent dwell
+      population direction, catalytic-step orientations, saturating bound ADP:ATP
+      ratio, and structural and affinity asymmetry. The table records observations
+      and tolerances, not model rankings or fitted predictions.
     kind: raw
     grantable: true
     source_base: problem
-    modalities: [csv, binding, kinetics]
+    modalities: [csv, rotation, kinetics, structure, validation]
     source_paths:
-      - repo/MarkovModelPrediction/PlotScripts/include/ExpDataLib/F1-ATPase_mix.bind.csv
+      - curated/independent_validation_constraints.csv
 
-  - id: combined_binding_training_tables
-    description: >-
-      Combined nucleotide-binding assay tables for bacterial F1-ATPase, including
-      ATP-only, ADP-only, mixed-nucleotide, and aggregate training views.
-    kind: raw
+  - id: fixed_model_selection_protocol
+    description: Numeric fit, validation, and BIC thresholds applied equally to three- and four-conformation model classes.
+    kind: processed
     grantable: true
     source_base: problem
-    modalities: [csv, binding, kinetics]
-    source_paths:
-      - repo/BayesianTraining/input_data/F1-ATPase_complete.bind.csv
-      - repo/BayesianTraining/input_data/F1-ATPase_both.bind.csv
-      - repo/BayesianTraining/input_data/F1-ATPase_onlyMix.bind.csv
-      - repo/BayesianTraining/input_data/F1-ATPase_onlyPure.bind.csv
-
-  - id: published_literature_constraints
-    description: >-
-      Quantitative constraints not present in the local tables, such as rotary
-      step structure, single-molecule rotation statistics, ATPase turnover
-      rates, and literature-reported hydrolysis kinetics, may be drawn from
-      public single-molecule and biochemistry literature.
-    kind: online
-    grantable: true
-    modalities: [literature]
-    online: null
+    modalities: [csv, evaluation-protocol]
+    source_paths: [curated/model_selection_protocol.csv]
 
   # ---- explicitly blocked (leak vectors) ----
   - id: author_repo_archive
@@ -77,3 +61,26 @@ entries:
     reason: Record metadata exposes the paper title, authors, and DOI.
     source_paths:
       - zenodo/19133448/metadata.json
+
+  - id: target_paper_source_data_archive
+    description: Nature Source Data archive for the target paper.
+    kind: processed
+    grantable: false
+    reason: >-
+      The archive is dominated by fitted parameter ensembles, model predictions,
+      state populations, model rankings, and figure-organized outputs that encode
+      the target conclusions.
+    source_base: problem
+    source_paths:
+      - data/nature-supplementary/source-data.zip
+
+  - id: target_paper_supplementary_information
+    description: Supplementary Information PDF for the target paper.
+    kind: processed
+    grantable: false
+    reason: >-
+      The document states the target model-selection results, candidate pruning,
+      and mechanistic conclusions.
+    source_base: problem
+    source_paths:
+      - data/nature-supplementary/supplementary-information.pdf

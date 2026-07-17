@@ -1,0 +1,49 @@
+problem_id: s41586-023-06344-6_global-river-methane
+benchmark_status: conditional
+readiness_reason: >-
+  The scoped observation analysis is runnable, but no audited reach-level bundle
+  exists for the paper's global aggregation and emissions conclusion.
+title: Environmental patterns in global river methane observations
+doi: 10.1038/s41586-023-06344-6
+target_footprint_date: 2023-08-23
+external_source_cutoff: 2023-08-15T23:59:59Z
+sandbox_prompt: |
+  This is a scoped candidate, not a request to reproduce a global emissions total.
+  Obtain the frozen river methane concentration, measured flux, site, and source
+  tables and the fixed source-group folds. Quantify held-out relationships between
+  methane concentration and water temperature and characterize measured diffusive
+  flux distributions. Keep observations from the same literature source in one
+  fold; additionally test coarse spatial blocking where coordinates are available.
+
+  Distinguish measured from estimated temperature, diffusive from ebullitive and
+  total flux, and individual from spatially or temporally aggregated records.
+  Propagate source-level heterogeneity and report sensitivity to non-positive,
+  below-detection, aggregated, and high-leverage observations.
+
+  Do not estimate global annual river methane emissions. No neutral river-network
+  aggregation bundle is available in this candidate, and target-paper predictions,
+  diagnostics, uncertainty products, feature importance, and rasters are withheld.
+expected_conclusions:
+  - River methane concentrations and measured diffusive fluxes span several orders of magnitude and require robust or transformed analyses.
+  - Water temperature contains reproducible held-out information about methane concentration, but substantial source and spatial heterogeneity remains.
+  - Diffusive flux observations are unevenly distributed across sources and regions, so row-wise random cross-validation materially overstates generalization.
+  - The observation database alone cannot identify a defensible global annual emissions total without independently audited river-reach areas, covariates, aggregation, and uncertainty propagation.
+judge_rubric:
+  - Are the four frozen tables joined by declared source and site keys without multiplying aggregated records?
+  - Are source-group folds used, with spatial-block sensitivity where coordinates permit?
+  - Are measured versus estimated temperature and diffusive versus other flux pathways kept distinct?
+  - Are transformed effect sizes, held-out errors, uncertainty, and source heterogeneity reported?
+  - Is any global total explicitly declined rather than reverse-engineered from blocked products?
+expected_caveats:
+  - The database combines heterogeneous methods, reporting units, aggregation levels, and literature sources.
+  - Tropical, arid, high-latitude, and high-altitude systems are unevenly represented.
+  - The scoped candidate lacks a neutral reach-level aggregation bundle and cannot support the paper's global total.
+leak_markers:
+  - "Global methane emissions from rivers and streams"
+  - "10.1038/s41586-023-06344-6"
+  - "zenodo.7733604"
+  - "zenodo.8108959"
+  - "s41586-023-06344-6"
+  - "7733604"
+  - "8108959"
+  - "27.9 Tg"

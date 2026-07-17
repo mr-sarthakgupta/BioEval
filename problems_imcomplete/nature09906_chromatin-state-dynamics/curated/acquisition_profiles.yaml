@@ -1,0 +1,26 @@
+profiles:
+  manifest-only:
+    description: Download no assay files; validate the tracked GEO inventory only.
+    cell_types: []
+    chromosomes: []
+  pilot:
+    description: Process six fixed H1/K562 H3K4me3, H3K27me3, and WCE files one at a time and retain only chr21 and chr22 intervals.
+    cell_types: [H1, K562]
+    accessions: [GSM646337, GSM646345, GSM646352, GSM646436, GSM646445, GSM646453]
+    chromosomes: [chr21, chr22]
+    compressed_transfer_bytes: 1067057099
+    max_transfer_bytes: 1200000000
+  full:
+    description: Download all 178 allowlisted core BED files and 19 expression CEL files.
+    cell_types: [GM12878, H1, HepG2, HMEC, HSMM, Huvec, K562, NHEK, NHLF]
+    chromosomes: ["*"]
+reference:
+  assembly: hg18
+  annotation_cutoff: "2011-01-21"
+  geo_series: GSE26386
+budgets:
+  core_bed_compressed_bytes: 44368287353
+  expression_cel_compressed_bytes: 49106218
+  pilot_compressed_transfer_bytes: 1067057099
+  pilot_peak_disk_bytes: 1200000000
+  pilot_peak_ram_bytes: 536870912

@@ -1,7 +1,7 @@
 """Hidden, host-only data catalogs.
 
 Each problem folder carries a `data_catalog.yaml` that enumerates the datasets the
-data-agent may grant (and the ones it must never grant, e.g. author code, trained
+experiment-agent may grant (and the ones it must never grant, e.g. author code, trained
 models, figure source data, supplementary-information PDFs). The catalog decouples
 grant decisions from (leaky) filenames and gives the leak guard an explicit allowlist.
 """
@@ -35,6 +35,9 @@ def resolve_entry_files(problem_root: Path, entry: CatalogEntry) -> list[Path]:
     """Expand an entry's source globs without exposing host layout to the UEA."""
     source_root = problem_root / ("data" if entry.source_base == "data" else "")
     source_root = source_root.resolve()
+    allowed_root = source_root
+    if entry.grantable and entry.source_base == "problem":
+        allowed_root = (problem_root / "curated").resolve()
     files: list[Path] = []
     seen: set[Path] = set()
     for pattern in entry.source_paths:
@@ -42,9 +45,9 @@ def resolve_entry_files(problem_root: Path, entry: CatalogEntry) -> list[Path]:
             if not match.is_file():
                 continue
             resolved = match.resolve()
-            # Defense in depth: never escape the configured source subtree.
+            # Grantable problem-relative files are restricted to the neutral curated tree.
             try:
-                resolved.relative_to(source_root)
+                resolved.relative_to(allowed_root)
             except ValueError:
                 continue
             if resolved not in seen:

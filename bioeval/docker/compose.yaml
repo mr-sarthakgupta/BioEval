@@ -1,12 +1,14 @@
 services:
-  data-agent:
+  experiment-agent:
     build:
       context: ..
-      dockerfile: docker/Dockerfile.data-agent
+      dockerfile: docker/Dockerfile.experiment-agent
     environment:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      DATA_AGENT_MODEL: ${DATA_AGENT_MODEL:-us.anthropic.claude-sonnet-4-6}
-      DATA_AGENT_API_BASE: ${DATA_AGENT_API_BASE:-bedrock:us-east-1}
+      OPENALEX_API_KEY: ${OPENALEX_API_KEY:-}
+      OPENALEX_API_KEY_FILE: /run/secrets/openalex_key
+      EXPERIMENT_AGENT_MODEL: ${EXPERIMENT_AGENT_MODEL:-us.anthropic.claude-sonnet-4-6}
+      EXPERIMENT_AGENT_API_BASE: ${EXPERIMENT_AGENT_API_BASE:-bedrock:us-east-1}
       AWS_BEARER_TOKEN_BEDROCK: ${AWS_BEARER_TOKEN_BEDROCK:-}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
@@ -19,12 +21,14 @@ services:
       BIOEVAL_PROBLEM_ID: ${BIOEVAL_PROBLEM_ID}
       BIOEVAL_RUN_ID: ${BIOEVAL_RUN_ID:-default}
       BIOEVAL_LOG_DIR: /run/logs
-      BIOEVAL_STRICT_DATA_REQUESTS: ${BIOEVAL_STRICT_DATA_REQUESTS:-1}
       BIOEVAL_MAX_DATASET_GRANTS_PER_REQUEST: ${BIOEVAL_MAX_DATASET_GRANTS_PER_REQUEST:-1}
       BIOEVAL_TRAFFIC_GUARD_ENABLED: ${BIOEVAL_TRAFFIC_GUARD_ENABLED:-1}
       BIOEVAL_TRAFFIC_GUARD_FAIL_CLOSED: ${BIOEVAL_TRAFFIC_GUARD_FAIL_CLOSED:-1}
       BIOEVAL_TRAFFIC_GUARD_MODEL: ${BIOEVAL_TRAFFIC_GUARD_MODEL:-us.anthropic.claude-sonnet-4-6}
       BIOEVAL_TRAFFIC_GUARD_API_BASE: ${BIOEVAL_TRAFFIC_GUARD_API_BASE:-bedrock:us-east-1}
+      BIOEVAL_OPENALEX_DESCENDANT_DEPTH: ${BIOEVAL_OPENALEX_DESCENDANT_DEPTH:-20}
+      BIOEVAL_OPENALEX_DESCENDANT_MAX_NODES: ${BIOEVAL_OPENALEX_DESCENDANT_MAX_NODES:-10000}
+      BIOEVAL_OPENALEX_GRAPH_CACHE_TTL: ${BIOEVAL_OPENALEX_GRAPH_CACHE_TTL:-21600}
     command:
       - --problems-root=/problems_complete
       - --staging-root=/run/data_grants
@@ -35,10 +39,13 @@ services:
       - --host=0.0.0.0
       - --port=8765
     volumes:
-      # The data-agent CAN see paper/ and repo/, but the leak guard ensures nothing
-      # that resembles code, models, documents, or paper identifiers ever leaves.
-      - ../../problems_complete:/problems_complete:ro
+      # Mount only catalog-approved source roots for the selected problem. Hidden
+      # evaluator labels, papers, and author repositories never enter this container.
+      - ../../problems_complete/${BIOEVAL_PROBLEM_ID}/data:/problems_complete/${BIOEVAL_PROBLEM_ID}/data:ro
+      - ../../problems_complete/${BIOEVAL_PROBLEM_ID}/curated:/problems_complete/${BIOEVAL_PROBLEM_ID}/curated:ro
+      - ../../problems_complete/${BIOEVAL_PROBLEM_ID}/data_catalog.yaml:/problems_complete/${BIOEVAL_PROBLEM_ID}/data_catalog.yaml:ro
       - ../runs/${BIOEVAL_PROBLEM_ID}/${BIOEVAL_RUN_ID:-default}:/run
+      - ${OPENALEX_API_KEY_FILE:-/home/mrsar/openalex_key.txt}:/run/secrets/openalex_key:ro
       - ${HOME}/.aws:/root/.aws:ro
     ports:
       - "8765:8765"
@@ -48,9 +55,9 @@ services:
       context: ..
       dockerfile: docker/Dockerfile.uea
     depends_on:
-      - data-agent
+      - experiment-agent
     environment:
-      DATA_AGENT_URL: http://data-agent:8765/request-data
+      EXPERIMENT_AGENT_URL: http://experiment-agent:8765/experiments
       BIOEVAL_DISK_BUDGET_GB: ${BIOEVAL_DISK_BUDGET_GB:-20}
       OPENAI_API_KEY: ${UEA_OPENAI_API_KEY:-}
       UEA_BEDROCK_MODEL: ${UEA_BEDROCK_MODEL:-us.anthropic.claude-sonnet-4-6}
@@ -74,6 +81,13 @@ services:
     memswap_limit: ${BIOEVAL_MEM_LIMIT:-8g}
     pids_limit: 512
     cpus: ${BIOEVAL_CPUS:-4}
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,noexec,size=256m
     # Disk usage is enforced cooperatively by `check_space`; Docker writable-layer
     # quotas are not portable across WSL/storage-driver configurations.
     volumes:

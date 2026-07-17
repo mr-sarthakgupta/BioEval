@@ -3,11 +3,18 @@ from __future__ import annotations
 import html
 import hashlib
 import json
+import logging
 import os
 import re
+import threading
 import time
 import unicodedata
+import urllib.error
+import urllib.request
 import xml.etree.ElementTree as ET
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 from html.parser import HTMLParser
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
@@ -20,6 +27,7 @@ from bioeval.bedrock_client import (
     is_bedrock_api_base,
     prompt_cache_point,
 )
+from bioeval.providers import _safe_urlopen, _validate_public_url
 
 USER_AGENT = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
@@ -30,26 +38,29 @@ FETCH_HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,text/plain;q=0.8,*/*;q=0.5",
     "Accept-Language": "en-US,en;q=0.9",
 }
+MAX_FETCH_BYTES = int(os.getenv("BIOEVAL_FETCH_WEBPAGE_MAX_BYTES", "10000000"))
 OPENALEX_API = "https://api.openalex.org"
 OPENALEX_API_KEY_FILE = os.getenv("OPENALEX_API_KEY_FILE", "/home/mrsar/openalex_key.txt")
 OPENALEX_WORK_SELECT = (
-    "id,doi,title,display_name,publication_year,primary_location,"
+    "id,doi,title,display_name,publication_year,publication_date,primary_location,"
     "cited_by_count,ids,abstract_inverted_index"
 )
+OPENALEX_GRAPH_SELECT = "id"
+OPENALEX_GRAPH_BATCH_SIZE = 20
+OPENALEX_GRAPH_CACHE_TTL = int(os.getenv("BIOEVAL_OPENALEX_GRAPH_CACHE_TTL", "21600"))
+OPENALEX_GRAPH_ERROR_TTL = int(os.getenv("BIOEVAL_OPENALEX_GRAPH_ERROR_TTL", "300"))
+OPENALEX_DOI_RE = re.compile(r"10\.\d{4,9}/[-._;()/:A-Z0-9]+", re.IGNORECASE)
+OPENALEX_ID_RE = re.compile(r"(?:https?://openalex\.org/)?(W\d+)", re.IGNORECASE)
+OPENALEX_GRAPH_CACHE: dict[str, tuple[float, frozenset[str], bool]] = {}
+OPENALEX_GRAPH_LOCK = threading.Lock()
+OPENALEX_DOI_ID_CACHE: dict[str, str | None] = {}
+LOGGER = logging.getLogger(__name__)
 
 DENIED_QUERY_RE = re.compile(
     r"\b(paper|manuscript|article|authors'? code|source code|github|repository|"
     r"\brepo\b|solution|answer key|ground truth|expected (?:result|conclusion)|doi)\b",
     re.IGNORECASE,
 )
-DEFAULT_BLOCKED_DOMAINS = {
-    "doi.org",
-    "nature.com",
-    "www.nature.com",
-    "github.com",
-    "raw.githubusercontent.com",
-    "codeload.github.com",
-}
 DEFAULT_GUARD_MODEL = "us.anthropic.claude-sonnet-4-6"
 DEFAULT_GUARD_API_BASE = "bedrock:us-east-1"
 TRAFFIC_GUARD_SYSTEM_PROMPT = """You are the traffic guard for BioEval, a blind scientific discovery benchmark.
@@ -77,6 +88,11 @@ held-out work, even if they discuss the same scientific field, organisms, assays
 For example, classic mechanism papers, general review articles, public databases, and earlier
 independent datasets are allowed unless they identify or summarize the held-out work.
 
+When a candidate includes `external_source_cutoff`, BLOCK independent sources published
+after that instant. For target-relevant papers, datasets, news, reviews, or mutable pages,
+BLOCK when the publication/release date cannot be established as on or before the cutoff.
+Target-lineage material remains blocked regardless of whether it predates the cutoff.
+
 Decision rule:
 - BLOCK if the item is the held-out work, a derivative/source/record of it, or would expose
   title/authors/DOI/PMID/repository/data-deposit/specific conclusions of it.
@@ -96,19 +112,6 @@ Return ONLY a JSON object:
 """
 
 TRAFFIC_GUARD_TYPE_INSTRUCTIONS = {
-    "data_request": (
-        "Review a data-agent request before it reaches the hidden catalog. BLOCK if the "
-        "request is broad catalog discovery, such as asking what data exists, whether "
-        "any/all data are available, anything related to a topic, or otherwise asking "
-        "to enumerate hidden holdings. BLOCK if the request asks for, names, or tries "
-        "to target the held-out paper, its DOI/PMID, authors, title/preprint title, "
-        "repository, source-data tables, public data deposit/record, trained models, "
-        "author code, answer key, or paper-specific results. BLOCK if the request "
-        "appears to have been formed from a target-paper title, abstract, data-record "
-        "name, or conclusion. ALLOW independently named measurements, assays, organisms, "
-        "cohorts, samples, treatments, or public background datasets, even when they "
-        "are scientifically relevant to the task."
-    ),
     "research_query": (
         "Review a literature-search query before sending it to an academic search API. "
         "BLOCK queries that search for the held-out paper directly, including exact or "
@@ -527,11 +530,16 @@ def traffic_guard_decision(
     if cache_key in _GUARD_DECISION_CACHE:
         return _GUARD_DECISION_CACHE[cache_key]
 
-    model = model or os.getenv("BIOEVAL_TRAFFIC_GUARD_MODEL") or os.getenv("DATA_AGENT_MODEL") or DEFAULT_GUARD_MODEL
+    model = (
+        model
+        or os.getenv("BIOEVAL_TRAFFIC_GUARD_MODEL")
+        or os.getenv("EXPERIMENT_AGENT_MODEL")
+        or DEFAULT_GUARD_MODEL
+    )
     api_base = (
         api_base
         or os.getenv("BIOEVAL_TRAFFIC_GUARD_API_BASE")
-        or os.getenv("DATA_AGENT_API_BASE")
+        or os.getenv("EXPERIMENT_AGENT_API_BASE")
         or DEFAULT_GUARD_API_BASE
     )
 
@@ -676,10 +684,11 @@ def blocked_url_reason(url: str, identifiers: list[str]) -> str | None:
         return "URL must be http(s)."
     if contains_hidden_identifier(url, identifiers):
         return PUBLIC_GUARD_DENIAL
-    blocked = set(DEFAULT_BLOCKED_DOMAINS)
+    if openalex_graph_blocks(url, identifiers):
+        return PUBLIC_GUARD_DENIAL
     extra = os.getenv("BIOEVAL_BLOCKED_WEB_DOMAINS", "")
-    blocked.update(domain.strip().lower() for domain in extra.split(",") if domain.strip())
-    if host_matches(url, blocked):
+    blocked = {domain.strip().lower() for domain in extra.split(",") if domain.strip()}
+    if blocked and host_matches(url, blocked):
         return "This URL cannot be fetched."
     return None
 
@@ -820,6 +829,146 @@ def openalex_get(path: str, params: dict, *, timeout: int = 20) -> tuple[dict | 
     return None, f"{path} returned repeated server errors"
 
 
+def normalize_openalex_id(value: str | None) -> str | None:
+    match = OPENALEX_ID_RE.search(value or "")
+    return match.group(1).upper() if match else None
+
+
+def hidden_work_doi(identifiers: list[str]) -> str | None:
+    for identifier in identifiers:
+        match = OPENALEX_DOI_RE.search(identifier or "")
+        if match:
+            return match.group(0).rstrip(".,;)]}").lower()
+    return None
+
+
+def _openalex_target_id(doi: str) -> tuple[str | None, str | None]:
+    data, error = openalex_get(
+        "/works",
+        {
+            "filter": f"doi:{doi}",
+            "per_page": 1,
+            "select": OPENALEX_GRAPH_SELECT,
+        },
+    )
+    if error:
+        return None, error
+    results = (data or {}).get("results") or []
+    if not results:
+        return None, "OpenAlex did not resolve the held-out DOI"
+    return normalize_openalex_id(results[0].get("id")), None
+
+
+def _openalex_direct_citers(
+    parent_ids: set[str],
+    *,
+    remaining_nodes: int,
+) -> tuple[set[str], str | None]:
+    descendants: set[str] = set()
+    ordered = sorted(parent_ids)
+    for start in range(0, len(ordered), OPENALEX_GRAPH_BATCH_SIZE):
+        batch = ordered[start : start + OPENALEX_GRAPH_BATCH_SIZE]
+        cursor = "*"
+        while cursor and len(descendants) < remaining_nodes:
+            data, error = openalex_get(
+                "/works",
+                {
+                    "filter": "cites:" + "|".join(batch),
+                    "per_page": min(200, remaining_nodes - len(descendants)),
+                    "cursor": cursor,
+                    "select": OPENALEX_GRAPH_SELECT,
+                },
+            )
+            if error:
+                return descendants, error
+            for work in (data or {}).get("results") or []:
+                work_id = normalize_openalex_id(work.get("id"))
+                if work_id:
+                    descendants.add(work_id)
+                    if len(descendants) >= remaining_nodes:
+                        break
+            cursor = ((data or {}).get("meta") or {}).get("next_cursor")
+            if not ((data or {}).get("results") or []):
+                break
+        if len(descendants) >= remaining_nodes:
+            break
+    return descendants, None
+
+
+def build_openalex_blocked_graph(identifiers: list[str]) -> tuple[frozenset[str], bool]:
+    """Return target plus incoming citation descendants across configured hops."""
+    doi = hidden_work_doi(identifiers)
+    if not doi:
+        return frozenset(), False
+    now = time.time()
+    with OPENALEX_GRAPH_LOCK:
+        cached = OPENALEX_GRAPH_CACHE.get(doi)
+        if cached and now - cached[0] < (
+            OPENALEX_GRAPH_CACHE_TTL if cached[2] else OPENALEX_GRAPH_ERROR_TTL
+        ):
+            return cached[1], cached[2]
+
+        target_id, error = _openalex_target_id(doi)
+        if not target_id:
+            LOGGER.warning("OpenAlex graph unavailable for %s: %s", doi, error)
+            result = (now, frozenset(), False)
+            OPENALEX_GRAPH_CACHE[doi] = result
+            return result[1], result[2]
+
+        max_depth = max(
+            1,
+            min(int(os.getenv("BIOEVAL_OPENALEX_DESCENDANT_DEPTH", "20")), 50),
+        )
+        max_nodes = max(
+            1,
+            min(int(os.getenv("BIOEVAL_OPENALEX_DESCENDANT_MAX_NODES", "10000")), 100000),
+        )
+        blocked = {target_id}
+        frontier = {target_id}
+        complete = True
+        for _depth in range(max_depth):
+            remaining = max_nodes - len(blocked)
+            if remaining <= 0:
+                complete = False
+                break
+            children, error = _openalex_direct_citers(
+                frontier,
+                remaining_nodes=remaining,
+            )
+            if error:
+                LOGGER.warning("OpenAlex descendant traversal incomplete for %s: %s", doi, error)
+                complete = False
+                break
+            frontier = children - blocked
+            if not frontier:
+                break
+            blocked.update(frontier)
+        else:
+            if frontier:
+                complete = False
+
+        result = (now, frozenset(blocked), complete)
+        OPENALEX_GRAPH_CACHE[doi] = result
+        return result[1], result[2]
+
+
+def openalex_graph_blocks(value: str | None, identifiers: list[str]) -> bool:
+    work_id = normalize_openalex_id(value)
+    if not work_id:
+        doi = hidden_work_doi([value or ""])
+        if doi:
+            if doi not in OPENALEX_DOI_ID_CACHE:
+                OPENALEX_DOI_ID_CACHE[doi], _error = _openalex_target_id(doi)
+            work_id = OPENALEX_DOI_ID_CACHE.get(doi)
+    if not work_id:
+        return False
+    blocked, complete = build_openalex_blocked_graph(identifiers)
+    if not complete:
+        LOGGER.warning("Blocking OpenAlex work because the hidden lineage graph is incomplete.")
+        return True
+    return work_id in blocked
+
+
 def abstract_from_inverted_index(index: dict | None) -> str:
     if not isinstance(index, dict):
         return ""
@@ -854,6 +1003,7 @@ def normalize_openalex_work(work: dict) -> dict:
     return {
         "title": work.get("title") or work.get("display_name") or "",
         "year": work.get("publication_year"),
+        "publicationDate": work.get("publication_date"),
         "venue": source.get("display_name") or "",
         "abstract": abstract_from_inverted_index(work.get("abstract_inverted_index")),
         "citationCount": work.get("cited_by_count", 0),
@@ -862,6 +1012,65 @@ def normalize_openalex_work(work: dict) -> dict:
         "url": work.get("id") or "",
         "landingPageUrl": primary_location.get("landing_page_url") or "",
     }
+
+
+def _after_external_cutoff(paper: dict, cutoff: str | None) -> bool:
+    if not cutoff:
+        return False
+    try:
+        limit = datetime.fromisoformat(cutoff.replace("Z", "+00:00"))
+        if limit.tzinfo is None:
+            limit = limit.replace(tzinfo=timezone.utc)
+    except ValueError:
+        return True
+    publication_date = paper.get("publicationDate")
+    if publication_date:
+        try:
+            published = datetime.fromisoformat(str(publication_date)).replace(
+                tzinfo=timezone.utc
+            )
+            return published > limit
+        except ValueError:
+            return True
+    year = paper.get("year")
+    if isinstance(year, int):
+        return year >= limit.year
+    return True
+
+
+def _page_publication_date(text: str, headers: object) -> str | None:
+    for pattern in (
+        r'(?i)(?:datePublished|article:published_time|publication_date)'
+        r'[^0-9]{0,80}(\d{4}-\d{2}-\d{2})',
+        r'(?i)<time[^>]+datetime=["\'](\d{4}-\d{2}-\d{2})',
+    ):
+        match = re.search(pattern, text)
+        if match:
+            return match.group(1)
+    if text.lstrip().startswith("<?xml"):
+        try:
+            root = ET.fromstring(text)
+            for element in root.iter():
+                if element.tag.rsplit("}", 1)[-1] != "pub-date":
+                    continue
+                values = {
+                    child.tag.rsplit("}", 1)[-1]: (child.text or "").strip()
+                    for child in element
+                }
+                if values.get("year") and values.get("month") and values.get("day"):
+                    return (
+                        f"{int(values['year']):04d}-{int(values['month']):02d}-"
+                        f"{int(values['day']):02d}"
+                    )
+        except (ET.ParseError, ValueError):
+            pass
+    last_modified = headers.get("Last-Modified") if hasattr(headers, "get") else None
+    if last_modified:
+        try:
+            return parsedate_to_datetime(last_modified).date().isoformat()
+        except (TypeError, ValueError):
+            return None
+    return None
 
 
 def openalex_search(query: str, limit: int) -> tuple[list[dict], list[str]]:
@@ -894,6 +1103,13 @@ def openalex_snippets(query: str, limit: int) -> tuple[list[dict], list[str]]:
 
 
 def paper_matches_hidden_work(paper: dict, identifiers: list[str]) -> bool:
+    if openalex_graph_blocks(
+        paper.get("openalexId")
+        or (paper.get("externalIds") or {}).get("OpenAlex")
+        or paper.get("url"),
+        identifiers,
+    ):
+        return True
     ext = paper.get("externalIds") or {}
     fields = [
         paper.get("title") or "",
@@ -905,6 +1121,8 @@ def paper_matches_hidden_work(paper: dict, identifiers: list[str]) -> bool:
 
 def snippet_matches_hidden_work(item: dict, identifiers: list[str]) -> bool:
     paper = item.get("paper") or {}
+    if paper_matches_hidden_work(paper, identifiers):
+        return True
     snippet = item.get("snippet") or {}
     fields = [
         paper.get("title") or "",
@@ -969,13 +1187,18 @@ def restricted_research_papers(
     identifiers: list[str],
     guard_model: str | None = None,
     guard_api_base: str | None = None,
+    external_source_cutoff: str | None = None,
 ) -> dict:
     deny = deny_leaky_query(query, identifiers)
     if deny:
         return {"status": "denied", "error": deny}
     guard_reason = traffic_guard_blocks(
         kind="research_query",
-        candidate={"operation": operation, "query": query},
+        candidate={
+            "operation": operation,
+            "query": query,
+            "external_source_cutoff": external_source_cutoff,
+        },
         identifiers=identifiers,
         model=guard_model,
         api_base=guard_api_base,
@@ -990,6 +1213,8 @@ def restricted_research_papers(
             if snippet_matches_hidden_work(item, identifiers):
                 continue
             paper = item.get("paper") or {}
+            if _after_external_cutoff(paper, external_source_cutoff):
+                continue
             snippet = item.get("snippet") or {}
             snippet_text = "\n".join(
                 [
@@ -1036,6 +1261,8 @@ def restricted_research_papers(
     filtered = []
     blocked_by_guard_agent = 0
     for paper in papers:
+        if _after_external_cutoff(paper, external_source_cutoff):
+            continue
         if paper_matches_hidden_work(paper, identifiers):
             continue
         paper_text = "\n".join(
@@ -1090,20 +1317,21 @@ def restricted_web_search(
     identifiers: list[str],
     guard_model: str | None = None,
     guard_api_base: str | None = None,
+    external_source_cutoff: str | None = None,
 ) -> dict:
     deny = deny_leaky_query(query, identifiers)
     if deny:
         return {"status": "denied", "error": deny}
     guard_reason = traffic_guard_blocks(
         kind="web_query",
-        candidate={"query": query},
+        candidate={"query": query, "external_source_cutoff": external_source_cutoff},
         identifiers=identifiers,
         model=guard_model,
         api_base=guard_api_base,
     )
     if guard_reason:
         return {"status": "denied", "error": PUBLIC_GUARD_DENIAL}
-    rows: list[dict[str, str]] = []
+    rows: list[dict] = []
     diagnostics: list[str] = []
     duckduckgo_error = None
     for attempt in range(2):
@@ -1126,6 +1354,11 @@ def restricted_web_search(
 
     duckduckgo_count = len(rows)
     used_openalex_fallback = False
+    if external_source_cutoff and rows:
+        diagnostics.append(
+            "Discarded undated general-web results under the external-source cutoff."
+        )
+        rows = []
     if not rows:
         diagnostics.append(f"DuckDuckGo search failed: {duckduckgo_error}" if duckduckgo_error else "DuckDuckGo returned 0 parsable external results")
         papers, openalex_diagnostics = openalex_search(query, limit)
@@ -1134,6 +1367,8 @@ def restricted_web_search(
             {
                 "title": paper.get("title") or "",
                 "url": paper.get("url") or openalex_web_search_url(paper.get("title") or ""),
+                "publicationDate": paper.get("publicationDate"),
+                "year": paper.get("year"),
             }
             for paper in papers
         ]
@@ -1147,8 +1382,11 @@ def restricted_web_search(
     blocked_by_allowed = 0
     blocked_by_identifier = 0
     blocked_by_guard_agent = 0
-    filtered: list[dict[str, str]] = []
+    filtered: list[dict] = []
     for row in rows:
+        if _after_external_cutoff(row, external_source_cutoff):
+            blocked_by_guard += 1
+            continue
         url = row["url"]
         if url in seen:
             continue
@@ -1179,6 +1417,7 @@ def restricted_web_search(
                     "If allowed and later fetched, fetch_url and fetched_page_content "
                     "guards inspect the URL and page text."
                 ),
+                "external_source_cutoff": external_source_cutoff,
             },
             identifiers=identifiers,
             model=guard_model,
@@ -1234,6 +1473,29 @@ def restricted_web_search(
     }
 
 
+@dataclass
+class _SafeWebResponse:
+    status_code: int
+    headers: object
+    url: str
+    text: str
+
+
+def _safe_web_get(url: str) -> _SafeWebResponse:
+    request = urllib.request.Request(url, headers=FETCH_HEADERS)
+    with _safe_urlopen(request, timeout=30) as response:
+        payload = response.read(MAX_FETCH_BYTES + 1)
+        if len(payload) > MAX_FETCH_BYTES:
+            raise ValueError("remote page exceeds the safe fetch byte limit")
+        charset = response.headers.get_content_charset() or "utf-8"
+        return _SafeWebResponse(
+            status_code=response.status,
+            headers=response.headers,
+            url=response.geturl(),
+            text=payload.decode(charset, errors="replace"),
+        )
+
+
 def restricted_fetch_webpage(
     *,
     url: str,
@@ -1241,13 +1503,18 @@ def restricted_fetch_webpage(
     identifiers: list[str],
     guard_model: str | None = None,
     guard_api_base: str | None = None,
+    external_source_cutoff: str | None = None,
 ) -> dict:
+    try:
+        _validate_public_url(url)
+    except ValueError:
+        return {"status": "denied", "error": "URL must resolve to a public HTTPS address."}
     reason = blocked_url_reason(url, identifiers)
     if reason:
         return {"status": "denied", "error": reason}
     guard_reason = traffic_guard_blocks(
         kind="fetch_url",
-        candidate={"url": url},
+        candidate={"url": url, "external_source_cutoff": external_source_cutoff},
         identifiers=identifiers,
         model=guard_model,
         api_base=guard_api_base,
@@ -1255,7 +1522,10 @@ def restricted_fetch_webpage(
     if guard_reason:
         return {"status": "denied", "error": PUBLIC_GUARD_DENIAL}
     fetch_url = pmc_eutils_url(url) or url
-    resp = requests.get(fetch_url, headers=FETCH_HEADERS, timeout=30, allow_redirects=True)
+    try:
+        resp = _safe_web_get(fetch_url)
+    except (ValueError, OSError, urllib.error.URLError):
+        return {"status": "denied", "error": "URL could not be fetched safely."}
     if resp.status_code == 403:
         return {
             "status": "error",
@@ -1275,7 +1545,11 @@ def restricted_fetch_webpage(
     if final_url != url:
         guard_reason = traffic_guard_blocks(
             kind="fetch_url",
-            candidate={"url": final_url, "redirected_from": url},
+            candidate={
+                "url": final_url,
+                "redirected_from": url,
+                "external_source_cutoff": external_source_cutoff,
+            },
             identifiers=identifiers,
             model=guard_model,
             api_base=guard_api_base,
@@ -1286,6 +1560,15 @@ def restricted_fetch_webpage(
     if "pdf" in content_type or "octet-stream" in content_type:
         raise ValueError("binary/PDF content is not fetchable through this text tool")
     response_text = resp.text
+    publication_date = _page_publication_date(response_text, resp.headers)
+    if external_source_cutoff and _after_external_cutoff(
+        {"publicationDate": publication_date},
+        external_source_cutoff,
+    ):
+        return {
+            "status": "denied",
+            "error": "Page date is unavailable or later than the external-source cutoff.",
+        }
     if "xml" in content_type or response_text.lstrip().startswith("<?xml"):
         text = extract_nlm_xml_text(response_text)
         if not text:
@@ -1316,6 +1599,7 @@ def restricted_fetch_webpage(
         candidate={
             "url": final_url,
             "content_type": content_type,
+            "external_source_cutoff": external_source_cutoff,
             "text_resource": make_guard_text_resource(
                 "\n".join([final_url, text]),
                 "Fetched webpage URL and extracted page text.",
@@ -1331,5 +1615,6 @@ def restricted_fetch_webpage(
         "status": "ok",
         "url": final_url,
         "content_type": content_type,
+        "publication_date": publication_date,
         "text": text[:max_chars],
     }
