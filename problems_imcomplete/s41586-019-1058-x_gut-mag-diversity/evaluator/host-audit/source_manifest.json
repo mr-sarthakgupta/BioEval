@@ -1,0 +1,12 @@
+{
+  "project": "PRJEB31003",
+  "sequence_set_first_public_min": "2019-04-04",
+  "sequence_set_first_public_max": "2019-04-09",
+  "sequence_sets": 2058,
+  "total_bases": 4462286565,
+  "pilot_size": 256,
+  "selection": "lowest SHA-256 values for bioeval-gut-mag-v1:<wgs_accession>",
+  "representative_pilot_downloaded": true,
+  "grantable": false,
+  "blocked_reason": "Author-selected one-per-discovered-OTU representatives encode the target selection result."
+}

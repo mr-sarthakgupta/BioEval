@@ -1,0 +1,12 @@
+field,description,unit
+year,calendar year at end of annual accounting interval,year
+concrete_tt,global in-use stock assigned to concrete,teratonnes
+aggregate_tt,global in-use stock assigned to construction aggregates,teratonnes
+brick_tt,global in-use stock assigned to bricks,teratonnes
+asphalt_tt,global in-use stock assigned to asphalt,teratonnes
+metal_tt,global in-use stock assigned to metals,teratonnes
+other_material_tt,global in-use stock assigned to other materials,teratonnes
+waste_tt,separately accounted discarded material stock,teratonnes
+source_group,citation-level grouping retained for source-aware analysis,category
+observation_year,calendar year represented by a biomass estimate,year
+biomass_gt_carbon,global living biomass expressed as carbon mass,gigatonnes carbon

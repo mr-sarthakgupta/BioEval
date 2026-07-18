@@ -1,0 +1,75 @@
+problem_id: s41586-025-08855-w_rna-hydration
+benchmark_status: conditional
+readiness_reason: >-
+  Four identifier-sanitized half-maps, a pre-footprint polymer-only RNA
+  scaffold, and evaluator-side half-map density recomputation form a bounded
+  replication task. Target solvent coordinates are not used for scoring.
+title: Replicated map-density inference around a folded RNA
+doi: 10.1038/s41586-025-08855-w
+target_footprint_date: 2024-06-16
+external_source_cutoff: 2024-06-15T23:59:59Z
+sandbox_prompt: |
+  Analyze two independent pairs of cryo-EM half-maps for the same folded RNA.
+  Detect candidate local density peaks independently in each half-map, then
+  match candidates across halves and reconstructions. Report coordinates in
+  the MRC map frame in angstroms.
+
+  This bounded task scores replicated density, not chemical identity. Require
+  support in both halves and report sensitivity to contour threshold and
+  matching radius without forcing water-versus-ion assignments.
+
+  Submit hydration_calls.csv and analysis_parameters.csv under the declared
+  contracts. Do not search for target solvent-bearing models, full maps,
+  simulations, code, or papers.
+expected_conclusions:
+  - Reproducible local density peaks can be detected independently in both half-maps and matched across the two reconstructions.
+  - Cross-half and cross-reconstruction support materially reduces false confidence compared with single-map peak calling.
+judge_rubric:
+  - Are candidates detected independently per half-map before deterministic matching?
+  - Are map-frame coordinates supported by evaluator-recomputed density in both halves?
+  - Are contour and matching-radius sensitivities reported without unsupported chemical identities?
+expected_caveats:
+  - Half-maps are target-produced reconstructions rather than raw particle-level evidence.
+  - The pre-footprint polymer scaffold is an external structural prior and local coordinate uncertainty affects solvent searches.
+  - Water and ion identities are not scored without independent chemistry or simulation.
+  - The map-level scope does not reproduce particle picking, reconstruction, or molecular-dynamics analysis.
+required_artifacts:
+  - path: hydration_calls.csv
+    columns:
+      - schema_version
+      - run_id
+      - site_id
+      - map_blind_id
+      - half_id
+      - x_angstrom
+      - y_angstrom
+      - z_angstrom
+      - peak_sigma
+      - confidence
+      - input_sha256
+      - parameter_sha256
+    forbidden_columns:
+      - pdb_atom_id
+      - author_assignment
+      - swim_label
+    min_rows: 20
+  - path: analysis_parameters.csv
+    columns:
+      - parameter
+      - value
+    min_rows: 3
+leak_markers:
+  - "Complex water networks visualized by cryogenic electron microscopy of RNA"
+  - "10.1038/s41586-025-08855-w"
+  - "s41586-025-08855-w"
+  - "10.1101/2025.01.23.634578"
+  - "EMPIAR-11844"
+  - "EMD-42498"
+  - "EMD-42499"
+  - "9CBU"
+  - "9CBW"
+  - "9CBX"
+  - "9CBY"
+  - "Water-CryoEM-ribozyme"
+  - "SWIM"
+  - "Kretsch"

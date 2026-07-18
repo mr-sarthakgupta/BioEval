@@ -1,0 +1,2049 @@
+cell_id	sample_id	stage	sequencing_batch	theiler_stage	evaluation_split
+cell_00001	sample_77e457a6157d				holdout
+cell_00002	sample_77e457a6157d				holdout
+cell_00003	sample_77e457a6157d				holdout
+cell_00004	sample_77e457a6157d				holdout
+cell_00005	sample_77e457a6157d				holdout
+cell_00006	sample_77e457a6157d				holdout
+cell_00007	sample_77e457a6157d				holdout
+cell_00008	sample_77e457a6157d				holdout
+cell_00009	sample_77e457a6157d				holdout
+cell_00010	sample_77e457a6157d				holdout
+cell_00011	sample_77e457a6157d				holdout
+cell_00012	sample_77e457a6157d				holdout
+cell_00013	sample_77e457a6157d				holdout
+cell_00014	sample_77e457a6157d				holdout
+cell_00015	sample_77e457a6157d				holdout
+cell_00016	sample_77e457a6157d				holdout
+cell_00017	sample_77e457a6157d				holdout
+cell_00018	sample_77e457a6157d				holdout
+cell_00019	sample_77e457a6157d				holdout
+cell_00020	sample_77e457a6157d				holdout
+cell_00021	sample_e3d92c6fbac4	E7.5	batch_99e77b46b26f	TS11	training
+cell_00022	sample_e3d92c6fbac4	E7.5	batch_99e77b46b26f	TS11	training
+cell_00023	sample_e3d92c6fbac4	E7.5	batch_99e77b46b26f	TS11	training
+cell_00024	sample_e3d92c6fbac4	E7.5	batch_99e77b46b26f	TS11	training
+cell_00025	sample_e3d92c6fbac4	E7.5	batch_99e77b46b26f	TS11	training
+cell_00026	sample_e3d92c6fbac4	E7.5	batch_99e77b46b26f	TS11	training
+cell_00027	sample_e3d92c6fbac4	E7.5	batch_99e77b46b26f	TS11	training
+cell_00028	sample_e3d92c6fbac4	E7.5	batch_99e77b46b26f	TS11	training
+cell_00029	sample_e3d92c6fbac4	E7.5	batch_99e77b46b26f	TS11	training
+cell_00030	sample_e3d92c6fbac4	E7.5	batch_99e77b46b26f	TS11	training
+cell_00031	sample_8d2489277c6c	E7.5	batch_99e77b46b26f	TS11	training
+cell_00032	sample_8d2489277c6c	E7.5	batch_99e77b46b26f	TS11	training
+cell_00033	sample_8d2489277c6c	E7.5	batch_99e77b46b26f	TS11	training
+cell_00034	sample_8d2489277c6c	E7.5	batch_99e77b46b26f	TS11	training
+cell_00035	sample_8d2489277c6c	E7.5	batch_99e77b46b26f	TS11	training
+cell_00036	sample_8d2489277c6c	E7.5	batch_99e77b46b26f	TS11	training
+cell_00037	sample_8d2489277c6c	E7.5	batch_99e77b46b26f	TS11	training
+cell_00038	sample_8d2489277c6c	E7.5	batch_99e77b46b26f	TS11	training
+cell_00039	sample_8d2489277c6c	E7.5	batch_99e77b46b26f	TS11	training
+cell_00040	sample_8d2489277c6c	E7.5	batch_99e77b46b26f	TS11	training
+cell_00041	sample_8d2489277c6c	E7.5	batch_99e77b46b26f	TS11	training
+cell_00042	sample_ee7252d4a464	E7.5	batch_99e77b46b26f	TS11	training
+cell_00043	sample_ee7252d4a464	E7.5	batch_99e77b46b26f	TS11	training
+cell_00044	sample_ee7252d4a464	E7.5	batch_99e77b46b26f	TS11	training
+cell_00045	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00046	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00047	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00048	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00049	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00050	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00051	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00052	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00053	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00054	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00055	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00056	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00057	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00058	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00059	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00060	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00061	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00062	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00063	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00064	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00065	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00066	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00067	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00068	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00069	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00070	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00071	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00072	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00073	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00074	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00075	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00076	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00077	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00078	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00079	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00080	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00081	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00082	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00083	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00084	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00085	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00086	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00087	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00088	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00089	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00090	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00091	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00092	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00093	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00094	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00095	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00096	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00097	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00098	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00099	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00100	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00101	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00102	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00103	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00104	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00105	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00106	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00107	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00108	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00109	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00110	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00111	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00112	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00113	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00114	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00115	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00116	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00117	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00118	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00119	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00120	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00121	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00122	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00123	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00124	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00125	sample_b4c1d394086e	E6.5	batch_99e77b46b26f	TS9	training
+cell_00126	sample_a117caa3aa08				holdout
+cell_00127	sample_a117caa3aa08				holdout
+cell_00128	sample_a117caa3aa08				holdout
+cell_00129	sample_a117caa3aa08				holdout
+cell_00130	sample_a117caa3aa08				holdout
+cell_00131	sample_a117caa3aa08				holdout
+cell_00132	sample_a117caa3aa08				holdout
+cell_00133	sample_a117caa3aa08				holdout
+cell_00134	sample_a117caa3aa08				holdout
+cell_00135	sample_a117caa3aa08				holdout
+cell_00136	sample_a117caa3aa08				holdout
+cell_00137	sample_a117caa3aa08				holdout
+cell_00138	sample_a117caa3aa08				holdout
+cell_00139	sample_a117caa3aa08				holdout
+cell_00140	sample_a117caa3aa08				holdout
+cell_00141	sample_a117caa3aa08				holdout
+cell_00142	sample_a117caa3aa08				holdout
+cell_00143	sample_a117caa3aa08				holdout
+cell_00144	sample_a117caa3aa08				holdout
+cell_00145	sample_a117caa3aa08				holdout
+cell_00146	sample_a117caa3aa08				holdout
+cell_00147	sample_a117caa3aa08				holdout
+cell_00148	sample_a117caa3aa08				holdout
+cell_00149	sample_a117caa3aa08				holdout
+cell_00150	sample_a117caa3aa08				holdout
+cell_00151	sample_a117caa3aa08				holdout
+cell_00152	sample_a117caa3aa08				holdout
+cell_00153	sample_a117caa3aa08				holdout
+cell_00154	sample_a117caa3aa08				holdout
+cell_00155	sample_a117caa3aa08				holdout
+cell_00156	sample_a117caa3aa08				holdout
+cell_00157	sample_a117caa3aa08				holdout
+cell_00158	sample_a117caa3aa08				holdout
+cell_00159	sample_a117caa3aa08				holdout
+cell_00160	sample_a117caa3aa08				holdout
+cell_00161	sample_a117caa3aa08				holdout
+cell_00162	sample_a117caa3aa08				holdout
+cell_00163	sample_a117caa3aa08				holdout
+cell_00164	sample_21faac7e2cf7				holdout
+cell_00165	sample_21faac7e2cf7				holdout
+cell_00166	sample_21faac7e2cf7				holdout
+cell_00167	sample_21faac7e2cf7				holdout
+cell_00168	sample_21faac7e2cf7				holdout
+cell_00169	sample_21faac7e2cf7				holdout
+cell_00170	sample_21faac7e2cf7				holdout
+cell_00171	sample_21faac7e2cf7				holdout
+cell_00172	sample_21faac7e2cf7				holdout
+cell_00173	sample_21faac7e2cf7				holdout
+cell_00174	sample_21faac7e2cf7				holdout
+cell_00175	sample_21faac7e2cf7				holdout
+cell_00176	sample_21faac7e2cf7				holdout
+cell_00177	sample_21faac7e2cf7				holdout
+cell_00178	sample_21faac7e2cf7				holdout
+cell_00179	sample_21faac7e2cf7				holdout
+cell_00180	sample_21faac7e2cf7				holdout
+cell_00181	sample_21faac7e2cf7				holdout
+cell_00182	sample_21faac7e2cf7				holdout
+cell_00183	sample_21faac7e2cf7				holdout
+cell_00184	sample_21faac7e2cf7				holdout
+cell_00185	sample_21faac7e2cf7				holdout
+cell_00186	sample_21faac7e2cf7				holdout
+cell_00187	sample_21faac7e2cf7				holdout
+cell_00188	sample_21faac7e2cf7				holdout
+cell_00189	sample_21faac7e2cf7				holdout
+cell_00190	sample_21faac7e2cf7				holdout
+cell_00191	sample_21faac7e2cf7				holdout
+cell_00192	sample_21faac7e2cf7				holdout
+cell_00193	sample_21faac7e2cf7				holdout
+cell_00194	sample_21faac7e2cf7				holdout
+cell_00195	sample_21faac7e2cf7				holdout
+cell_00196	sample_21faac7e2cf7				holdout
+cell_00197	sample_21faac7e2cf7				holdout
+cell_00198	sample_21faac7e2cf7				holdout
+cell_00199	sample_21faac7e2cf7				holdout
+cell_00200	sample_21faac7e2cf7				holdout
+cell_00201	sample_21faac7e2cf7				holdout
+cell_00202	sample_21faac7e2cf7				holdout
+cell_00203	sample_21faac7e2cf7				holdout
+cell_00204	sample_21faac7e2cf7				holdout
+cell_00205	sample_21faac7e2cf7				holdout
+cell_00206	sample_21faac7e2cf7				holdout
+cell_00207	sample_21faac7e2cf7				holdout
+cell_00208	sample_21faac7e2cf7				holdout
+cell_00209	sample_21faac7e2cf7				holdout
+cell_00210	sample_21faac7e2cf7				holdout
+cell_00211	sample_21faac7e2cf7				holdout
+cell_00212	sample_21faac7e2cf7				holdout
+cell_00213	sample_21faac7e2cf7				holdout
+cell_00214	sample_21faac7e2cf7				holdout
+cell_00215	sample_21faac7e2cf7				holdout
+cell_00216	sample_21faac7e2cf7				holdout
+cell_00217	sample_21faac7e2cf7				holdout
+cell_00218	sample_21faac7e2cf7				holdout
+cell_00219	sample_21faac7e2cf7				holdout
+cell_00220	sample_21faac7e2cf7				holdout
+cell_00221	sample_21faac7e2cf7				holdout
+cell_00222	sample_21faac7e2cf7				holdout
+cell_00223	sample_21faac7e2cf7				holdout
+cell_00224	sample_21faac7e2cf7				holdout
+cell_00225	sample_21faac7e2cf7				holdout
+cell_00226	sample_21faac7e2cf7				holdout
+cell_00227	sample_21faac7e2cf7				holdout
+cell_00228	sample_21faac7e2cf7				holdout
+cell_00229	sample_21faac7e2cf7				holdout
+cell_00230	sample_21faac7e2cf7				holdout
+cell_00231	sample_21faac7e2cf7				holdout
+cell_00232	sample_21faac7e2cf7				holdout
+cell_00233	sample_21faac7e2cf7				holdout
+cell_00234	sample_21faac7e2cf7				holdout
+cell_00235	sample_21faac7e2cf7				holdout
+cell_00236	sample_21faac7e2cf7				holdout
+cell_00237	sample_21faac7e2cf7				holdout
+cell_00238	sample_21faac7e2cf7				holdout
+cell_00239	sample_21faac7e2cf7				holdout
+cell_00240	sample_21faac7e2cf7				holdout
+cell_00241	sample_21faac7e2cf7				holdout
+cell_00242	sample_21faac7e2cf7				holdout
+cell_00243	sample_21faac7e2cf7				holdout
+cell_00244	sample_21faac7e2cf7				holdout
+cell_00245	sample_21faac7e2cf7				holdout
+cell_00246	sample_21faac7e2cf7				holdout
+cell_00247	sample_21faac7e2cf7				holdout
+cell_00248	sample_21faac7e2cf7				holdout
+cell_00249	sample_21faac7e2cf7				holdout
+cell_00250	sample_21faac7e2cf7				holdout
+cell_00251	sample_21faac7e2cf7				holdout
+cell_00252	sample_21faac7e2cf7				holdout
+cell_00253	sample_21faac7e2cf7				holdout
+cell_00254	sample_21faac7e2cf7				holdout
+cell_00255	sample_21faac7e2cf7				holdout
+cell_00256	sample_21faac7e2cf7				holdout
+cell_00257	sample_21faac7e2cf7				holdout
+cell_00258	sample_21faac7e2cf7				holdout
+cell_00259	sample_21faac7e2cf7				holdout
+cell_00260	sample_21faac7e2cf7				holdout
+cell_00261	sample_21faac7e2cf7				holdout
+cell_00262	sample_21faac7e2cf7				holdout
+cell_00263	sample_21faac7e2cf7				holdout
+cell_00264	sample_21faac7e2cf7				holdout
+cell_00265	sample_21faac7e2cf7				holdout
+cell_00266	sample_21faac7e2cf7				holdout
+cell_00267	sample_21faac7e2cf7				holdout
+cell_00268	sample_21faac7e2cf7				holdout
+cell_00269	sample_21faac7e2cf7				holdout
+cell_00270	sample_21faac7e2cf7				holdout
+cell_00271	sample_21faac7e2cf7				holdout
+cell_00272	sample_21faac7e2cf7				holdout
+cell_00273	sample_21faac7e2cf7				holdout
+cell_00274	sample_21faac7e2cf7				holdout
+cell_00275	sample_21faac7e2cf7				holdout
+cell_00276	sample_21faac7e2cf7				holdout
+cell_00277	sample_21faac7e2cf7				holdout
+cell_00278	sample_21faac7e2cf7				holdout
+cell_00279	sample_21faac7e2cf7				holdout
+cell_00280	sample_21faac7e2cf7				holdout
+cell_00281	sample_21faac7e2cf7				holdout
+cell_00282	sample_21faac7e2cf7				holdout
+cell_00283	sample_21faac7e2cf7				holdout
+cell_00284	sample_21faac7e2cf7				holdout
+cell_00285	sample_21faac7e2cf7				holdout
+cell_00286	sample_21faac7e2cf7				holdout
+cell_00287	sample_21faac7e2cf7				holdout
+cell_00288	sample_21faac7e2cf7				holdout
+cell_00289	sample_21faac7e2cf7				holdout
+cell_00290	sample_21faac7e2cf7				holdout
+cell_00291	sample_21faac7e2cf7				holdout
+cell_00292	sample_21faac7e2cf7				holdout
+cell_00293	sample_21faac7e2cf7				holdout
+cell_00294	sample_21faac7e2cf7				holdout
+cell_00295	sample_21faac7e2cf7				holdout
+cell_00296	sample_21faac7e2cf7				holdout
+cell_00297	sample_21faac7e2cf7				holdout
+cell_00298	sample_21faac7e2cf7				holdout
+cell_00299	sample_21faac7e2cf7				holdout
+cell_00300	sample_21faac7e2cf7				holdout
+cell_00301	sample_21faac7e2cf7				holdout
+cell_00302	sample_21faac7e2cf7				holdout
+cell_00303	sample_21faac7e2cf7				holdout
+cell_00304	sample_21faac7e2cf7				holdout
+cell_00305	sample_21faac7e2cf7				holdout
+cell_00306	sample_21faac7e2cf7				holdout
+cell_00307	sample_21faac7e2cf7				holdout
+cell_00308	sample_21faac7e2cf7				holdout
+cell_00309	sample_21faac7e2cf7				holdout
+cell_00310	sample_21faac7e2cf7				holdout
+cell_00311	sample_21faac7e2cf7				holdout
+cell_00312	sample_21faac7e2cf7				holdout
+cell_00313	sample_21faac7e2cf7				holdout
+cell_00314	sample_21faac7e2cf7				holdout
+cell_00315	sample_21faac7e2cf7				holdout
+cell_00316	sample_21faac7e2cf7				holdout
+cell_00317	sample_21faac7e2cf7				holdout
+cell_00318	sample_21faac7e2cf7				holdout
+cell_00319	sample_21faac7e2cf7				holdout
+cell_00320	sample_21faac7e2cf7				holdout
+cell_00321	sample_21faac7e2cf7				holdout
+cell_00322	sample_21faac7e2cf7				holdout
+cell_00323	sample_21faac7e2cf7				holdout
+cell_00324	sample_21faac7e2cf7				holdout
+cell_00325	sample_21faac7e2cf7				holdout
+cell_00326	sample_21faac7e2cf7				holdout
+cell_00327	sample_21faac7e2cf7				holdout
+cell_00328	sample_21faac7e2cf7				holdout
+cell_00329	sample_21faac7e2cf7				holdout
+cell_00330	sample_21faac7e2cf7				holdout
+cell_00331	sample_21faac7e2cf7				holdout
+cell_00332	sample_21faac7e2cf7				holdout
+cell_00333	sample_21faac7e2cf7				holdout
+cell_00334	sample_21faac7e2cf7				holdout
+cell_00335	sample_21faac7e2cf7				holdout
+cell_00336	sample_21faac7e2cf7				holdout
+cell_00337	sample_21faac7e2cf7				holdout
+cell_00338	sample_21faac7e2cf7				holdout
+cell_00339	sample_21faac7e2cf7				holdout
+cell_00340	sample_21faac7e2cf7				holdout
+cell_00341	sample_21faac7e2cf7				holdout
+cell_00342	sample_21faac7e2cf7				holdout
+cell_00343	sample_21faac7e2cf7				holdout
+cell_00344	sample_21faac7e2cf7				holdout
+cell_00345	sample_21faac7e2cf7				holdout
+cell_00346	sample_21faac7e2cf7				holdout
+cell_00347	sample_21faac7e2cf7				holdout
+cell_00348	sample_21faac7e2cf7				holdout
+cell_00349	sample_21faac7e2cf7				holdout
+cell_00350	sample_21faac7e2cf7				holdout
+cell_00351	sample_21faac7e2cf7				holdout
+cell_00352	sample_21faac7e2cf7				holdout
+cell_00353	sample_21faac7e2cf7				holdout
+cell_00354	sample_21faac7e2cf7				holdout
+cell_00355	sample_21faac7e2cf7				holdout
+cell_00356	sample_21faac7e2cf7				holdout
+cell_00357	sample_21faac7e2cf7				holdout
+cell_00358	sample_21faac7e2cf7				holdout
+cell_00359	sample_21faac7e2cf7				holdout
+cell_00360	sample_21faac7e2cf7				holdout
+cell_00361	sample_21faac7e2cf7				holdout
+cell_00362	sample_21faac7e2cf7				holdout
+cell_00363	sample_21faac7e2cf7				holdout
+cell_00364	sample_21faac7e2cf7				holdout
+cell_00365	sample_21faac7e2cf7				holdout
+cell_00366	sample_21faac7e2cf7				holdout
+cell_00367	sample_21faac7e2cf7				holdout
+cell_00368	sample_21faac7e2cf7				holdout
+cell_00369	sample_dd1efe48915b				holdout
+cell_00370	sample_dd1efe48915b				holdout
+cell_00371	sample_dd1efe48915b				holdout
+cell_00372	sample_dd1efe48915b				holdout
+cell_00373	sample_dd1efe48915b				holdout
+cell_00374	sample_dd1efe48915b				holdout
+cell_00375	sample_dd1efe48915b				holdout
+cell_00376	sample_dd1efe48915b				holdout
+cell_00377	sample_dd1efe48915b				holdout
+cell_00378	sample_dd1efe48915b				holdout
+cell_00379	sample_dd1efe48915b				holdout
+cell_00380	sample_dd1efe48915b				holdout
+cell_00381	sample_dd1efe48915b				holdout
+cell_00382	sample_dd1efe48915b				holdout
+cell_00383	sample_dd1efe48915b				holdout
+cell_00384	sample_dd1efe48915b				holdout
+cell_00385	sample_dd1efe48915b				holdout
+cell_00386	sample_dd1efe48915b				holdout
+cell_00387	sample_dd1efe48915b				holdout
+cell_00388	sample_dd1efe48915b				holdout
+cell_00389	sample_dd1efe48915b				holdout
+cell_00390	sample_dd1efe48915b				holdout
+cell_00391	sample_dd1efe48915b				holdout
+cell_00392	sample_dd1efe48915b				holdout
+cell_00393	sample_dd1efe48915b				holdout
+cell_00394	sample_dd1efe48915b				holdout
+cell_00395	sample_dd1efe48915b				holdout
+cell_00396	sample_dd1efe48915b				holdout
+cell_00397	sample_dd1efe48915b				holdout
+cell_00398	sample_dd1efe48915b				holdout
+cell_00399	sample_dd1efe48915b				holdout
+cell_00400	sample_dd1efe48915b				holdout
+cell_00401	sample_dd1efe48915b				holdout
+cell_00402	sample_dd1efe48915b				holdout
+cell_00403	sample_dd1efe48915b				holdout
+cell_00404	sample_dd1efe48915b				holdout
+cell_00405	sample_dd1efe48915b				holdout
+cell_00406	sample_dd1efe48915b				holdout
+cell_00407	sample_dd1efe48915b				holdout
+cell_00408	sample_dd1efe48915b				holdout
+cell_00409	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00410	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00411	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00412	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00413	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00414	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00415	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00416	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00417	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00418	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00419	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00420	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00421	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00422	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00423	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00424	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00425	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00426	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00427	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00428	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00429	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00430	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00431	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00432	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00433	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00434	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00435	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00436	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00437	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00438	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00439	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00440	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00441	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00442	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00443	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00444	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00445	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00446	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00447	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00448	sample_a2650b753994	E7.75	batch_99e77b46b26f	TS11	training
+cell_00449	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00450	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00451	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00452	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00453	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00454	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00455	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00456	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00457	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00458	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00459	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00460	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00461	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00462	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00463	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00464	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00465	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00466	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00467	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00468	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00469	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00470	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00471	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00472	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00473	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00474	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00475	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00476	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00477	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00478	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00479	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00480	sample_8f0f1108c0f2	E7.0	batch_99e77b46b26f	TS10	training
+cell_00481	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00482	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00483	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00484	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00485	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00486	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00487	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00488	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00489	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00490	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00491	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00492	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00493	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00494	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00495	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00496	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00497	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00498	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00499	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00500	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00501	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00502	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00503	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00504	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00505	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00506	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00507	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00508	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00509	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00510	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00511	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00512	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00513	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00514	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00515	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00516	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00517	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00518	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00519	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00520	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00521	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00522	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00523	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00524	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00525	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00526	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00527	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00528	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00529	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00530	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00531	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00532	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00533	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00534	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00535	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00536	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00537	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00538	sample_f1bda1bc7030	E7.75	batch_296560d7244c	TS11	training
+cell_00539	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00540	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00541	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00542	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00543	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00544	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00545	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00546	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00547	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00548	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00549	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00550	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00551	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00552	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00553	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00554	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00555	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00556	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00557	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00558	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00559	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00560	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00561	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00562	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00563	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00564	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00565	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00566	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00567	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00568	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00569	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00570	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00571	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00572	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00573	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00574	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00575	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00576	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00577	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00578	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00579	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00580	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00581	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00582	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00583	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00584	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00585	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00586	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00587	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00588	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00589	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00590	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00591	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00592	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00593	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00594	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00595	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00596	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00597	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00598	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00599	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00600	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00601	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00602	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00603	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00604	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00605	sample_845af1a54bbe	E7.75	batch_296560d7244c	TS11	training
+cell_00606	sample_2c40882102a2	E7.0	batch_296560d7244c	TS10	training
+cell_00607	sample_2c40882102a2	E7.0	batch_296560d7244c	TS10	training
+cell_00608	sample_2c40882102a2	E7.0	batch_296560d7244c	TS10	training
+cell_00609	sample_2c40882102a2	E7.0	batch_296560d7244c	TS10	training
+cell_00610	sample_2c40882102a2	E7.0	batch_296560d7244c	TS10	training
+cell_00611	sample_2c40882102a2	E7.0	batch_296560d7244c	TS10	training
+cell_00612	sample_2c40882102a2	E7.0	batch_296560d7244c	TS10	training
+cell_00613	sample_2c40882102a2	E7.0	batch_296560d7244c	TS10	training
+cell_00614	sample_2c40882102a2	E7.0	batch_296560d7244c	TS10	training
+cell_00615	sample_2c40882102a2	E7.0	batch_296560d7244c	TS10	training
+cell_00616	sample_2c40882102a2	E7.0	batch_296560d7244c	TS10	training
+cell_00617	sample_2c40882102a2	E7.0	batch_296560d7244c	TS10	training
+cell_00618	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00619	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00620	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00621	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00622	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00623	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00624	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00625	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00626	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00627	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00628	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00629	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00630	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00631	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00632	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00633	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00634	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00635	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00636	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00637	sample_0cbf47397b25	E7.0	batch_296560d7244c	TS10	training
+cell_00638	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00639	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00640	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00641	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00642	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00643	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00644	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00645	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00646	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00647	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00648	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00649	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00650	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00651	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00652	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00653	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00654	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00655	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00656	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00657	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00658	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00659	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00660	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00661	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00662	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00663	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00664	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00665	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00666	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00667	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00668	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00669	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00670	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00671	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00672	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00673	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00674	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00675	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00676	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00677	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00678	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00679	sample_3060352b010a	E8.0	batch_296560d7244c	TS12	training
+cell_00680	sample_82741efcc1cc				holdout
+cell_00681	sample_82741efcc1cc				holdout
+cell_00682	sample_82741efcc1cc				holdout
+cell_00683	sample_82741efcc1cc				holdout
+cell_00684	sample_82741efcc1cc				holdout
+cell_00685	sample_82741efcc1cc				holdout
+cell_00686	sample_82741efcc1cc				holdout
+cell_00687	sample_82741efcc1cc				holdout
+cell_00688	sample_82741efcc1cc				holdout
+cell_00689	sample_82741efcc1cc				holdout
+cell_00690	sample_82741efcc1cc				holdout
+cell_00691	sample_82741efcc1cc				holdout
+cell_00692	sample_82741efcc1cc				holdout
+cell_00693	sample_82741efcc1cc				holdout
+cell_00694	sample_82741efcc1cc				holdout
+cell_00695	sample_82741efcc1cc				holdout
+cell_00696	sample_82741efcc1cc				holdout
+cell_00697	sample_82741efcc1cc				holdout
+cell_00698	sample_82741efcc1cc				holdout
+cell_00699	sample_82741efcc1cc				holdout
+cell_00700	sample_82741efcc1cc				holdout
+cell_00701	sample_82741efcc1cc				holdout
+cell_00702	sample_82741efcc1cc				holdout
+cell_00703	sample_82741efcc1cc				holdout
+cell_00704	sample_82741efcc1cc				holdout
+cell_00705	sample_82741efcc1cc				holdout
+cell_00706	sample_82741efcc1cc				holdout
+cell_00707	sample_82741efcc1cc				holdout
+cell_00708	sample_82741efcc1cc				holdout
+cell_00709	sample_82741efcc1cc				holdout
+cell_00710	sample_82741efcc1cc				holdout
+cell_00711	sample_82741efcc1cc				holdout
+cell_00712	sample_82741efcc1cc				holdout
+cell_00713	sample_82741efcc1cc				holdout
+cell_00714	sample_82741efcc1cc				holdout
+cell_00715	sample_82741efcc1cc				holdout
+cell_00716	sample_82741efcc1cc				holdout
+cell_00717	sample_82741efcc1cc				holdout
+cell_00718	sample_82741efcc1cc				holdout
+cell_00719	sample_82741efcc1cc				holdout
+cell_00720	sample_82741efcc1cc				holdout
+cell_00721	sample_82741efcc1cc				holdout
+cell_00722	sample_82741efcc1cc				holdout
+cell_00723	sample_82741efcc1cc				holdout
+cell_00724	sample_82741efcc1cc				holdout
+cell_00725	sample_82741efcc1cc				holdout
+cell_00726	sample_82741efcc1cc				holdout
+cell_00727	sample_82741efcc1cc				holdout
+cell_00728	sample_82741efcc1cc				holdout
+cell_00729	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00730	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00731	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00732	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00733	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00734	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00735	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00736	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00737	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00738	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00739	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00740	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00741	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00742	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00743	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00744	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00745	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00746	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00747	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00748	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00749	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00750	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00751	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00752	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00753	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00754	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00755	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00756	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00757	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00758	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00759	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00760	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00761	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00762	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00763	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00764	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00765	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00766	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00767	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00768	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00769	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00770	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00771	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00772	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00773	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00774	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00775	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00776	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00777	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00778	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00779	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00780	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00781	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00782	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00783	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00784	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00785	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00786	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00787	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00788	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00789	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00790	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00791	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00792	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00793	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00794	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00795	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00796	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00797	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00798	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00799	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00800	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00801	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00802	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00803	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00804	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00805	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00806	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00807	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00808	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00809	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00810	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00811	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00812	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00813	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00814	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00815	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00816	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00817	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00818	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00819	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00820	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00821	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00822	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00823	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00824	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00825	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00826	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00827	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00828	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00829	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00830	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00831	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00832	sample_e9c05b05d218	E6.5	batch_296560d7244c	TS9	training
+cell_00833	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00834	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00835	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00836	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00837	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00838	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00839	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00840	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00841	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00842	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00843	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00844	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00845	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00846	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00847	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00848	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00849	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00850	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00851	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00852	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00853	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00854	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00855	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00856	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00857	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00858	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00859	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00860	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00861	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00862	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00863	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00864	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00865	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00866	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00867	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00868	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00869	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00870	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00871	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00872	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00873	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00874	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00875	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00876	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00877	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00878	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00879	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00880	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00881	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00882	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00883	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00884	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00885	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00886	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00887	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00888	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00889	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00890	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00891	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00892	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00893	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00894	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00895	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00896	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00897	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00898	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00899	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00900	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00901	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00902	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00903	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00904	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00905	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00906	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00907	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00908	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00909	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00910	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00911	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00912	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00913	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00914	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00915	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00916	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00917	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00918	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00919	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00920	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00921	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00922	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00923	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00924	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00925	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00926	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00927	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00928	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00929	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00930	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00931	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00932	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00933	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00934	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00935	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00936	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00937	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00938	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00939	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00940	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00941	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00942	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00943	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00944	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00945	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00946	sample_984f7a5f457a	E7.5	batch_296560d7244c	TS11	training
+cell_00947	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00948	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00949	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00950	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00951	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00952	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00953	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00954	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00955	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00956	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00957	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00958	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00959	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00960	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00961	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00962	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00963	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00964	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00965	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00966	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00967	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00968	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00969	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00970	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00971	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00972	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00973	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00974	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00975	sample_15f8af97392f	E7.5	batch_296560d7244c	TS11	training
+cell_00976	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00977	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00978	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00979	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00980	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00981	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00982	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00983	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00984	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00985	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00986	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00987	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00988	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00989	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00990	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00991	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00992	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00993	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00994	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00995	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00996	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00997	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00998	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_00999	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01000	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01001	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01002	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01003	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01004	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01005	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01006	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01007	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01008	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01009	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01010	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01011	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01012	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01013	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01014	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01015	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01016	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01017	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01018	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01019	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01020	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01021	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01022	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01023	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01024	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01025	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01026	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01027	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01028	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01029	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01030	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01031	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01032	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01033	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01034	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01035	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01036	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01037	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01038	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01039	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01040	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01041	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01042	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01043	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01044	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01045	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01046	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01047	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01048	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01049	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01050	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01051	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01052	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01053	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01054	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01055	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01056	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01057	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01058	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01059	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01060	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01061	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01062	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01063	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01064	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01065	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01066	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01067	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01068	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01069	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01070	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01071	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01072	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01073	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01074	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01075	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01076	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01077	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01078	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01079	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01080	sample_f1ad01452e1c	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01081	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01082	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01083	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01084	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01085	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01086	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01087	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01088	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01089	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01090	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01091	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01092	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01093	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01094	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01095	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01096	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01097	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01098	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01099	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01100	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01101	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01102	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01103	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01104	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01105	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01106	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01107	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01108	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01109	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01110	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01111	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01112	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01113	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01114	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01115	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01116	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01117	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01118	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01119	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01120	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01121	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01122	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01123	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01124	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01125	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01126	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01127	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01128	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01129	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01130	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01131	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01132	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01133	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01134	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01135	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01136	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01137	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01138	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01139	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01140	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01141	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01142	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01143	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01144	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01145	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01146	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01147	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01148	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01149	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01150	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01151	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01152	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01153	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01154	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01155	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01156	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01157	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01158	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01159	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01160	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01161	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01162	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01163	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01164	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01165	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01166	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01167	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01168	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01169	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01170	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01171	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01172	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01173	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01174	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01175	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01176	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01177	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01178	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01179	sample_3948eec7d16d	mixed_gastrulation	batch_296560d7244c	TS9-10	training
+cell_01180	sample_cc9bb8104ef5				holdout
+cell_01181	sample_cc9bb8104ef5				holdout
+cell_01182	sample_cc9bb8104ef5				holdout
+cell_01183	sample_cc9bb8104ef5				holdout
+cell_01184	sample_cc9bb8104ef5				holdout
+cell_01185	sample_cc9bb8104ef5				holdout
+cell_01186	sample_cc9bb8104ef5				holdout
+cell_01187	sample_cc9bb8104ef5				holdout
+cell_01188	sample_cc9bb8104ef5				holdout
+cell_01189	sample_cc9bb8104ef5				holdout
+cell_01190	sample_cc9bb8104ef5				holdout
+cell_01191	sample_cc9bb8104ef5				holdout
+cell_01192	sample_cc9bb8104ef5				holdout
+cell_01193	sample_cc9bb8104ef5				holdout
+cell_01194	sample_cc9bb8104ef5				holdout
+cell_01195	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01196	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01197	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01198	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01199	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01200	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01201	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01202	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01203	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01204	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01205	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01206	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01207	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01208	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01209	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01210	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01211	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01212	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01213	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01214	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01215	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01216	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01217	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01218	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01219	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01220	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01221	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01222	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01223	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01224	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01225	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01226	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01227	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01228	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01229	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01230	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01231	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01232	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01233	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01234	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01235	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01236	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01237	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01238	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01239	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01240	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01241	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01242	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01243	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01244	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01245	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01246	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01247	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01248	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01249	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01250	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01251	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01252	sample_20514ce46d92	E8.25	batch_296560d7244c	TS12	training
+cell_01253	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01254	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01255	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01256	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01257	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01258	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01259	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01260	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01261	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01262	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01263	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01264	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01265	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01266	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01267	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01268	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01269	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01270	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01271	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01272	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01273	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01274	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01275	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01276	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01277	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01278	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01279	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01280	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01281	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01282	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01283	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01284	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01285	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01286	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01287	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01288	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01289	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01290	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01291	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01292	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01293	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01294	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01295	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01296	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01297	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01298	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01299	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01300	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01301	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01302	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01303	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01304	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01305	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01306	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01307	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01308	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01309	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01310	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01311	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01312	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01313	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01314	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01315	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01316	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01317	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01318	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01319	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01320	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01321	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01322	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01323	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01324	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01325	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01326	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01327	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01328	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01329	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01330	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01331	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01332	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01333	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01334	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01335	sample_5fc46a8eb63a	E8.25	batch_296560d7244c	TS12	training
+cell_01336	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01337	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01338	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01339	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01340	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01341	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01342	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01343	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01344	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01345	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01346	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01347	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01348	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01349	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01350	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01351	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01352	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01353	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01354	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01355	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01356	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01357	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01358	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01359	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01360	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01361	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01362	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01363	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01364	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01365	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01366	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01367	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01368	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01369	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01370	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01371	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01372	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01373	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01374	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01375	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01376	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01377	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01378	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01379	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01380	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01381	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01382	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01383	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01384	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01385	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01386	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01387	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01388	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01389	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01390	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01391	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01392	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01393	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01394	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01395	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01396	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01397	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01398	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01399	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01400	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01401	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01402	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01403	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01404	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01405	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01406	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01407	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01408	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01409	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01410	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01411	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01412	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01413	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01414	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01415	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01416	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01417	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01418	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01419	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01420	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01421	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01422	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01423	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01424	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01425	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01426	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01427	sample_b305e85728ca	E7.25	batch_296560d7244c	TS10	training
+cell_01428	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01429	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01430	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01431	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01432	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01433	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01434	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01435	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01436	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01437	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01438	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01439	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01440	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01441	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01442	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01443	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01444	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01445	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01446	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01447	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01448	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01449	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01450	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01451	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01452	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01453	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01454	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01455	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01456	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01457	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01458	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01459	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01460	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01461	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01462	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01463	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01464	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01465	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01466	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01467	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01468	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01469	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01470	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01471	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01472	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01473	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01474	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01475	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01476	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01477	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01478	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01479	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01480	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01481	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01482	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01483	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01484	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01485	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01486	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01487	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01488	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01489	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01490	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01491	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01492	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01493	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01494	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01495	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01496	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01497	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01498	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01499	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01500	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01501	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01502	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01503	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01504	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01505	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01506	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01507	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01508	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01509	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01510	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01511	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01512	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01513	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01514	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01515	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01516	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01517	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01518	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01519	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01520	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01521	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01522	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01523	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01524	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01525	sample_ecae9d26876c	E7.25	batch_296560d7244c	TS10	training
+cell_01526	sample_6192791781ab				holdout
+cell_01527	sample_6192791781ab				holdout
+cell_01528	sample_6192791781ab				holdout
+cell_01529	sample_6192791781ab				holdout
+cell_01530	sample_6192791781ab				holdout
+cell_01531	sample_6192791781ab				holdout
+cell_01532	sample_6192791781ab				holdout
+cell_01533	sample_6192791781ab				holdout
+cell_01534	sample_6192791781ab				holdout
+cell_01535	sample_6192791781ab				holdout
+cell_01536	sample_6192791781ab				holdout
+cell_01537	sample_6192791781ab				holdout
+cell_01538	sample_6192791781ab				holdout
+cell_01539	sample_6192791781ab				holdout
+cell_01540	sample_6192791781ab				holdout
+cell_01541	sample_6192791781ab				holdout
+cell_01542	sample_6192791781ab				holdout
+cell_01543	sample_6192791781ab				holdout
+cell_01544	sample_6192791781ab				holdout
+cell_01545	sample_6192791781ab				holdout
+cell_01546	sample_6192791781ab				holdout
+cell_01547	sample_6192791781ab				holdout
+cell_01548	sample_6192791781ab				holdout
+cell_01549	sample_6192791781ab				holdout
+cell_01550	sample_6192791781ab				holdout
+cell_01551	sample_6192791781ab				holdout
+cell_01552	sample_6192791781ab				holdout
+cell_01553	sample_6192791781ab				holdout
+cell_01554	sample_6192791781ab				holdout
+cell_01555	sample_6192791781ab				holdout
+cell_01556	sample_6192791781ab				holdout
+cell_01557	sample_6192791781ab				holdout
+cell_01558	sample_6192791781ab				holdout
+cell_01559	sample_6192791781ab				holdout
+cell_01560	sample_6192791781ab				holdout
+cell_01561	sample_6192791781ab				holdout
+cell_01562	sample_6192791781ab				holdout
+cell_01563	sample_6192791781ab				holdout
+cell_01564	sample_6192791781ab				holdout
+cell_01565	sample_6192791781ab				holdout
+cell_01566	sample_6192791781ab				holdout
+cell_01567	sample_6192791781ab				holdout
+cell_01568	sample_6192791781ab				holdout
+cell_01569	sample_6192791781ab				holdout
+cell_01570	sample_6192791781ab				holdout
+cell_01571	sample_6192791781ab				holdout
+cell_01572	sample_6192791781ab				holdout
+cell_01573	sample_6192791781ab				holdout
+cell_01574	sample_6192791781ab				holdout
+cell_01575	sample_6192791781ab				holdout
+cell_01576	sample_6192791781ab				holdout
+cell_01577	sample_6192791781ab				holdout
+cell_01578	sample_6192791781ab				holdout
+cell_01579	sample_6192791781ab				holdout
+cell_01580	sample_6192791781ab				holdout
+cell_01581	sample_6192791781ab				holdout
+cell_01582	sample_6192791781ab				holdout
+cell_01583	sample_6192791781ab				holdout
+cell_01584	sample_6192791781ab				holdout
+cell_01585	sample_6192791781ab				holdout
+cell_01586	sample_6192791781ab				holdout
+cell_01587	sample_6192791781ab				holdout
+cell_01588	sample_6192791781ab				holdout
+cell_01589	sample_6192791781ab				holdout
+cell_01590	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01591	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01592	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01593	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01594	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01595	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01596	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01597	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01598	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01599	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01600	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01601	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01602	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01603	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01604	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01605	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01606	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01607	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01608	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01609	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01610	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01611	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01612	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01613	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01614	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01615	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01616	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01617	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01618	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01619	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01620	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01621	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01622	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01623	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01624	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01625	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01626	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01627	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01628	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01629	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01630	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01631	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01632	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01633	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01634	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01635	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01636	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01637	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01638	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01639	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01640	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01641	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01642	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01643	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01644	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01645	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01646	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01647	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01648	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01649	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01650	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01651	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01652	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01653	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01654	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01655	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01656	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01657	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01658	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01659	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01660	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01661	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01662	sample_4fb49866f500	E8.5	batch_d12882140981	TS12	training
+cell_01663	sample_65037fe9aebf				holdout
+cell_01664	sample_65037fe9aebf				holdout
+cell_01665	sample_65037fe9aebf				holdout
+cell_01666	sample_65037fe9aebf				holdout
+cell_01667	sample_65037fe9aebf				holdout
+cell_01668	sample_65037fe9aebf				holdout
+cell_01669	sample_65037fe9aebf				holdout
+cell_01670	sample_65037fe9aebf				holdout
+cell_01671	sample_65037fe9aebf				holdout
+cell_01672	sample_65037fe9aebf				holdout
+cell_01673	sample_65037fe9aebf				holdout
+cell_01674	sample_65037fe9aebf				holdout
+cell_01675	sample_65037fe9aebf				holdout
+cell_01676	sample_65037fe9aebf				holdout
+cell_01677	sample_65037fe9aebf				holdout
+cell_01678	sample_65037fe9aebf				holdout
+cell_01679	sample_65037fe9aebf				holdout
+cell_01680	sample_65037fe9aebf				holdout
+cell_01681	sample_65037fe9aebf				holdout
+cell_01682	sample_65037fe9aebf				holdout
+cell_01683	sample_65037fe9aebf				holdout
+cell_01684	sample_65037fe9aebf				holdout
+cell_01685	sample_65037fe9aebf				holdout
+cell_01686	sample_65037fe9aebf				holdout
+cell_01687	sample_65037fe9aebf				holdout
+cell_01688	sample_65037fe9aebf				holdout
+cell_01689	sample_65037fe9aebf				holdout
+cell_01690	sample_65037fe9aebf				holdout
+cell_01691	sample_65037fe9aebf				holdout
+cell_01692	sample_65037fe9aebf				holdout
+cell_01693	sample_65037fe9aebf				holdout
+cell_01694	sample_65037fe9aebf				holdout
+cell_01695	sample_65037fe9aebf				holdout
+cell_01696	sample_65037fe9aebf				holdout
+cell_01697	sample_65037fe9aebf				holdout
+cell_01698	sample_65037fe9aebf				holdout
+cell_01699	sample_65037fe9aebf				holdout
+cell_01700	sample_65037fe9aebf				holdout
+cell_01701	sample_65037fe9aebf				holdout
+cell_01702	sample_65037fe9aebf				holdout
+cell_01703	sample_65037fe9aebf				holdout
+cell_01704	sample_65037fe9aebf				holdout
+cell_01705	sample_65037fe9aebf				holdout
+cell_01706	sample_65037fe9aebf				holdout
+cell_01707	sample_65037fe9aebf				holdout
+cell_01708	sample_65037fe9aebf				holdout
+cell_01709	sample_65037fe9aebf				holdout
+cell_01710	sample_65037fe9aebf				holdout
+cell_01711	sample_65037fe9aebf				holdout
+cell_01712	sample_65037fe9aebf				holdout
+cell_01713	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01714	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01715	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01716	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01717	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01718	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01719	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01720	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01721	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01722	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01723	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01724	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01725	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01726	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01727	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01728	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01729	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01730	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01731	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01732	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01733	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01734	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01735	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01736	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01737	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01738	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01739	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01740	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01741	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01742	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01743	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01744	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01745	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01746	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01747	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01748	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01749	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01750	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01751	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01752	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01753	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01754	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01755	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01756	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01757	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01758	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01759	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01760	sample_07d997c995e4	E7.0	batch_d12882140981	TS10	training
+cell_01761	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01762	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01763	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01764	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01765	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01766	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01767	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01768	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01769	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01770	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01771	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01772	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01773	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01774	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01775	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01776	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01777	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01778	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01779	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01780	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01781	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01782	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01783	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01784	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01785	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01786	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01787	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01788	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01789	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01790	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01791	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01792	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01793	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01794	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01795	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01796	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01797	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01798	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01799	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01800	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01801	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01802	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01803	sample_a1fdc6f29d20	E7.0	batch_d12882140981	TS10	training
+cell_01804	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01805	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01806	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01807	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01808	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01809	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01810	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01811	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01812	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01813	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01814	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01815	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01816	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01817	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01818	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01819	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01820	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01821	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01822	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01823	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01824	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01825	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01826	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01827	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01828	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01829	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01830	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01831	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01832	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01833	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01834	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01835	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01836	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01837	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01838	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01839	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01840	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01841	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01842	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01843	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01844	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01845	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01846	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01847	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01848	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01849	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01850	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01851	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01852	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01853	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01854	sample_4d19da36f78a	E8.0	batch_d12882140981	TS12	training
+cell_01855	sample_4f4f722a99a6				holdout
+cell_01856	sample_4f4f722a99a6				holdout
+cell_01857	sample_4f4f722a99a6				holdout
+cell_01858	sample_4f4f722a99a6				holdout
+cell_01859	sample_4f4f722a99a6				holdout
+cell_01860	sample_4f4f722a99a6				holdout
+cell_01861	sample_4f4f722a99a6				holdout
+cell_01862	sample_4f4f722a99a6				holdout
+cell_01863	sample_4f4f722a99a6				holdout
+cell_01864	sample_4f4f722a99a6				holdout
+cell_01865	sample_4f4f722a99a6				holdout
+cell_01866	sample_4f4f722a99a6				holdout
+cell_01867	sample_4f4f722a99a6				holdout
+cell_01868	sample_4f4f722a99a6				holdout
+cell_01869	sample_4f4f722a99a6				holdout
+cell_01870	sample_4f4f722a99a6				holdout
+cell_01871	sample_4f4f722a99a6				holdout
+cell_01872	sample_4f4f722a99a6				holdout
+cell_01873	sample_4f4f722a99a6				holdout
+cell_01874	sample_4f4f722a99a6				holdout
+cell_01875	sample_4f4f722a99a6				holdout
+cell_01876	sample_4f4f722a99a6				holdout
+cell_01877	sample_4f4f722a99a6				holdout
+cell_01878	sample_4f4f722a99a6				holdout
+cell_01879	sample_4f4f722a99a6				holdout
+cell_01880	sample_4f4f722a99a6				holdout
+cell_01881	sample_4f4f722a99a6				holdout
+cell_01882	sample_4f4f722a99a6				holdout
+cell_01883	sample_4f4f722a99a6				holdout
+cell_01884	sample_4f4f722a99a6				holdout
+cell_01885	sample_4f4f722a99a6				holdout
+cell_01886	sample_4f4f722a99a6				holdout
+cell_01887	sample_4f4f722a99a6				holdout
+cell_01888	sample_4f4f722a99a6				holdout
+cell_01889	sample_4f4f722a99a6				holdout
+cell_01890	sample_4f4f722a99a6				holdout
+cell_01891	sample_4f4f722a99a6				holdout
+cell_01892	sample_4f4f722a99a6				holdout
+cell_01893	sample_4f4f722a99a6				holdout
+cell_01894	sample_4f4f722a99a6				holdout
+cell_01895	sample_4f4f722a99a6				holdout
+cell_01896	sample_4f4f722a99a6				holdout
+cell_01897	sample_4f4f722a99a6				holdout
+cell_01898	sample_4f4f722a99a6				holdout
+cell_01899	sample_4f4f722a99a6				holdout
+cell_01900	sample_4f4f722a99a6				holdout
+cell_01901	sample_4f4f722a99a6				holdout
+cell_01902	sample_4f4f722a99a6				holdout
+cell_01903	sample_4f4f722a99a6				holdout
+cell_01904	sample_4f4f722a99a6				holdout
+cell_01905	sample_4f4f722a99a6				holdout
+cell_01906	sample_4f4f722a99a6				holdout
+cell_01907	sample_4f4f722a99a6				holdout
+cell_01908	sample_4f4f722a99a6				holdout
+cell_01909	sample_4f4f722a99a6				holdout
+cell_01910	sample_4f4f722a99a6				holdout
+cell_01911	sample_4f4f722a99a6				holdout
+cell_01912	sample_4f4f722a99a6				holdout
+cell_01913	sample_4f4f722a99a6				holdout
+cell_01914	sample_4f4f722a99a6				holdout
+cell_01915	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01916	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01917	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01918	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01919	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01920	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01921	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01922	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01923	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01924	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01925	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01926	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01927	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01928	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01929	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01930	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01931	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01932	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01933	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01934	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01935	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01936	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01937	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01938	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01939	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01940	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01941	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01942	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01943	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01944	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01945	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01946	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01947	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01948	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01949	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01950	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01951	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01952	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01953	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01954	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01955	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01956	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01957	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01958	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01959	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01960	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01961	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01962	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01963	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01964	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01965	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01966	sample_ef2baf8b791f	E8.0	batch_d12882140981	TS12	training
+cell_01967	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01968	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01969	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01970	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01971	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01972	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01973	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01974	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01975	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01976	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01977	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01978	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01979	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01980	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01981	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01982	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01983	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01984	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01985	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01986	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01987	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01988	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01989	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01990	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01991	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01992	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01993	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01994	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01995	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01996	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01997	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01998	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_01999	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_02000	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_02001	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_02002	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_02003	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_02004	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_02005	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_02006	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_02007	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_02008	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_02009	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_02010	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_02011	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_02012	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_02013	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_02014	sample_ef147b47f6a7	E8.5	batch_d12882140981	TS12	training
+cell_02015	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02016	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02017	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02018	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02019	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02020	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02021	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02022	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02023	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02024	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02025	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02026	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02027	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02028	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02029	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02030	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02031	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02032	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02033	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02034	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02035	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02036	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02037	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02038	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02039	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02040	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02041	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02042	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02043	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02044	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02045	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02046	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02047	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training
+cell_02048	sample_072039d2c505	E8.5	batch_d12882140981	TS12	training

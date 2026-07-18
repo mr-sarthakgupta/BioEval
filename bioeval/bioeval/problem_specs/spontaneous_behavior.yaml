@@ -1,0 +1,27 @@
+problem_id: s41586-022-05611-2_spontaneous-behavior
+benchmark_status: acquisition_only
+readiness_reason: >-
+  The only public data deposit is one 60.75 GB mixed archive. It has not been
+  audited or selectively extracted into neutral event, photometry, stimulation,
+  and kinematic tables, so no data are currently grantable.
+title: Intervention-linked structure in spontaneous behavior
+doi: 10.1038/s41586-022-05611-2
+target_footprint_date: 2022-10-08
+external_source_cutoff: 2022-10-07T23:59:59Z
+sandbox_prompt: This acquisition-only record is not executable.
+expected_conclusions: []
+judge_rubric: []
+expected_caveats:
+  - Module identifiers must remain semantically neutral and cannot be treated as independently validated behavioral categories.
+  - Session, animal, intervention, and temporal dependence preclude row-wise random validation.
+  - The public deposit is a single large mixed archive and cannot be granted before selective extraction and leak review.
+required_artifacts: []
+leak_markers:
+  - "Spontaneous behaviour is structured by reinforcement without explicit reward"
+  - "10.1038/s41586-022-05611-2"
+  - "s41586-022-05611-2"
+  - "10.5281/zenodo.7274803"
+  - "7274803"
+  - "dopamine-reinforces-spontaneous-behavior"
+  - "Markowitz"
+  - "MoSeq"

@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "genomes": 256,
+  "total_bases": 559365448,
+  "total_contigs": 80846,
+  "header_policy": "opaque genome and sequential contig identifiers only",
+  "outputs": [
+    {
+      "path": "pilot-fastas/pilot_sequences.fna.gz",
+      "bytes": 171230245,
+      "sha256": "facc4937b65bd19a740efbe3d5d04b195c27724cf833fe3e3542113ec82d3e56"
+    },
+    {
+      "path": "pilot_metadata.csv",
+      "bytes": 6386,
+      "sha256": "2d6166ea304c710e0d7c165b9fc1edf21cf0510f218f55197842c61fcb9893ff"
+    }
+  ]
+}

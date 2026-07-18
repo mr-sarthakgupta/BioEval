@@ -30,7 +30,7 @@ services:
       BIOEVAL_OPENALEX_DESCENDANT_MAX_NODES: ${BIOEVAL_OPENALEX_DESCENDANT_MAX_NODES:-10000}
       BIOEVAL_OPENALEX_GRAPH_CACHE_TTL: ${BIOEVAL_OPENALEX_GRAPH_CACHE_TTL:-21600}
     command:
-      - --problems-root=/problems_complete
+      - --problems-root=/problems
       - --staging-root=/run/data_grants
       - --sandbox-data-root=/workspace/data
       - --problem-id=${BIOEVAL_PROBLEM_ID}
@@ -41,9 +41,9 @@ services:
     volumes:
       # Mount only catalog-approved source roots for the selected problem. Hidden
       # evaluator labels, papers, and author repositories never enter this container.
-      - ../../problems_complete/${BIOEVAL_PROBLEM_ID}/data:/problems_complete/${BIOEVAL_PROBLEM_ID}/data:ro
-      - ../../problems_complete/${BIOEVAL_PROBLEM_ID}/curated:/problems_complete/${BIOEVAL_PROBLEM_ID}/curated:ro
-      - ../../problems_complete/${BIOEVAL_PROBLEM_ID}/data_catalog.yaml:/problems_complete/${BIOEVAL_PROBLEM_ID}/data_catalog.yaml:ro
+      - ../../${BIOEVAL_PROBLEMS_DIR:?set BIOEVAL_PROBLEMS_DIR}/${BIOEVAL_PROBLEM_ID}/data:/problems/${BIOEVAL_PROBLEM_ID}/data:ro
+      - ../../${BIOEVAL_PROBLEMS_DIR:?set BIOEVAL_PROBLEMS_DIR}/${BIOEVAL_PROBLEM_ID}/curated:/problems/${BIOEVAL_PROBLEM_ID}/curated:ro
+      - ../../${BIOEVAL_PROBLEMS_DIR:?set BIOEVAL_PROBLEMS_DIR}/${BIOEVAL_PROBLEM_ID}/data_catalog.yaml:/problems/${BIOEVAL_PROBLEM_ID}/data_catalog.yaml:ro
       - ../runs/${BIOEVAL_PROBLEM_ID}/${BIOEVAL_RUN_ID:-default}:/run
       - ${OPENALEX_API_KEY_FILE:-/home/mrsar/openalex_key.txt}:/run/secrets/openalex_key:ro
       - ${HOME}/.aws:/root/.aws:ro

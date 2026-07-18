@@ -6,7 +6,11 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from bioeval.problems import load_problem_spec, validate_problem_ready
+from bioeval.problems import (
+    load_problem_spec,
+    resolve_problems_dir,
+    validate_problem_ready,
+)
 from bioeval.run_record import default_run_id, env_snapshot, git_commit, git_dirty, utc_now, write_json
 
 
@@ -43,6 +47,9 @@ def main() -> None:
         raise SystemExit(
             "Problem is not ready:\n- " + "\n- ".join(readiness_errors)
         )
+    problems_dir = resolve_problems_dir(args.problem_id, repo_root)
+    if problems_dir is None:
+        raise SystemExit(f"Problem directory is missing: {args.problem_id}")
     run_id = args.run_id or default_run_id(args.problem_id)
     run_root = args.runs_root / args.problem_id / run_id
     for child in ["uea_workspace", "data_grants", "results", "logs"]:
@@ -91,6 +98,7 @@ def main() -> None:
             "sandbox_prompt": spec.sandbox_prompt.strip(),
         },
         "paths": {
+            "problems_dir": problems_dir,
             "run_root": str(run_root),
             "workspace": str(run_root / "uea_workspace"),
             "data_grants": str(run_root / "data_grants"),
@@ -108,6 +116,7 @@ def main() -> None:
     print("Use this run with Docker Compose:")
     print(f"  export BIOEVAL_RUN_ID={run_id}")
     print(f"  export BIOEVAL_PROBLEM_ID={args.problem_id}")
+    print(f"  export BIOEVAL_PROBLEMS_DIR={problems_dir}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,5 @@
+map_blind_id,half_id,filename,bytes,sha256,grid_x,grid_y,grid_z,mode,start_column,start_row,start_section,mapc,mapr,maps,origin_x,origin_y,origin_z,voxel_x,voxel_y,voxel_z
+map_a,1,map_a_half_1.map.gz,62316576,1f611e7c7efd0f5203c21daf9502be08f9f694e1b174828950f3c6cf41f8e7b6,256,256,256,2,0,0,0,3,2,1,0,0,0,0.81999999,0.81999999,0.81999999
+map_a,2,map_a_half_2.map.gz,62317623,2727c17de4dab423b7dc7a707bf08601ff1a6c714c0c3ab674899e003eb5bdc3,256,256,256,2,0,0,0,3,2,1,0,0,0,0.81999999,0.81999999,0.81999999
+map_b,1,map_b_half_1.map.gz,62332078,9cbca789c457c44397bad4a30ebb44e9ede521b1fb0261352bd09ffc30611dca,256,256,256,2,0,0,0,3,2,1,0,0,0,0.81999999,0.81999999,0.81999999
+map_b,2,map_b_half_2.map.gz,62347843,1be8e650961b5de65394778a11c11057b0bafff720be5dcedb1a0e821fea7da9,256,256,256,2,0,0,0,3,2,1,0,0,0,0.81999999,0.81999999,0.81999999

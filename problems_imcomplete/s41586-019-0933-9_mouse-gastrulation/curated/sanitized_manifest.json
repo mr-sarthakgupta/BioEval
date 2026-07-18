@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "selection": {
+    "cells": 2048,
+    "genes": 2108,
+    "cell_rule": "stage-balanced lowest SHA-256 bioeval-gastrulation-cell-v1",
+    "gene_rule": "lowest SHA-256 bioeval-gastrulation-gene-v1",
+    "holdout_rule": "one deterministic complete sample per numeric developmental stage; source sample ordinality, batch, stage, and Theiler labels removed from holdout metadata",
+    "holdout_cells": 541,
+    "gene_expression_filter": "detected in at least 21 pilot cells (1%)",
+    "metadata_blinding": "non-ordinal SHA-256-derived sample and batch IDs",
+    "frozen_baseline": "five-nearest training-sample pseudobulks after library-size normalization and log1p"
+  },
+  "matrix_nonzero": 1152742,
+  "source_archive": {
+    "bytes": 1669415283,
+    "sha256": "ef7674e9801dce2907cf7319e5e217d22c59599cc437bcb1ed6227104655a2b0"
+  },
+  "grantable_outputs": [
+    {
+      "path": "counts.mtx.gz",
+      "bytes": 3370889,
+      "sha256": "5639e35d39b4549d9be63d22229a7b2f16a432c664d51f32eb6fc0c7840da7f8"
+    },
+    {
+      "path": "genes.tsv",
+      "bytes": 54024,
+      "sha256": "584d2382a32a1a5ff77fe3c6380260b516048bdf2020af30054183d09d8e71aa"
+    },
+    {
+      "path": "cells.tsv",
+      "bytes": 130352,
+      "sha256": "4b585649d502d879351dc589f200f164407cee70e0df78746ddbc87409b1e01e"
+    }
+  ],
+  "hidden_evaluator": {
+    "path": "trajectory_holdout_labels.csv",
+    "rows": 541,
+    "sha256": "c3e45b684766300e01ab0f9cdfdc0fd15b181952078821e948b3f5016e8b6659",
+    "bytes": 27355
+  }
+}

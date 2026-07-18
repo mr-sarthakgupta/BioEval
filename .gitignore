@@ -1,6 +1,8 @@
 # Downloaded datasets for benchmark problems (regenerate via scripts/setup_problems.py)
 problems_complete/*/data/
 problems_imcomplete/*/data/
+# Large host-audit pilots stay outside container-mounted data/curated roots.
+problems_imcomplete/*/evaluator/host-audit/pilot-fastas/
 
 # Generated BioEval run artifacts.
 bioeval/runs/

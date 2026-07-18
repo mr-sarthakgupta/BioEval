@@ -3,19 +3,260 @@ from __future__ import annotations
 import hashlib
 import csv
 import json
+import math
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
+from bioeval.evaluators import evaluate_problem_artifacts
+from bioeval.evaluators.biology import _MrcMap
+from bioeval.evaluators.registry import _load_rules
 from bioeval.judge import (
     FORGE_PROBLEM_ID,
     _deterministic_result,
     _forge_hidden_holdout_summary,
     _verify_analysis_manifest,
 )
+from bioeval.problems import load_problem_spec
 
 
 class JudgeScoringTests(unittest.TestCase):
+    def test_malformed_artifact_rules_fail_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            evaluator = root / "evaluator"
+            evaluator.mkdir()
+            (evaluator / "artifact_rules.json").write_text("{not-json")
+            with patch(
+                "bioeval.evaluators.registry._problem_root",
+                return_value=root,
+            ):
+                rules = _load_rules("test-problem")
+            self.assertIn("_load_error", rules)
+
+    def test_new_conditional_contracts_reject_malformed_artifacts(self) -> None:
+        problem_ids = (
+            "s41586-019-0933-9_mouse-gastrulation",
+            "s41586-025-08855-w_rna-hydration",
+        )
+        for problem_id in problem_ids:
+            with self.subTest(problem_id=problem_id), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                artifact_entries = []
+                for contract in load_problem_spec(problem_id).required_artifacts:
+                    artifact = root / contract.path
+                    with artifact.open("w", newline="") as handle:
+                        writer = csv.DictWriter(handle, fieldnames=contract.columns)
+                        writer.writeheader()
+                        writer.writerows(
+                            {column: "0" for column in contract.columns}
+                            for _ in range(contract.min_rows)
+                        )
+                    artifact_entries.append({"path": contract.path})
+                manifest = root / "analysis_manifest.json"
+                manifest.write_text(json.dumps({"artifacts": artifact_entries}))
+
+                output = evaluate_problem_artifacts(
+                    problem_id,
+                    manifest,
+                    root,
+                    True,
+                )
+                assert output is not None
+                self.assertTrue(output.failures)
+
+    def test_gastrulation_evaluator_scores_frozen_expression_holdout(self) -> None:
+        problem_id = "s41586-019-0933-9_mouse-gastrulation"
+        problem_root = Path(__file__).resolve().parents[2] / "problems_imcomplete" / problem_id
+        with (
+            problem_root / "evaluator" / "trajectory_holdout_labels.csv"
+        ).open(newline="") as handle:
+            labels = list(csv.DictReader(handle))
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            predictions = root / "trajectory_holdout.csv"
+            with predictions.open("w", newline="") as handle:
+                fields = [
+                    "cell_id",
+                    "predicted_time",
+                    "confidence",
+                ]
+                writer = csv.DictWriter(handle, fieldnames=fields)
+                writer.writeheader()
+                for row in labels:
+                    observed = float(row["observed_time"])
+                    writer.writerow(
+                        {
+                            "cell_id": row["cell_id"],
+                            "predicted_time": observed,
+                            "confidence": 0.9,
+                        }
+                    )
+            manifest = root / "analysis_manifest.json"
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "artifacts": [
+                            {"path": predictions.name},
+                        ]
+                    }
+                )
+            )
+            output = evaluate_problem_artifacts(
+                problem_id, manifest, root, True
+            )
+            assert output is not None
+            self.assertEqual(output.failures, [])
+            self.assertIn("RMSE=0", output.summary)
+            with predictions.open(newline="") as handle:
+                rows = list(csv.DictReader(handle))
+            rows[0]["cell_id"] = "invented_cell"
+            with predictions.open("w", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=fields)
+                writer.writeheader()
+                writer.writerows(rows)
+            output = evaluate_problem_artifacts(
+                problem_id, manifest, root, True
+            )
+            assert output is not None
+            self.assertTrue(any("unknown cell" in item for item in output.failures))
+
+    def test_gastrulation_mean_time_shortcut_fails_strong_baseline(self) -> None:
+        problem_id = "s41586-019-0933-9_mouse-gastrulation"
+        problem_root = (
+            Path(__file__).resolve().parents[2] / "problems_imcomplete" / problem_id
+        )
+        with (
+            problem_root / "evaluator" / "trajectory_holdout_labels.csv"
+        ).open(newline="") as handle:
+            labels = list(csv.DictReader(handle))
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            predictions = root / "trajectory_holdout.csv"
+            with predictions.open("w", newline="") as handle:
+                writer = csv.writer(handle)
+                writer.writerow(("cell_id", "predicted_time", "confidence"))
+                writer.writerows(
+                    (row["cell_id"], 7.55, 0.5) for row in labels
+                )
+            manifest = root / "analysis_manifest.json"
+            manifest.write_text(
+                json.dumps({"artifacts": [{"path": predictions.name}]})
+            )
+            output = evaluate_problem_artifacts(
+                problem_id, manifest, root, True
+            )
+            assert output is not None
+            self.assertTrue(
+                any("frozen expression baseline" in item for item in output.failures)
+            )
+
+    def test_rna_evaluator_recomputes_half_map_density(self) -> None:
+        problem_id = "s41586-025-08855-w_rna-hydration"
+        problem_root = Path(__file__).resolve().parents[2] / "problems_imcomplete" / problem_id
+        with (problem_root / "evaluator" / "density_sites_fixture.csv").open(
+            newline=""
+        ) as handle:
+            density_sites = list(csv.DictReader(handle))
+        with (problem_root / "curated" / "map_manifest.csv").open(newline="") as handle:
+            map_manifest = {
+                (row["map_blind_id"], row["half_id"]): row
+                for row in csv.DictReader(handle)
+            }
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            parameters = root / "analysis_parameters.csv"
+            with parameters.open("w", newline="") as handle:
+                writer = csv.writer(handle)
+                writer.writerow(("parameter", "value"))
+                writer.writerows(
+                    (
+                        ("coordinate_frame", "map_angstrom"),
+                        ("minimum_peak_sigma", "3.0"),
+                        ("replication_radius_angstrom", "1.5"),
+                    )
+                )
+            parameter_hash = hashlib.sha256(parameters.read_bytes()).hexdigest()
+            calls = root / "hydration_calls.csv"
+            fields = load_problem_spec(problem_id).required_artifacts[0].columns
+            maps = {
+                key: _MrcMap(
+                    problem_root / "data" / "half-maps" / row["filename"]
+                )
+                for key, row in map_manifest.items()
+            }
+            with calls.open("w", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=fields)
+                writer.writeheader()
+                for map_id in ("map_a", "map_b"):
+                    for site in density_sites:
+                        point = tuple(
+                            float(site[column])
+                            for column in ("x_angstrom", "y_angstrom", "z_angstrom")
+                        )
+                        for half_id in ("1", "2"):
+                            map_row = map_manifest[(map_id, half_id)]
+                            writer.writerow(
+                                {
+                                    "schema_version": "1.0",
+                                    "run_id": "fixture",
+                                    "site_id": site["site_id"],
+                                    "map_blind_id": map_id,
+                                    "half_id": half_id,
+                                    "x_angstrom": site["x_angstrom"],
+                                    "y_angstrom": site["y_angstrom"],
+                                    "z_angstrom": site["z_angstrom"],
+                                    "peak_sigma": maps[(map_id, half_id)].peak_sigma(
+                                        point
+                                    ),
+                                    "confidence": 0.9,
+                                    "input_sha256": map_row["sha256"],
+                                    "parameter_sha256": parameter_hash,
+                                }
+                            )
+            manifest = root / "analysis_manifest.json"
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "artifacts": [
+                            {"path": calls.name},
+                            {"path": parameters.name},
+                        ]
+                    }
+                )
+            )
+            output = evaluate_problem_artifacts(
+                problem_id, manifest, root, True
+            )
+            assert output is not None
+            self.assertEqual(output.failures, [])
+            self.assertIn("density_valid=24", output.summary)
+            with calls.open(newline="") as handle:
+                rows = list(csv.DictReader(handle))
+            for row in rows:
+                row["x_angstrom"] = str(float(row["x_angstrom"]) + 20)
+            with calls.open("w", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=fields)
+                writer.writeheader()
+                writer.writerows(rows)
+            output = evaluate_problem_artifacts(
+                problem_id, manifest, root, True
+            )
+            assert output is not None
+            self.assertTrue(
+                any(
+                    "density" in item.lower() or "half-map" in item.lower()
+                    for item in output.failures
+                )
+            )
+
+    def test_human_mass_has_no_runnable_evaluator_while_acquisition_only(self) -> None:
+        problem_id = "s41586-020-3010-5_human-made-mass"
+        self.assertIsNone(
+            evaluate_problem_artifacts(problem_id, None, None, False)
+        )
+
     def test_forge_predictions_are_scored_against_hidden_labels(self) -> None:
         labels_path = (
             Path(__file__).resolve().parents[2]

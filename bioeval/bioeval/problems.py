@@ -11,6 +11,20 @@ from bioeval.catalog import load_catalog, resolve_entry_files
 SPEC_DIR = Path(__file__).parent / "problem_specs"
 
 
+def resolve_problem_root(problem_id: str, repo_root: Path | None = None) -> Path | None:
+    root = repo_root or Path(__file__).resolve().parents[2]
+    for folder in ("problems_complete", "problems_imcomplete"):
+        candidate = root / folder / problem_id
+        if candidate.is_dir():
+            return candidate
+    return None
+
+
+def resolve_problems_dir(problem_id: str, repo_root: Path | None = None) -> str | None:
+    problem_root = resolve_problem_root(problem_id, repo_root)
+    return problem_root.parent.name if problem_root is not None else None
+
+
 def list_problem_specs(spec_dir: Path = SPEC_DIR) -> list[ProblemSpec]:
     specs: list[ProblemSpec] = []
     seen: set[str] = set()
@@ -31,11 +45,7 @@ def load_problem_spec(problem_id: str, spec_dir: Path = SPEC_DIR) -> ProblemSpec
 
 
 def validate_problem_ready(spec: ProblemSpec, repo_root: Path) -> list[str]:
-    roots = [
-        repo_root / "problems_complete" / spec.problem_id,
-        repo_root / "problems_imcomplete" / spec.problem_id,
-    ]
-    problem_root = next((path for path in roots if path.exists()), None)
+    problem_root = resolve_problem_root(spec.problem_id, repo_root)
     if problem_root is None:
         return ["problem directory is missing"]
     try:

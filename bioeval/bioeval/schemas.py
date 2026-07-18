@@ -392,6 +392,15 @@ class DataCatalog(BaseModel):
         return public_entries
 
 
+class ArtifactContract(StrictModel):
+    """A submitted analysis artifact required by a problem-specific evaluator."""
+
+    path: str = Field(..., min_length=1, pattern=r"^[^/\\]+$")
+    columns: list[str] = Field(..., min_length=1)
+    forbidden_columns: list[str] = Field(default_factory=list)
+    min_rows: int = Field(default=1, ge=1)
+
+
 class GrantedFile(BaseModel):
     source_path: str = Field(exclude=True)
     sandbox_path: str
@@ -462,6 +471,7 @@ class ProblemSpec(BaseModel):
         default=None,
         description="Strict latest admissible publication time for independent external sources.",
     )
+    required_artifacts: list[ArtifactContract] = Field(default_factory=list)
     # Optional extra identifiers used by the leak guard to detect that the UEA
     # found the original paper/repo. Hidden, host-only.
     leak_markers: list[str] = Field(default_factory=list)

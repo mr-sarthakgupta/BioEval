@@ -1,0 +1,34 @@
+{
+  "source_commit": "5a0170a51d164c1cc98b232452e86feb1e4ee334",
+  "source_commit_date": "2020-09-18T15:35:37+03:00",
+  "curation": "input-only workbook conversion; no post-2015 projection or fitted target trajectory",
+  "sources": [
+    {
+      "path": "data/anthropogenic_mass_2015.xlsx",
+      "bytes": 20853,
+      "sha256": "22fbcabbc6e8b1443b357c0bec5125819b1e835386bd89c763342a93df99ba1a"
+    },
+    {
+      "path": "biomass_calculation/bm_est.xlsx",
+      "bytes": 12011,
+      "sha256": "5c7a47391fe509d50bdf383d1423055f745edc643c5b35f669caab762c1bd67e"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "annual_material_stocks_1900_2015.csv",
+      "bytes": 11720,
+      "sha256": "6bb0350ca7612526129e3d51beffedb4790a1de94a83b04b3e161430178894c8"
+    },
+    {
+      "path": "historical_biomass_estimates.csv",
+      "bytes": 461,
+      "sha256": "9a0cd74ab623c24a138a994b9f6503ad4473f8206b4967ac6de99ad76e79eb55"
+    },
+    {
+      "path": "field_dictionary.csv",
+      "bytes": 797,
+      "sha256": "5dfabcbd8063fd08765641a14da5b958d38570a6ede93d02fd2ca1d386fc2fe2"
+    }
+  ]
+}

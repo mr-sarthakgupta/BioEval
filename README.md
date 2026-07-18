@@ -67,8 +67,14 @@ Create a recorded run directory:
 
 ```bash
 bioeval-init-run --problem-id "$BIOEVAL_PROBLEM_ID"
+# Copy all three exports printed by the command:
 export BIOEVAL_RUN_ID=<printed run id>
+export BIOEVAL_PROBLEM_ID=<printed problem id>
+export BIOEVAL_PROBLEMS_DIR=<printed problems_complete or problems_imcomplete>
 ```
+
+For a reviewed conditional problem, pass `--allow-conditional` explicitly.
+Acquisition-only records cannot be initialized.
 
 Build and start the sandbox:
 

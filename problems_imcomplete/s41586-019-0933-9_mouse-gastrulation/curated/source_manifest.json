@@ -1,0 +1,52 @@
+{
+  "target_footprint": {
+    "date": "2018-10-11",
+    "kind": "target-bearing analysis repository commit"
+  },
+  "primary": {
+    "arrayexpress": "E-MTAB-6967",
+    "ena_project": "PRJEB28586",
+    "ena_study": "ERP110801",
+    "runs": 2560,
+    "alignment_files": 2560,
+    "index_files": 2560,
+    "alignment_and_index_bytes": 1161489907645,
+    "processed_archive": {
+      "name": "atlas_data.tar.gz",
+      "bytes": 1669415283
+    }
+  },
+  "associated": [
+    {
+      "arrayexpress": "E-MTAB-6970",
+      "ena_project": "PRJEB27570",
+      "submitted_files": 288,
+      "submitted_bytes": 10810240866,
+      "raw_counts_name": "counts_raw.txt",
+      "raw_counts_bytes": 29834631
+    },
+    {
+      "arrayexpress": "E-MTAB-7324",
+      "ena_project": "PRJEB29364",
+      "alignment_and_index_bytes": 158870184188
+    },
+    {
+      "arrayexpress": "E-MTAB-7325",
+      "ena_project": "PRJEB29517",
+      "alignment_and_index_bytes": 217946908328
+    },
+    {
+      "arrayexpress": "E-MTAB-6153",
+      "raw_counts_name": "rawCounts.tsv",
+      "raw_counts_bytes": 873307933,
+      "annotation_name": "cellAnnotation.tsv",
+      "annotation_grantable": false
+    }
+  ],
+  "license": {
+    "statement": "No dataset-specific license field found; EMBL-EBI adds no restriction subject to original-owner rights and attribution.",
+    "promotion_requires_review": true
+  },
+  "downloaded": false,
+  "grantable": false
+}

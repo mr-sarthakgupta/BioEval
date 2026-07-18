@@ -1,0 +1,30 @@
+problem_id: s41586-019-1058-x_gut-mag-diversity
+benchmark_status: acquisition_only
+readiness_reason: >-
+  The staged PRJEB31003 genomes are author-selected representatives of 2,058
+  already-discovered species-level OTUs and therefore encode the target
+  selection result. They are blocked. The pre-clustering 60,664-MAG archive is
+  40.45 GB compressed, exceeds the harness budget, and has no resource-bounded
+  independently validated pilot.
+title: Sequence diversity among uncultivated human-gut microbial genomes
+doi: 10.1038/s41586-019-1058-x
+target_footprint_date: 2018-11-17
+external_source_cutoff: 2018-11-16T23:59:59Z
+sandbox_prompt: This acquisition-only record is not executable.
+expected_conclusions: []
+judge_rubric: []
+expected_caveats:
+  - The public ENA collection contains target-generated representative genomes, not raw metagenomes or an unbiased sample of gut organisms.
+  - Novelty depends on the frozen reference database, ANI threshold, assembly quality, and pilot selection.
+  - Author species assignments, trees, taxonomy, functional annotations, geography, phenotype, and disease associations cannot be used as input labels.
+required_artifacts: []
+leak_markers:
+  - "New insights from uncultivated genomes of the global human gut microbiome"
+  - "10.1038/s41586-019-1058-x"
+  - "s41586-019-1058-x"
+  - "PRJEB31003"
+  - "IGGdb"
+  - "Nayfach"
+  - "Integrated Gut Genomes"
+  - "2,058"
+  - "60,664"

@@ -1,0 +1,33 @@
+{
+  "artifacts": {
+    "hydration_calls.csv": {
+      "numeric_bounds": {
+        "x_angstrom": {"min": -500.0, "max": 500.0},
+        "y_angstrom": {"min": -500.0, "max": 500.0},
+        "z_angstrom": {"min": -500.0, "max": 500.0},
+        "peak_sigma": {"min": 0.0, "max": 100.0},
+        "confidence": {"min": 0.0, "max": 1.0}
+      },
+      "allowed_values": {
+        "map_blind_id": ["map_a", "map_b"],
+        "half_id": ["1", "2"]
+      },
+      "required_values": {
+        "map_blind_id": ["map_a", "map_b"],
+        "half_id": ["1", "2"]
+      },
+      "minimum_unique": {
+        "site_id": 5
+      }
+    },
+    "analysis_parameters.csv": {
+      "required_values": {
+        "parameter": [
+          "coordinate_frame",
+          "minimum_peak_sigma",
+          "replication_radius_angstrom"
+        ]
+      }
+    }
+  }
+}

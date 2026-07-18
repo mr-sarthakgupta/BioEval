@@ -1,0 +1,28 @@
+problem_id: s41586-020-3010-5_human-made-mass
+benchmark_status: acquisition_only
+readiness_reason: >-
+  The staged workbooks come from the target repository and have not passed an
+  independent observation-versus-target-output provenance review. The biomass
+  table also contains post-2015 rows, the carbon-to-dry-mass conversion is not
+  frozen, and no input-recomputing scientific evaluator exists.
+title: Historical material stocks and global living biomass
+doi: 10.1038/s41586-020-3010-5
+target_footprint_date: 2020-09-18
+external_source_cutoff: 2020-09-17T23:59:59Z
+sandbox_prompt: This acquisition-only record is not executable.
+expected_conclusions: []
+judge_rubric: []
+expected_caveats:
+  - The material-stock series is reconstructed and category definitions are not immutable.
+  - Historical global biomass estimates are sparse, source-dependent, and much more uncertain than the material-stock arithmetic.
+  - Crossing years after 2015 are extrapolations and depend on the fitted trend family and fit window.
+  - This scoped problem tests global biomass accounting at the boundary of a biology benchmark.
+required_artifacts: []
+leak_markers:
+  - "Global human-made mass exceeds all living biomass"
+  - "10.1038/s41586-020-3010-5"
+  - "s41586-020-3010-5"
+  - "anthropogenic_mass"
+  - "milo-lab"
+  - "Elhacham"
+  - "crossover point"

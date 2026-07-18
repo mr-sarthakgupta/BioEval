@@ -1,0 +1,62 @@
+problem_id: s41586-025-08855-w_rna-hydration
+# Hidden, host-only. Never mounted into the UEA container.
+entries:
+  - id: blind_half_maps
+    description: Four cryo-EM half-maps with EMDB labels removed, grouped into two blinded reconstruction pairs.
+    kind: processed
+    grantable: true
+    modalities: [mrc, cryo-em, half-map]
+    source_paths:
+      - half-maps/map_a_half_1.map.gz
+      - half-maps/map_a_half_2.map.gz
+      - half-maps/map_b_half_1.map.gz
+      - half-maps/map_b_half_2.map.gz
+
+  - id: polymer_only_reference
+    description: Pre-footprint RNA polymer scaffold with every non-polymer atom, identifier, and narrative header removed.
+    kind: processed
+    grantable: true
+    source_base: problem
+    modalities: [pdb, rna, coordinates]
+    source_paths: [curated/rna_scaffold.pdb]
+
+  - id: blind_map_manifest
+    description: Blinded map-pair IDs, half IDs, voxel geometry, byte sizes, and cryptographic hashes.
+    kind: processed
+    grantable: true
+    source_base: problem
+    modalities: [csv, map-metadata]
+    source_paths: [curated/map_manifest.csv]
+
+  - id: raw_movies_and_particles
+    description: Raw movies, particle stacks, orientations, and reconstruction metadata.
+    kind: raw
+    grantable: false
+    approx_bytes: 3700000000000
+    reason: The 3.7 TB archive exceeds the benchmark budget and includes target reconstruction choices.
+
+  - id: labeled_source_half_maps
+    description: Original EMDB half-map gzip files before MRC-header identifier sanitization.
+    kind: processed
+    grantable: false
+    source_paths: [source-half-maps/*.map.gz]
+    reason: Original MRC labels disclose the target EMDB accessions.
+
+  - id: solvent_bearing_atomic_models
+    description: Target consensus atomic models containing waters and ions.
+    kind: processed
+    grantable: false
+    source_paths: [target-models/*.pdb]
+    reason: Solvent and ion coordinates directly encode the target assignments.
+
+  - id: target_full_maps_validation_and_simulations
+    description: Full maps, map-model validation, Q-scores, molecular-dynamics trajectories, density predictions, and target outputs.
+    kind: processed
+    grantable: false
+    reason: These products directly encode or amplify the expected solvent-network conclusions.
+
+  - id: target_repository_and_publication
+    description: Target code, repository metadata, manuscript, preprint, supplement, figures, and result tables.
+    kind: processed
+    grantable: false
+    reason: The target lineage reveals identities, methods, and conclusions.

@@ -1,0 +1,55 @@
+problem_id: s41586-019-0933-9_mouse-gastrulation
+benchmark_status: conditional
+readiness_reason: >-
+  A stage-balanced, label-free 2,048-cell by 2,108-gene count pilot is staged;
+  every retained gene is detected in at least one percent of pilot cells.
+  Holdout source ordinality and batch are hidden, and predictions are compared
+  with a frozen expression-based pseudobulk baseline. It remains conditional
+  pending blinded trajectory review.
+title: Time-resolved single-cell structure during mouse development
+doi: 10.1038/s41586-019-0933-9
+target_footprint_date: 2018-10-11
+external_source_cutoff: 2018-10-10T23:59:59Z
+sandbox_prompt: |
+  Analyze the sanitized sparse single-cell count pilot spanning experimental
+  developmental stages without searching for the target study or using
+  external processed atlas objects.
+
+  Predict developmental time for the supplied fixed complete-sample holdout,
+  whose source-sample ordinality, batch, stage, and Theiler labels are removed
+  from grantable metadata. Compare against defensible expression-based
+  baselines and report uncertainty and preprocessing sensitivity.
+
+  Submit trajectory_holdout.csv under the declared contract. Do not claim
+  recovery of the full atlas taxonomy from this pilot.
+expected_conclusions:
+  - Holdout developmental-time predictions on the fixed complete-sample split match or improve upon the frozen expression-based baseline.
+  - The bounded pilot supports an out-of-sample temporal-signal claim but cannot establish the paper's complete cell-type taxonomy or organogenesis atlas.
+judge_rubric:
+  - Is the fixed complete-sample holdout used rather than a random cell-wise split?
+  - Do predictions match or improve upon the frozen expression-based baseline?
+  - Are preprocessing sensitivity and uncertainty reported without full-atlas claims?
+expected_caveats:
+  - Cell states and trajectories are resolution- and preprocessing-dependent, so literal author labels and cluster counts are not scoring targets.
+  - Developmental time, embryo, pool, batch, and perturbation structure must be respected in validation.
+  - Processed atlas objects, author annotations, embeddings, transport maps, and trajectories are target outputs and cannot be granted.
+required_artifacts:
+  - path: trajectory_holdout.csv
+    columns:
+      - cell_id
+      - predicted_time
+      - confidence
+    forbidden_columns:
+      - celltype
+      - author_cluster
+      - author_pseudotime
+    min_rows: 100
+leak_markers:
+  - "A single-cell molecular map of mouse gastrulation and early organogenesis"
+  - "10.1038/s41586-019-0933-9"
+  - "s41586-019-0933-9"
+  - "EmbryoTimecourse2018"
+  - "MouseGastrulationData"
+  - "Pijuan-Sala"
+  - "Waddington-OT"
+  - "E-MTAB-6967"

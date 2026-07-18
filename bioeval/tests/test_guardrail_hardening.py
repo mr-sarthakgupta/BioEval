@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import gzip
 import subprocess
 import sys
 import tempfile
@@ -73,6 +74,13 @@ class GuardrailHardeningTests(unittest.TestCase):
             marker = b"held-out-paper-marker"
             path.write_bytes(b"a" * 4_000_000 + marker + b"b" * 4_000_000)
             self.assertIsNotNone(scan_file(path, [marker.decode()]))
+
+    def test_standalone_gzip_marker_is_detected_after_decompression(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "blinded.map.gz"
+            with gzip.open(path, "wb") as handle:
+                handle.write(b"\x00" * 512 + b"EMD-42498" + b"\x00" * 512)
+            self.assertIsNotNone(scan_file(path, ["EMD-42498"]))
 
     def test_common_statistics_worksheet_name_is_not_blocked(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

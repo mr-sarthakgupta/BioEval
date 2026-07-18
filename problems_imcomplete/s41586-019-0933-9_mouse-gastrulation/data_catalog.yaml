@@ -1,0 +1,68 @@
+problem_id: s41586-019-0933-9_mouse-gastrulation
+# Hidden, host-only. Never mounted into the UEA container.
+entries:
+  - id: primary_atlas_manifest
+    description: Pinned inventory for the primary time-resolved single-cell atlas deposit.
+    kind: online
+    grantable: false
+    source_base: problem
+    source_paths: [curated/source_manifest.json]
+    reason: Host-only provenance includes target accessions and file identities.
+
+  - id: sanitized_count_matrix
+    description: Stage-balanced sparse gene-by-cell count pilot with opaque cell identifiers and no target annotations.
+    kind: processed
+    grantable: true
+    source_base: problem
+    modalities: [matrix-market, gzip, single-cell-counts]
+    source_paths: [curated/sanitized-counts/counts.mtx.gz]
+
+  - id: neutral_cell_metadata
+    description: Non-ordinal opaque cell/sample IDs, evaluation split, training-only batch and developmental/Theiler stage; all holdout labels and batch values are blank.
+    kind: processed
+    grantable: true
+    source_base: problem
+    modalities: [tsv, single-cell-metadata]
+    source_paths: [curated/sanitized-counts/cells.tsv]
+
+  - id: neutral_gene_metadata
+    description: Stable gene identifiers and symbols for the deterministic pilot gene panel.
+    kind: processed
+    grantable: true
+    source_base: problem
+    modalities: [tsv, gene-metadata]
+    source_paths: [curated/sanitized-counts/genes.tsv]
+
+  - id: sanitized_pilot_manifest
+    description: Selection rules, dimensions, nonzero count, byte sizes, and hashes for the sanitized pilot.
+    kind: processed
+    grantable: false
+    source_base: problem
+    modalities: [json, provenance]
+    source_paths: [curated/sanitized_manifest.json]
+    reason: Host-only manifest format is blocked; neutral dimensions are described in the public task and table schemas.
+
+  - id: full_primary_alignment_archive
+    description: Primary atlas BAM and index files across 2,560 runs.
+    kind: raw
+    grantable: false
+    approx_bytes: 1161489907645
+    reason: The full alignment collection exceeds the benchmark budget and is unnecessary if sanitized counts pass provenance review.
+
+  - id: target_atlas_objects_and_annotations
+    description: Processed atlas objects, cell-type and cluster labels, marker tables, embeddings, and colour maps.
+    kind: processed
+    grantable: false
+    reason: These fields encode the target taxonomy and interpretation.
+
+  - id: target_trajectory_outputs
+    description: Corrected embeddings, pseudotime, transport maps, lineage trajectories, and author graph outputs.
+    kind: processed
+    grantable: false
+    reason: These are the answer-bearing outputs of the target analysis.
+
+  - id: target_repository_and_publication
+    description: Target repositories, code, notebooks, manuscript, supplement, figures, and metadata.
+    kind: processed
+    grantable: false
+    reason: The target lineage reveals the identity, methods, and conclusions.

@@ -12,6 +12,8 @@ import os
 import shutil
 import subprocess
 import sys
+import tarfile
+import tempfile
 import time
 import urllib.error
 import urllib.parse
@@ -21,7 +23,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable, Literal
 
-ROOT = Path("/home/mrsar/paper-invert")
+ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "bioeval"))
 from bioeval.providers import _safe_urlopen  # noqa: E402
 
@@ -223,6 +225,119 @@ PROBLEM_DEFS: list[Problem] = [
         notes=[
             "Scoped to held-out concentration, temperature-response and measured diffusive flux.",
             "The mixed 9.807 GB target archive and all gridded output rasters remain manifest-only and blocked.",
+        ],
+    ),
+    Problem(
+        problem_id="s41586-020-3010-5_human-made-mass",
+        title="Historical material stocks and global living biomass",
+        doi="10.1038/s41586-020-3010-5",
+        pdf_name=None,
+        repos=[
+            (
+                "repo",
+                "https://github.com/milo-lab/anthropogenic_mass.git",
+            )
+        ],
+        destination="incomplete",
+        notes=[
+            "Curate only the 1900-2015 material-stock input and sparse historical biomass estimates.",
+            "Block repository identity, post-2015 projections, annual biomass trajectories, crossover calculations, code, and figures.",
+            "Pinned source commit: 5a0170a51d164c1cc98b232452e86feb1e4ee334.",
+        ],
+    ),
+    Problem(
+        problem_id="s41586-022-05611-2_spontaneous-behavior",
+        title="Intervention-linked structure in spontaneous behavior",
+        doi="10.1038/s41586-022-05611-2",
+        pdf_name=None,
+        repos=[],
+        destination="incomplete",
+        notes=[
+            "Acquisition-only: Zenodo 7274803 is one 60,751,713,398-byte mixed archive.",
+            "The setup script intentionally does not download the archive.",
+            "Promote only after a budgeted input-only allowlist and neutral event-table curation.",
+        ],
+    ),
+    Problem(
+        problem_id="s41586-019-0933-9_mouse-gastrulation",
+        title="Time-resolved single-cell structure during mouse development",
+        doi="10.1038/s41586-019-0933-9",
+        pdf_name=None,
+        repos=[],
+        destination="incomplete",
+        urls=[
+            UrlAsset(
+                "https://www.ebi.ac.uk/biostudies/files/E-MTAB-6967/atlas_data.tar.gz",
+                "atlas_data.tar.gz",
+                "biostudies",
+                expected_bytes=1_669_415_283,
+                sha256="ef7674e9801dce2907cf7319e5e217d22c59599cc437bcb1ed6227104655a2b0",
+            )
+        ],
+        notes=[
+            "Conditional: a sanitized sparse count pilot and fixed hidden complete-sample holdout are materialized.",
+            "Primary E-MTAB-6967/PRJEB28586 alignments exceed 1.16 TB.",
+            "Block author cell labels, embeddings, markers, transport maps, pseudotime, and trajectories.",
+        ],
+    ),
+    Problem(
+        problem_id="s41586-019-1058-x_gut-mag-diversity",
+        title="Sequence diversity among uncultivated human-gut microbial genomes",
+        doi="10.1038/s41586-019-1058-x",
+        pdf_name=None,
+        repos=[],
+        destination="incomplete",
+        notes=[
+            "Acquisition-only: ENA PRJEB31003 contains 2,058 answer-bearing author-selected representative WGS sets.",
+            "The pre-clustering 60,664-MAG archive is 40,451,655,328 compressed bytes and exceeds the harness budget.",
+            "Block author clusters, trees, taxonomy, novelty labels, functions, and cohort associations.",
+        ],
+    ),
+    Problem(
+        problem_id="s41586-025-08855-w_rna-hydration",
+        title="Replicated map-density inference around a folded RNA",
+        doi="10.1038/s41586-025-08855-w",
+        pdf_name=None,
+        repos=[],
+        destination="incomplete",
+        urls=[
+            UrlAsset(
+                "https://ftp.ebi.ac.uk/pub/databases/emdb/structures/EMD-42498/other/emd_42498_half_map_1.map.gz",
+                "map_a_half_1.map.gz",
+                "source-half-maps",
+                expected_bytes=62_316_639,
+                sha256="760d346e654928ee31a215b1a2477d3068b32e4be9453b015cc3f10c3b03a1fa",
+            ),
+            UrlAsset(
+                "https://ftp.ebi.ac.uk/pub/databases/emdb/structures/EMD-42498/other/emd_42498_half_map_2.map.gz",
+                "map_a_half_2.map.gz",
+                "source-half-maps",
+                expected_bytes=62_317_687,
+                sha256="2f7ba5d2c771c268af26a68bb91c6cf54fcf76500ce5f607b8fb01dcfbe306b7",
+            ),
+            UrlAsset(
+                "https://ftp.ebi.ac.uk/pub/databases/emdb/structures/EMD-42499/other/emd_42499_half_map_1.map.gz",
+                "map_b_half_1.map.gz",
+                "source-half-maps",
+                expected_bytes=62_332_121,
+                sha256="d009db3dafaec0004b392ee6c5443ebbb347c6b1e40c809a5d0298f4616569bc",
+            ),
+            UrlAsset(
+                "https://ftp.ebi.ac.uk/pub/databases/emdb/structures/EMD-42499/other/emd_42499_half_map_2.map.gz",
+                "map_b_half_2.map.gz",
+                "source-half-maps",
+                expected_bytes=62_347_914,
+                sha256="43e80a8a2832580550168a294af8e386e0a265b146bb04b71e8a7385eb855218",
+            ),
+            UrlAsset(
+                "https://files.rcsb.org/download/7EZ0.pdb",
+                "7EZ0.pdb",
+                "source-reference",
+            ),
+        ],
+        notes=[
+            "Grant only identifier-sanitized half-maps, a polymer-only pre-footprint scaffold, and neutral map metadata.",
+            "Score replicated density directly from half-maps; do not acquire target solvent models or labels.",
         ],
     ),
     Problem(
@@ -562,23 +677,98 @@ def extract_zip_members(
 
 
 def postprocess_problem(problem: Problem, problem_dir: Path) -> list[dict]:
-    if problem.problem_id != "s41586-023-06328-6_protein-protease-resistance":
-        return []
-    source = problem_dir / "data" / "zenodo" / "7992926"
-    extracted = problem_dir / "data" / "primary-observations"
-    entries = extract_zip_members(
-        source / "Raw_NGS_count_tables.zip",
-        extracted / "ngs-counts",
-        allowed_basenames={f"NGS_count_lib{i}.csv" for i in range(1, 5)},
-    )
-    entries.extend(
-        extract_zip_members(
-            source / "Pipeline_qPCR_data.zip",
-            extracted / "qpcr",
-            allowed_basenames={"Raw_qPCR_data_FigS1.csv"},
+    if problem.problem_id == "s41586-023-06328-6_protein-protease-resistance":
+        source = problem_dir / "data" / "zenodo" / "7992926"
+        extracted = problem_dir / "data" / "primary-observations"
+        entries = extract_zip_members(
+            source / "Raw_NGS_count_tables.zip",
+            extracted / "ngs-counts",
+            allowed_basenames={f"NGS_count_lib{i}.csv" for i in range(1, 5)},
         )
-    )
-    return entries
+        entries.extend(
+            extract_zip_members(
+                source / "Pipeline_qPCR_data.zip",
+                extracted / "qpcr",
+                allowed_basenames={"Raw_qPCR_data_FigS1.csv"},
+            )
+        )
+        return entries
+    if problem.problem_id == "s41586-019-0933-9_mouse-gastrulation":
+        archive = problem_dir / "data" / "biostudies" / "atlas_data.tar.gz"
+        with tempfile.TemporaryDirectory() as temporary:
+            temp = Path(temporary)
+            meta_path = temp / "meta.csv"
+            genes_path = temp / "genes.tsv"
+            with tarfile.open(archive, "r:gz") as bundle:
+                for member_name, destination in (
+                    ("atlas/meta.csv", meta_path),
+                    ("atlas/genes.tsv", genes_path),
+                ):
+                    source = bundle.extractfile(member_name)
+                    if source is None:
+                        raise RuntimeError(f"Missing {member_name} in {archive}.")
+                    with source, destination.open("wb") as output:
+                        shutil.copyfileobj(source, output)
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "scripts" / "build_mouse_gastrulation_pilot.py"),
+                    "--archive",
+                    str(archive),
+                    "--meta",
+                    str(meta_path),
+                    "--genes",
+                    str(genes_path),
+                ],
+                check=True,
+            )
+        outputs = [
+            problem_dir / "curated" / "sanitized-counts" / "counts.mtx.gz",
+            problem_dir / "curated" / "sanitized-counts" / "cells.tsv",
+            problem_dir / "curated" / "sanitized-counts" / "genes.tsv",
+            problem_dir / "curated" / "sanitized_manifest.json",
+            problem_dir / "evaluator" / "trajectory_holdout_labels.csv",
+        ]
+        return [
+            {
+                "source": "curated",
+                "file": str(path.relative_to(problem_dir)),
+                "bytes": path.stat().st_size,
+                "downloaded": True,
+                "sha256": _sha256_file(path),
+            }
+            for path in outputs
+        ]
+    if problem.problem_id == "s41586-025-08855-w_rna-hydration":
+        source_pdb = problem_dir / "data" / "source-reference" / "7EZ0.pdb"
+        subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts" / "build_rna_hydration_inputs.py"),
+                "--source-pdb",
+                str(source_pdb),
+                "--source-half-maps",
+                str(problem_dir / "data" / "source-half-maps"),
+            ],
+            check=True,
+        )
+        outputs = [
+            *sorted((problem_dir / "data" / "half-maps").glob("*.map.gz")),
+            problem_dir / "curated" / "rna_scaffold.pdb",
+            problem_dir / "curated" / "map_manifest.csv",
+            problem_dir / "curated" / "source_manifest.json",
+        ]
+        return [
+            {
+                "source": "curated",
+                "file": str(path.relative_to(problem_dir)),
+                "bytes": path.stat().st_size,
+                "downloaded": True,
+                "sha256": _sha256_file(path),
+            }
+            for path in outputs
+        ]
+    return []
 
 
 def build_sra_manifest(problem_dir: Path) -> list[dict]:
@@ -843,6 +1033,18 @@ def setup_problem(
         if asset.filename.endswith(".html"):
             continue
         dest = problem_dir / "data" / asset.subdir / asset.filename
+        if profile == "metadata":
+            entries.append(
+                {
+                    "source": asset.subdir,
+                    "file": str(dest.relative_to(problem_dir)),
+                    "bytes": asset.expected_bytes or 0,
+                    "url": asset.url,
+                    "downloaded": False,
+                    "sha256": asset.sha256,
+                }
+            )
+            continue
         try:
             size = download_file(
                 asset.url,
@@ -871,7 +1073,8 @@ def setup_problem(
     if "forge" in problem.problem_id:
         entries.extend(build_external_manifests(problem, problem_dir))
 
-    entries.extend(postprocess_problem(problem, problem_dir))
+    if profile != "metadata":
+        entries.extend(postprocess_problem(problem, problem_dir))
     write_manifest(problem_dir, entries)
     return entries
 

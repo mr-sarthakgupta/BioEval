@@ -21,6 +21,7 @@ from bioeval.bedrock_client import (
     extract_text_from_response,
 )
 from bioeval.bedrock_cost import BedrockCostTracker
+from bioeval.evaluators import apply_evaluator_gate, evaluate_problem_artifacts
 from bioeval.problems import load_problem_spec
 from bioeval.search_proxy import contains_hidden_identifier
 from bioeval.run_record import append_jsonl, utc_now, write_json
@@ -1120,9 +1121,16 @@ def judge_with_llm(
         analysis_manifest,
         artifact_root,
     )
+    registered_evaluator = evaluate_problem_artifacts(
+        problem_id,
+        analysis_manifest,
+        artifact_root,
+        manifest_verified,
+    )
     evaluator_summaries = [
         summary
         for summary in (
+            registered_evaluator.summary if registered_evaluator else None,
             _forge_hidden_holdout_summary(
                 problem_id=problem_id,
                 manifest_path=analysis_manifest,
@@ -1234,7 +1242,7 @@ def judge_with_llm(
         result = _apply_f1_model_gate(result, evaluator_summary)
     elif problem_id == BUTTERFLY_PROBLEM_ID:
         result = _apply_butterfly_metric_gate(result, evaluator_summary)
-    return result
+    return apply_evaluator_gate(result, registered_evaluator)
 
 
 def build_arg_parser() -> argparse.ArgumentParser:

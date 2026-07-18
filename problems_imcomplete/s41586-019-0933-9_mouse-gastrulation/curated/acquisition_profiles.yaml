@@ -1,0 +1,17 @@
+profiles:
+  manifest-only:
+    max_download_bytes: 0
+    description: Pin metadata and file inventories without downloading primary data.
+  sanitized-counts-pilot:
+    max_download_bytes: 2000000000
+    include:
+      - E-MTAB-6967/atlas_data.tar.gz
+    description: Download the processed archive only for host-side input audit and neutral count extraction.
+    grant_archive: false
+  full-alignments:
+    max_download_bytes: 1200000000000
+    include:
+      - PRJEB28586/*.bam
+      - PRJEB28586/*.bai
+    description: Manifested for provenance only; outside the default benchmark resource budget.
+    enabled: false

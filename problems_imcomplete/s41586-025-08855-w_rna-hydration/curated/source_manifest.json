@@ -1,0 +1,54 @@
+{
+  "license": "CC0",
+  "target_footprint_date": "2024-06-16",
+  "half_maps": [
+    {
+      "map_blind_id": "map_a",
+      "half_id": "1",
+      "source_accession": "EMD-42498",
+      "source_filename": "emd_42498_half_1.map.gz",
+      "source_bytes": 62316639,
+      "source_sha256": "760d346e654928ee31a215b1a2477d3068b32e4be9453b015cc3f10c3b03a1fa",
+      "output_bytes": 62316576,
+      "output_sha256": "1f611e7c7efd0f5203c21daf9502be08f9f694e1b174828950f3c6cf41f8e7b6"
+    },
+    {
+      "map_blind_id": "map_a",
+      "half_id": "2",
+      "source_accession": "EMD-42498",
+      "source_filename": "emd_42498_half_2.map.gz",
+      "source_bytes": 62317687,
+      "source_sha256": "2f7ba5d2c771c268af26a68bb91c6cf54fcf76500ce5f607b8fb01dcfbe306b7",
+      "output_bytes": 62317623,
+      "output_sha256": "2727c17de4dab423b7dc7a707bf08601ff1a6c714c0c3ab674899e003eb5bdc3"
+    },
+    {
+      "map_blind_id": "map_b",
+      "half_id": "1",
+      "source_accession": "EMD-42499",
+      "source_filename": "emd_42499_half_1.map.gz",
+      "source_bytes": 62332121,
+      "source_sha256": "d009db3dafaec0004b392ee6c5443ebbb347c6b1e40c809a5d0298f4616569bc",
+      "output_bytes": 62332078,
+      "output_sha256": "9cbca789c457c44397bad4a30ebb44e9ede521b1fb0261352bd09ffc30611dca"
+    },
+    {
+      "map_blind_id": "map_b",
+      "half_id": "2",
+      "source_accession": "EMD-42499",
+      "source_filename": "emd_42499_half_2.map.gz",
+      "source_bytes": 62347914,
+      "source_sha256": "43e80a8a2832580550168a294af8e386e0a265b146bb04b71e8a7385eb855218",
+      "output_bytes": 62347843,
+      "output_sha256": "1be8e650961b5de65394778a11c11057b0bafff720be5dcedb1a0e821fea7da9"
+    }
+  ],
+  "polymer_reference": {
+    "source_accession": "7EZ0",
+    "source_release": "2021-08-25",
+    "source_sha256": "75c869440e0aea2a593a853e09685c7a8188b96fc344e7918fb551b21feeec78",
+    "output_atoms": 8279,
+    "output_sha256": "d555b17d34cb2545301c3332c18758b531a8cb8cb0b63daac9e4eaac1c985712"
+  },
+  "scientific_evaluator": "recomputes local density directly from each sanitized half-map"
+}

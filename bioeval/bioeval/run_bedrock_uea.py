@@ -11,7 +11,7 @@ from urllib.request import urlopen
 
 from dotenv import load_dotenv
 
-from bioeval.problems import list_problem_specs
+from bioeval.problems import list_problem_specs, resolve_problems_dir
 
 
 DEFAULT_MODEL = "us.anthropic.claude-sonnet-4-6"
@@ -107,7 +107,7 @@ def prepare_run(problem_id: str, args: argparse.Namespace, root: Path, env: dict
         "--uea-model",
         args.model,
     ]
-    if args.include_conditional or bool(args.problems):
+    if args.include_conditional:
         command.append("--allow-conditional")
     init = run(
         command,
@@ -124,9 +124,14 @@ def prepare_run(problem_id: str, args: argparse.Namespace, root: Path, env: dict
 
 def run_problem(problem_id: str, args: argparse.Namespace, root: Path, env_file: Path) -> None:
     env = os.environ.copy()
+    repo_root = root.parent
+    problems_dir = resolve_problems_dir(problem_id, repo_root)
+    if problems_dir is None:
+        raise FileNotFoundError(f"No data catalog found for {problem_id}.")
     env.update(
         {
             "BIOEVAL_PROBLEM_ID": problem_id,
+            "BIOEVAL_PROBLEMS_DIR": problems_dir,
             "UEA_BEDROCK_MODEL": args.model,
             "UEA_BEDROCK_API_BASE": args.api_base,
             "UEA_MODEL": args.model,

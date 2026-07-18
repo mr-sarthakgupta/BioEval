@@ -1,0 +1,77 @@
+problem_id: s41586-019-1058-x_gut-mag-diversity
+# Hidden, host-only. Never mounted into the UEA container.
+entries:
+  - id: ena_sequence_inventory
+    description: Pinned inventory of public representative genome sequence sets with lengths and download locations.
+    kind: processed
+    grantable: false
+    source_base: problem
+    source_paths: [evaluator/host-audit/ena_sequence_manifest.csv]
+    reason: Host-only accession and URL inventory would allow direct joins to target annotations.
+
+  - id: deterministic_pilot_selection
+    description: Deterministic hash-selected subset planned for a resource-bounded sequence-clustering pilot.
+    kind: processed
+    grantable: false
+    source_base: problem
+    source_paths: [evaluator/host-audit/pilot_selection.csv]
+    reason: Host-only accession mapping must be replaced by opaque identifiers during FASTA curation.
+
+  - id: anonymized_pilot_fastas
+    description: Deterministic pilot of author-selected representative genomes with opaque genome and contig identifiers.
+    kind: processed
+    grantable: false
+    source_base: problem
+    modalities: [fasta, gzip, microbial-genomes]
+    source_paths: [evaluator/host-audit/pilot-fastas/pilot_sequences.fna.gz]
+    reason: Anonymization does not remove the answer-bearing one-representative-per-discovered-OTU selection.
+
+  - id: neutral_pilot_metadata
+    description: Opaque genome identifiers with recomputable assembly span and contig-count checks.
+    kind: processed
+    grantable: false
+    source_base: problem
+    modalities: [csv, assembly-metadata]
+    source_paths: [evaluator/host-audit/pilot_metadata.csv]
+    reason: Unique assembly-size and contig-count pairs make the target representative genomes externally joinable.
+
+  - id: pilot_build_manifest
+    description: Host-side output hashes, selection policy, and curation totals.
+    kind: processed
+    grantable: false
+    source_base: problem
+    source_paths: [evaluator/host-audit/pilot_manifest.json]
+    reason: JSON manifests are blocked and source provenance remains host-only.
+
+  - id: frozen_reference_genomes
+    description: Planned pre-footprint reference-genome panel used only for nearest-reference ANI and novelty sensitivity.
+    kind: processed
+    grantable: false
+    source_base: problem
+    source_paths: [evaluator/host-audit/reference-fastas/*.fna.zst]
+    reason: A dated January 2019 reference freeze with redistribution review has not been assembled.
+
+  - id: preclustering_hgm_genomes
+    description: Full target HGM collection of 60,664 MAGs before species-level clustering and representative selection.
+    kind: processed
+    grantable: false
+    approx_bytes: 40451655328
+    reason: The 40.45 GB compressed archive exceeds the harness budget and no unbiased bounded pilot has passed review.
+
+  - id: target_clusters_trees_and_taxonomy
+    description: Author species clusters, representative assignments, phylogenomic trees, taxonomy, and novelty labels.
+    kind: processed
+    grantable: false
+    reason: These artifacts directly encode the sequence-clustering and novelty conclusions.
+
+  - id: target_functional_and_association_outputs
+    description: Functional annotations, abundance profiles, geography, lifestyle, phenotype, and disease-association results.
+    kind: processed
+    grantable: false
+    reason: These downstream target outputs are outside the bounded clustering scope and contain sensitive cohort-derived associations.
+
+  - id: target_repository_and_publication
+    description: Target repository, manuscript, supplement, code, notebooks, figures, and metadata.
+    kind: processed
+    grantable: false
+    reason: The target lineage reveals the identity, methods, and conclusions.

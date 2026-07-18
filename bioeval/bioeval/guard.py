@@ -9,6 +9,7 @@ contains paper/repo identifiers is withheld.
 
 from __future__ import annotations
 
+import gzip
 import re
 import tarfile
 import xml.etree.ElementTree as ET
@@ -161,6 +162,29 @@ def _content_leak(path: Path, markers: list[bytes]) -> str | None:
     return None
 
 
+def _gzip_content_leak(path: Path, markers: list[bytes]) -> str | None:
+    if not markers:
+        return None
+    overlap = max((len(marker) for marker in markers), default=1) - 1
+    carry = b""
+    expanded = 0
+    try:
+        with gzip.open(path, "rb") as stream:
+            while True:
+                chunk = stream.read(_SCAN_CHUNK_BYTES)
+                if not chunk:
+                    return None
+                expanded += len(chunk)
+                if expanded > _MAX_EXPANDED_SCAN_BYTES:
+                    return "gzip expands beyond the safe inspection limit"
+                blob = (carry + chunk).lower()
+                if any(marker and marker in blob for marker in markers):
+                    return "gzip content matches a hidden paper/repo identifier"
+                carry = blob[-overlap:] if overlap else b""
+    except Exception:
+        return "gzip could not be fully scanned for identifiers"
+
+
 def _xlsx_sheet_names(path: Path) -> list[str]:
     try:
         with zipfile.ZipFile(path) as zf:
@@ -252,6 +276,10 @@ def scan_file(path: Path, identifiers: list[str]) -> str | None:
     markers = _build_markers(identifiers)
     if _has_suffix(name, INSPECTABLE_ARCHIVE_SUFFIXES):
         reason = _archive_content_leak(path, markers)
+        if reason:
+            return reason
+    elif name.endswith(".gz"):
+        reason = _gzip_content_leak(path, markers)
         if reason:
             return reason
     # Filename check.

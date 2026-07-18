@@ -1,0 +1,18 @@
+{
+  "provider": "zenodo",
+  "record_id": 7274803,
+  "concept_record_id": 7274802,
+  "version": "1.0.0",
+  "publication_date": "2023-01-18",
+  "license": "CC-BY-4.0",
+  "files": [
+    {
+      "name": "dopamine-reinforces-spontaneous-behavior.zip",
+      "bytes": 60751713398,
+      "checksum": "md5:8b858e447902642555200faf89e00179"
+    }
+  ],
+  "downloaded": false,
+  "grantable": false,
+  "reason": "Single mixed archive requires budgeted selective extraction and answer-bearing-field audit."
+}

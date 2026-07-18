@@ -1,0 +1,68 @@
+problem_id: s41586-020-3010-5_human-made-mass
+# Hidden, host-only. Never mounted into the UEA container.
+entries:
+  - id: historical_material_stocks
+    description: Annual global in-use material stocks by neutral material category from 1900 through 2015, with waste separated from the stock-only total.
+    kind: raw
+    grantable: false
+    source_base: problem
+    modalities: [csv, annual-time-series, material-stocks]
+    source_paths: [evaluator/host-audit/annual_material_stocks_1900_2015.csv]
+    reason: Target-repository workbook provenance has not been independently validated as observation-only.
+
+  - id: historical_biomass_estimates
+    description: Sparse published estimates of global living biomass with source and observation year retained for source-aware uncertainty analysis.
+    kind: raw
+    grantable: false
+    source_base: problem
+    modalities: [csv, biomass, historical-estimates]
+    source_paths: [evaluator/host-audit/historical_biomass_estimates.csv]
+    reason: The target-repository table includes post-2015 rows and lacks a frozen admissible carbon-to-dry-mass conversion.
+
+  - id: neutral_field_dictionary
+    description: Units, accounting boundaries, and non-result-bearing descriptions for the staged columns.
+    kind: processed
+    grantable: false
+    source_base: problem
+    modalities: [csv, schema, provenance]
+    source_paths: [evaluator/host-audit/field_dictionary.csv]
+    reason: No inputs are grantable while the candidate remains acquisition-only.
+
+  - id: frozen_source_manifest
+    description: Pinned source commit and cryptographic hashes for every source workbook used to create the neutral tables.
+    kind: processed
+    grantable: false
+    source_base: problem
+    modalities: [json, provenance]
+    source_paths: [evaluator/host-audit/source_manifest.json]
+    reason: Host-only provenance includes the target repository identity and source paths.
+
+  - id: post_2015_material_projections
+    description: Material-stock projections after the observation cutoff.
+    kind: processed
+    grantable: false
+    reason: The projection directly narrows the target crossing interval.
+
+  - id: annual_biomass_trajectories
+    description: Target-produced annual dry- and wet-biomass trajectories and uncertainties.
+    kind: processed
+    grantable: false
+    reason: These fitted trajectories encode a decisive target analysis rather than independent observations.
+
+  - id: target_sensitivity_and_crossing_outputs
+    description: Target-produced sensitivity tables, crossing-year calculations, and material-composition summaries.
+    kind: processed
+    grantable: false
+    reason: These artifacts directly encode the expected conclusions.
+
+  - id: target_repository_code_and_figures
+    description: Target notebooks, scripts, rendered notebooks, figures, README, and repository metadata.
+    kind: processed
+    grantable: false
+    reason: Repository names, narrative documentation, code, and figures reveal the target identity and analysis.
+
+  - id: target_paper_and_supplement
+    description: Target manuscript, supplementary information, source-data tables, and extended-data outputs.
+    kind: processed
+    grantable: false
+    reason: The publication lineage states the target conclusions and exact reported values.

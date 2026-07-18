@@ -1,0 +1,10 @@
+{
+  "artifacts": {
+    "trajectory_holdout.csv": {
+      "numeric_bounds": {
+        "predicted_time": {"min": 6.0, "max": 9.0},
+        "confidence": {"min": 0.0, "max": 1.0}
+      }
+    }
+  }
+}
