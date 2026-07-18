@@ -311,7 +311,7 @@ class DatasetRequest(BaseModel):
     max_bytes: int = Field(default=1_000_000_000, ge=1_000_000)
 
 
-class CatalogEntry(BaseModel):
+class CatalogEntry(StrictModel):
     """One logical, grantable (or explicitly blocked) dataset for a problem.
 
     This is hidden, host-only benchmark metadata. The UEA never sees `source_paths`,
@@ -321,7 +321,7 @@ class CatalogEntry(BaseModel):
     id: str
     description: str = Field(..., description="Neutral description shown to the experiment-agent matcher.")
     kind: Literal["raw", "processed", "derivable", "online"] = "raw"
-    grantable: bool = True
+    grantable: bool = False
     source_paths: list[str] = Field(
         default_factory=list,
         description=(
@@ -355,9 +355,16 @@ class CatalogEntry(BaseModel):
         }
 
 
-class DataCatalog(BaseModel):
+class DataCatalog(StrictModel):
     problem_id: str
     entries: list[CatalogEntry] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def unique_entry_ids(self) -> "DataCatalog":
+        identifiers = [entry.id for entry in self.entries]
+        if len(identifiers) != len(set(identifiers)):
+            raise ValueError("Catalog entry IDs must be unique.")
+        return self
 
     def grantable(self) -> list[CatalogEntry]:
         return [e for e in self.entries if e.grantable]
@@ -455,7 +462,7 @@ class ExperimentResult(StrictModel):
 
 class ProblemSpec(BaseModel):
     problem_id: str
-    benchmark_status: Literal["active", "conditional", "acquisition_only"] = "active"
+    benchmark_status: Literal["active", "conditional", "acquisition_only"]
     readiness_reason: str | None = None
     title: str
     doi: str

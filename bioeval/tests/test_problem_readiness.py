@@ -41,12 +41,16 @@ class ProblemReadinessTests(unittest.TestCase):
         }
         self.assertEqual(
             active,
-            {FORGE_ID, F1_ID, PROTEIN_ID, IDR_ID, "s41467-026-73635-7_butterfly-longevity-pollen-feeding"},
+            {
+                FORGE_ID,
+                IDR_ID,
+                "s41467-026-73635-7_butterfly-longevity-pollen-feeding",
+            },
         )
         for problem_id in active:
             self.assertEqual(validate_problem_ready(load_problem_spec(problem_id), REPO_ROOT), [])
-        self.assertEqual(load_problem_spec(PLANT_ID).benchmark_status, "conditional")
-        self.assertEqual(load_problem_spec(CHROMATIN_ID).benchmark_status, "conditional")
+        self.assertEqual(load_problem_spec(PLANT_ID).benchmark_status, "acquisition_only")
+        self.assertEqual(load_problem_spec(CHROMATIN_ID).benchmark_status, "acquisition_only")
 
     def test_idr_grants_only_curated_observations_and_hidden_templates(self) -> None:
         root = PROBLEMS_ROOT / IDR_ID
@@ -69,6 +73,51 @@ class ProblemReadinessTests(unittest.TestCase):
             / "41589_2026_2251_MOESM10_ESM.xlsx"
         )
         self.assertIsNotNone(scan_file(workbook, identifiers))
+
+    def test_idr_holdout_pairs_are_absent_from_grantable_outcomes(self) -> None:
+        root = PROBLEMS_ROOT / IDR_ID
+        with (root / "evaluator" / "perturbation_test_labels.csv").open(
+            newline=""
+        ) as handle:
+            held_out = {
+                row["pair"].casefold().replace(" ", "")
+                for row in csv.DictReader(handle)
+            }
+        leaked: list[str] = []
+        for path in sorted((root / "curated" / "observations").glob("*.csv")):
+            with path.open(newline="", encoding="utf-8") as handle:
+                for row in csv.DictReader(handle):
+                    candidates = [row.get("pair", "")]
+                    for left, right in (
+                        ("IDR_A", "IDR_B"),
+                        ("IDR1", "IDR2"),
+                        ("Protein_A", "Protein_B"),
+                    ):
+                        if row.get(left) and row.get(right):
+                            candidates.extend(
+                                [
+                                    f"{row[left]}-{row[right]}",
+                                    f"{row[right]}-{row[left]}",
+                                ]
+                            )
+                    if any(
+                        candidate.casefold().replace(" ", "") in held_out
+                        for candidate in candidates
+                    ):
+                        leaked.append(path.name)
+        self.assertEqual(leaked, [])
+        excluded = {
+            "aromatic_serine_fusion_scores.csv",
+            "charged_serine_fusion_scores.csv",
+            "low_charge_fusion_scores.csv",
+            "serine_blocky_high_scores.csv",
+            "serine_blocky_low_scores.csv",
+        }
+        self.assertTrue(
+            excluded.isdisjoint(
+                path.name for path in (root / "curated" / "observations").glob("*.csv")
+            )
+        )
 
     def test_forge_target_aliases_cover_every_training_drug(self) -> None:
         root = PROBLEMS_ROOT / FORGE_ID / "curated"
@@ -157,11 +206,12 @@ class ProblemReadinessTests(unittest.TestCase):
 
     def test_f1_separates_training_validation_and_blocks_target_outputs(self) -> None:
         spec = load_problem_spec(F1_ID)
+        self.assertEqual(spec.benchmark_status, "conditional")
         prompt = spec.sandbox_prompt.lower()
         self.assertIn("three-conformation class", prompt)
         self.assertIn("conditional on this model family", prompt)
 
-        root = PROBLEMS_ROOT / F1_ID
+        root = INCOMPLETE_ROOT / F1_ID
         catalog = load_catalog(root)
         for entry_id in (
             "turnover_and_coupling_training_observations",
@@ -199,7 +249,11 @@ class ProblemReadinessTests(unittest.TestCase):
             ),
         }
         for problem_id, entry_ids in cases.items():
-            root = PROBLEMS_ROOT / problem_id
+            root = (
+                INCOMPLETE_ROOT / problem_id
+                if problem_id == F1_ID
+                else PROBLEMS_ROOT / problem_id
+            )
             catalog = load_catalog(root)
             spec = load_problem_spec(problem_id)
             with self.subTest(problem_id=problem_id), tempfile.TemporaryDirectory() as tmp:
@@ -218,16 +272,19 @@ class ProblemReadinessTests(unittest.TestCase):
                 self.assertEqual(len(report.kept), expected)
                 self.assertFalse(report.rejected)
 
-    def test_plant_snapshot_is_pinned_and_answer_outputs_are_blocked(self) -> None:
+    def test_plant_stays_acquisition_only_until_inputs_are_vendored(self) -> None:
         spec = load_problem_spec(PLANT_ID)
-        self.assertIn("pseudoreplication", " ".join(spec.judge_rubric).lower())
-        root = PROBLEMS_ROOT / PLANT_ID
+        self.assertEqual(spec.benchmark_status, "acquisition_only")
+        self.assertEqual(spec.expected_conclusions, [])
+        self.assertEqual(spec.required_artifacts, [])
+        root = INCOMPLETE_ROOT / PLANT_ID
         catalog = load_catalog(root)
         online = catalog.by_id("pinned_dryad_snapshot")
         assert online is not None and online.online is not None
-        self.assertTrue(online.grantable)
+        self.assertFalse(online.grantable)
         self.assertEqual(online.online["provider"], "dryad")
         self.assertEqual(online.online["version_id"], 204170)
+        self.assertFalse(any(entry.grantable for entry in catalog.entries))
         for entry_id in ("derived_trait_response_tables", "dataset_readme", "author_analysis_code"):
             entry = catalog.by_id(entry_id)
             assert entry is not None
@@ -241,9 +298,10 @@ class ProblemReadinessTests(unittest.TestCase):
 
     def test_protein_scope_uses_raw_counts_and_neutral_condition_map(self) -> None:
         spec = load_problem_spec(PROTEIN_ID)
+        self.assertEqual(spec.benchmark_status, "conditional")
         self.assertIn("not fastq", spec.sandbox_prompt.lower())
         self.assertIn("absolute delta-g", spec.expected_caveats[-1].lower())
-        root = PROBLEMS_ROOT / PROTEIN_ID
+        root = INCOMPLETE_ROOT / PROTEIN_ID
         catalog = load_catalog(root)
         counts = catalog.by_id("exact_match_ngs_counts")
         conditions = catalog.by_id("assay_condition_map")
@@ -267,6 +325,7 @@ class ProblemReadinessTests(unittest.TestCase):
 
     def test_methane_candidate_pins_observations_and_blocks_global_outputs(self) -> None:
         spec = load_problem_spec(METHANE_ID)
+        self.assertEqual(spec.benchmark_status, "conditional")
         self.assertIn("do not estimate global annual", spec.sandbox_prompt.lower())
         root = INCOMPLETE_ROOT / METHANE_ID
         catalog = load_catalog(root)
@@ -295,11 +354,14 @@ class ProblemReadinessTests(unittest.TestCase):
             ).digest()
             self.assertEqual(int(row["fold"]), int.from_bytes(digest[:8], "big") % 5)
 
-    def test_chromatin_manifests_are_exact_and_target_states_are_blocked(self) -> None:
+    def test_chromatin_stays_acquisition_only_with_manifest_locks(self) -> None:
         spec = load_problem_spec(CHROMATIN_ID)
-        self.assertIn("label-invariant", spec.sandbox_prompt.lower())
+        self.assertEqual(spec.benchmark_status, "acquisition_only")
+        self.assertEqual(spec.expected_conclusions, [])
+        self.assertEqual(spec.required_artifacts, [])
         root = INCOMPLETE_ROOT / CHROMATIN_ID
         catalog = load_catalog(root)
+        self.assertFalse(any(entry.grantable for entry in catalog.entries))
         for entry_id in ("published_state_segmentations", "published_state_labels_and_models"):
             entry = catalog.by_id(entry_id)
             assert entry is not None

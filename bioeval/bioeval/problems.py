@@ -13,11 +13,14 @@ SPEC_DIR = Path(__file__).parent / "problem_specs"
 
 def resolve_problem_root(problem_id: str, repo_root: Path | None = None) -> Path | None:
     root = repo_root or Path(__file__).resolve().parents[2]
-    for folder in ("problems_complete", "problems_imcomplete"):
-        candidate = root / folder / problem_id
-        if candidate.is_dir():
-            return candidate
-    return None
+    matches = [
+        root / folder / problem_id
+        for folder in ("problems_complete", "problems_imcomplete")
+        if (root / folder / problem_id).is_dir()
+    ]
+    if len(matches) > 1:
+        raise ValueError(f"Problem exists in multiple lifecycle roots: {problem_id}")
+    return matches[0] if matches else None
 
 
 def resolve_problems_dir(problem_id: str, repo_root: Path | None = None) -> str | None:

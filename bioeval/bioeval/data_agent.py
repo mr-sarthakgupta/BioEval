@@ -56,6 +56,7 @@ class ExperimentAgentSettings(BaseModel):
     api_base: str = DEFAULT_EXPERIMENT_AGENT_API_BASE
     run_id: str = "default"
     run_root: Path | None = None
+    enforce_problem_status: bool = True
 
 
 class ResearchPapersToolRequest(BaseModel):
@@ -224,6 +225,25 @@ def create_app(settings: ExperimentAgentSettings) -> FastAPI:
         problem_id = request.problem_id or settings.default_problem_id
         if not problem_id:
             raise HTTPException(status_code=400, detail="No problem_id configured for experiment-agent.")
+        if settings.enforce_problem_status:
+            try:
+                spec = load_problem_spec(problem_id)
+            except KeyError as exc:
+                raise HTTPException(
+                    status_code=404, detail=f"Unknown problem_id: {problem_id}"
+                ) from exc
+            if spec.benchmark_status == "acquisition_only":
+                raise HTTPException(
+                    status_code=403, detail="Acquisition-only problems are not runnable."
+                )
+            if (
+                spec.benchmark_status == "conditional"
+                and os.getenv("BIOEVAL_ALLOW_CONDITIONAL", "0") != "1"
+            ):
+                raise HTTPException(
+                    status_code=403,
+                    detail="Conditional problem requires explicit runtime approval.",
+                )
 
         problem_root = settings.problems_root / problem_id
         if not problem_root.exists():

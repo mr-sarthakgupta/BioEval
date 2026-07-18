@@ -8,6 +8,8 @@ from pathlib import Path
 
 from openpyxl import load_workbook
 
+from idr_holdout import is_test_pair, pair_is_held_out
+
 
 ROOT = Path(__file__).resolve().parents[1]
 PROBLEM = ROOT / "problems_complete" / "s41589-026-02251-9_idr-condensate-serine-charge"
@@ -18,6 +20,13 @@ HOLDOUT_FILES = {
     "aromatic_serine_mutant_scores.csv",
     "charged_serine_mutant_scores.csv",
     "low_charge_mutant_scores.csv",
+}
+EXCLUDED_PARALLEL_OUTCOMES = {
+    "aromatic_serine_fusion_scores.csv",
+    "charged_serine_fusion_scores.csv",
+    "low_charge_fusion_scores.csv",
+    "serine_blocky_high_scores.csv",
+    "serine_blocky_low_scores.csv",
 }
 
 SHEETS = {
@@ -74,30 +83,85 @@ SHEETS = {
 }
 
 
+def _sheet_rows(workbook_name: str, sheet_name: str) -> list[list[object]]:
+    workbook = load_workbook(
+        SOURCE / workbook_name,
+        read_only=True,
+        data_only=True,
+    )
+    worksheet = workbook[sheet_name]
+    rows: list[list[object]] = []
+    for row in worksheet.iter_rows(values_only=True):
+        values = list(row)
+        while values and values[-1] is None:
+            values.pop()
+        rows.append(values)
+    workbook.close()
+    return rows
+
+
+def _write_rows(path: Path, rows: list[list[object]]) -> None:
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerows(
+            ["" if value is None else value for value in row]
+            for row in rows
+        )
+
+
 def main() -> int:
     DESTINATION.mkdir(parents=True, exist_ok=True)
     HOLDOUT_SOURCE.mkdir(parents=True, exist_ok=True)
     expected = {name for sheets in SHEETS.values() for name in sheets.values()}
     for stale in DESTINATION.glob("*.csv"):
-        if stale.name not in expected or stale.name in HOLDOUT_FILES:
+        if (
+            stale.name not in expected
+            or stale.name in HOLDOUT_FILES
+            or stale.name in EXCLUDED_PARALLEL_OUTCOMES
+        ):
             stale.unlink()
+    for stale in HOLDOUT_SOURCE.glob("*.csv"):
+        if stale.name not in HOLDOUT_FILES:
+            stale.unlink()
+
+    cached: dict[str, list[list[object]]] = {}
     for workbook_name, sheets in SHEETS.items():
-        workbook = load_workbook(
-            SOURCE / workbook_name,
-            read_only=True,
-            data_only=True,
-        )
         for sheet_name, output_name in sheets.items():
-            worksheet = workbook[sheet_name]
-            output_root = HOLDOUT_SOURCE if output_name in HOLDOUT_FILES else DESTINATION
-            with (output_root / output_name).open("w", newline="", encoding="utf-8") as handle:
-                writer = csv.writer(handle)
-                for row in worksheet.iter_rows(values_only=True):
-                    values = list(row)
-                    while values and values[-1] is None:
-                        values.pop()
-                    writer.writerow("" if value is None else value for value in values)
-    print(f"Wrote {len(expected)} neutral observation tables to {DESTINATION}.")
+            rows = _sheet_rows(workbook_name, sheet_name)
+            cached[output_name] = rows
+            if output_name in HOLDOUT_FILES:
+                _write_rows(HOLDOUT_SOURCE / output_name, rows)
+
+    held_out_pairs: set[str] = set()
+    for path in sorted(HOLDOUT_SOURCE.glob("*.csv")):
+        with path.open(newline="", encoding="utf-8") as handle:
+            for row in csv.DictReader(handle):
+                if is_test_pair(path.stem, row["pair"]):
+                    held_out_pairs.add(row["pair"])
+
+    written = 0
+    for output_name, rows in cached.items():
+        if output_name in HOLDOUT_FILES or output_name in EXCLUDED_PARALLEL_OUTCOMES:
+            continue
+        if not rows:
+            continue
+        header = [str(value) for value in rows[0]]
+        filtered = [rows[0]]
+        for values in rows[1:]:
+            record = {
+                header[index]: value
+                for index, value in enumerate(values)
+                if index < len(header)
+            }
+            if pair_is_held_out(record, held_out_pairs):
+                continue
+            filtered.append(values)
+        _write_rows(DESTINATION / output_name, filtered)
+        written += 1
+    print(
+        f"Wrote {written} holdout-redacted observation tables and "
+        f"{len(HOLDOUT_FILES)} evaluator-only sources."
+    )
     return 0
 
 

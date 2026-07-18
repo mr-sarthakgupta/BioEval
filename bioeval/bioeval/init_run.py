@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -51,7 +52,13 @@ def main() -> None:
     if problems_dir is None:
         raise SystemExit(f"Problem directory is missing: {args.problem_id}")
     run_id = args.run_id or default_run_id(args.problem_id)
-    run_root = args.runs_root / args.problem_id / run_id
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", run_id):
+        raise SystemExit("Run ID must contain only letters, digits, dot, underscore, or hyphen.")
+    runs_root = args.runs_root.resolve()
+    run_root = (runs_root / args.problem_id / run_id).resolve()
+    run_root.relative_to(runs_root)
+    if run_root.exists():
+        raise SystemExit(f"Run directory already exists: {run_root}")
     for child in ["uea_workspace", "data_grants", "results", "logs"]:
         (run_root / child).mkdir(parents=True, exist_ok=True)
 

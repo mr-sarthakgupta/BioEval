@@ -4,8 +4,9 @@
 from __future__ import annotations
 
 import csv
-import hashlib
 from pathlib import Path
+
+from idr_holdout import is_test_pair
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,11 +15,6 @@ SOURCE = PROBLEM / "evaluator" / "holdout_source"
 TRAIN = PROBLEM / "curated" / "perturbation_training.csv"
 TEST_ROWS = PROBLEM / "curated" / "perturbation_test_rows.csv"
 TEST_LABELS = PROBLEM / "evaluator" / "perturbation_test_labels.csv"
-
-
-def is_test_pair(assay: str, pair: str) -> bool:
-    digest = hashlib.sha256(f"bioeval-idr-v1:{assay}:{pair}".encode()).digest()
-    return int.from_bytes(digest[:8], "big") % 5 == 0
 
 
 def main() -> int:

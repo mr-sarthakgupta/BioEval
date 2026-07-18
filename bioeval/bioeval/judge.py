@@ -6,8 +6,11 @@ import hashlib
 import json
 import math
 import os
+import random
 import re
+import statistics
 import sys
+from collections.abc import Callable
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -22,7 +25,7 @@ from bioeval.bedrock_client import (
 )
 from bioeval.bedrock_cost import BedrockCostTracker
 from bioeval.evaluators import apply_evaluator_gate, evaluate_problem_artifacts
-from bioeval.problems import load_problem_spec
+from bioeval.problems import load_problem_spec, resolve_problem_root
 from bioeval.search_proxy import contains_hidden_identifier
 from bioeval.run_record import append_jsonl, utc_now, write_json
 from bioeval.schemas import CaveatScore, ConclusionScore, EvidenceCitation, JudgeResult
@@ -209,6 +212,7 @@ def _forge_hidden_holdout_summary(
         / "evaluator"
         / "drug_response_test_labels.csv"
     )
+    training_path = labels_path.parents[1] / "curated" / "drug_response_train.csv"
     required = {
         "drug",
         "cell_line_id",
@@ -223,6 +227,17 @@ def _forge_hidden_holdout_summary(
                 (row["drug"], row["cell_line_id"]): float(row["observed_ic50"])
                 for row in csv.DictReader(handle)
             }
+        training_by_drug: dict[str, list[float]] = {}
+        with training_path.open(newline="") as handle:
+            for row in csv.DictReader(handle):
+                training_by_drug.setdefault(row["drug"], []).append(
+                    float(row["observed_ic50"])
+                )
+        frozen_baseline = {
+            drug: sum(values) / len(values)
+            for drug, values in training_by_drug.items()
+            if values
+        }
         with prediction_path.open(newline="") as handle:
             reader = csv.DictReader(handle)
             fields = set(reader.fieldnames or [])
@@ -257,16 +272,25 @@ def _forge_hidden_holdout_summary(
     informed_sq = []
     baseline_abs = []
     informed_abs = []
+    reference_sq = []
+    reference_abs = []
     for key, (baseline, informed, _benefit) in predictions.items():
         observed = labels[key]
         baseline_sq.append((baseline - observed) ** 2)
         informed_sq.append((informed - observed) ** 2)
         baseline_abs.append(abs(baseline - observed))
         informed_abs.append(abs(informed - observed))
+        reference = frozen_baseline.get(key[0])
+        if reference is None:
+            return f"{prefix} frozen baseline is unavailable for {key[0]}."
+        reference_sq.append((reference - observed) ** 2)
+        reference_abs.append(abs(reference - observed))
     baseline_rmse = math.sqrt(sum(baseline_sq) / len(baseline_sq))
     informed_rmse = math.sqrt(sum(informed_sq) / len(informed_sq))
     baseline_mae = sum(baseline_abs) / len(baseline_abs)
     informed_mae = sum(informed_abs) / len(informed_abs)
+    reference_rmse = math.sqrt(sum(reference_sq) / len(reference_sq))
+    reference_mae = sum(reference_abs) / len(reference_abs)
     egfr_rows = [
         (cell, informed, benefit)
         for (drug, cell), (_baseline, informed, benefit) in predictions.items()
@@ -318,7 +342,8 @@ def _forge_hidden_holdout_summary(
         f"{prefix} coverage={len(predictions)}/{len(labels)}; duplicates={duplicates}; "
         f"unknown_rows={unknown}; baseline_RMSE={baseline_rmse:.6g}; "
         f"dependency_RMSE={informed_rmse:.6g}; baseline_MAE={baseline_mae:.6g}; "
-        f"dependency_MAE={informed_mae:.6g}; EGFR_erlotinib_n={len(aligned)}; "
+        f"dependency_MAE={informed_mae:.6g}; frozen_RMSE={reference_rmse:.6g}; "
+        f"frozen_MAE={reference_mae:.6g}; EGFR_erlotinib_n={len(aligned)}; "
         f"benefit_dependency_r={benefit_dependency_r:.6g}; "
         f"benefit_IC50_r={benefit_ic50_r:.6g}."
     )
@@ -354,7 +379,9 @@ def _idr_hidden_holdout_summary(
     if prediction_path is None:
         return f"{prefix} missing declared idr_predictions.csv."
 
-    problem_root = Path(__file__).resolve().parents[2] / "problems_complete" / IDR_PROBLEM_ID
+    problem_root = resolve_problem_root(IDR_PROBLEM_ID)
+    if problem_root is None:
+        return f"{prefix} unavailable because the problem root is missing."
     labels_path = problem_root / "evaluator" / "perturbation_test_labels.csv"
     training_path = problem_root / "curated" / "perturbation_training.csv"
     key_columns = ("assay", "pair", "group", "replicate")
@@ -528,13 +555,10 @@ def _butterfly_survival_summary(
     )
     if metrics_path is None:
         return f"{prefix} missing declared butterfly_metrics.csv."
-    problem_root = (
-        Path(__file__).resolve().parents[2]
-        / "problems_complete"
-        / BUTTERFLY_PROBLEM_ID
-        / "curated"
-        / "observations"
-    )
+    resolved_root = resolve_problem_root(BUTTERFLY_PROBLEM_ID)
+    if resolved_root is None:
+        return f"{prefix} unavailable because the problem root is missing."
+    problem_root = resolved_root / "curated" / "observations"
 
     def km_median(rows: list[dict[str, str]]) -> float:
         times = sorted({float(row["Age"]) for row in rows if row["Age"]})
@@ -551,6 +575,82 @@ def _butterfly_survival_summary(
                 return time_value
         return math.inf
 
+    def percentile(values: list[float], fraction: float) -> float:
+        ordered = sorted(values)
+        index = min(len(ordered) - 1, max(0, int(fraction * len(ordered))))
+        return ordered[index]
+
+    def bootstrap_interval(
+        values: list[object],
+        statistic: Callable[[list[object]], float],
+        rng: random.Random,
+        replicates: int = 1000,
+    ) -> tuple[float, float]:
+        sampled = [
+            statistic([values[rng.randrange(len(values))] for _ in values])
+            for _ in range(replicates)
+        ]
+        return percentile(sampled, 0.025), percentile(sampled, 0.975)
+
+    def ols_slope(points: list[tuple[float, float]]) -> float:
+        x_mean = sum(point[0] for point in points) / len(points)
+        y_mean = sum(point[1] for point in points) / len(points)
+        denominator = sum((point[0] - x_mean) ** 2 for point in points)
+        if denominator == 0:
+            raise ZeroDivisionError
+        return (
+            sum(
+                (point[0] - x_mean) * (point[1] - y_mean)
+                for point in points
+            )
+            / denominator
+        )
+
+    def log_hazard_slope(rows: list[dict[str, str]]) -> float:
+        times = sorted(
+            {
+                float(row["Age"])
+                for row in rows
+                if row["Age"] and 7 <= float(row["Age"]) <= 90
+            }
+        )
+        cumulative = 0.0
+        points: list[tuple[float, float]] = []
+        for time_value in times:
+            at_risk = sum(float(row["Age"]) >= time_value for row in rows)
+            events = sum(
+                float(row["Age"]) == time_value and row["Status"] == "1"
+                for row in rows
+            )
+            if at_risk and events:
+                cumulative += events / at_risk
+                if cumulative > 0:
+                    points.append((time_value, math.log(cumulative)))
+        if len(points) < 3:
+            raise ValueError("insufficient hazard points")
+        return ols_slope(points)
+
+    def individual_grip_slopes(
+        rows: list[dict[str, str]],
+        species: str,
+    ) -> list[float]:
+        grouped: dict[str, list[tuple[float, float]]] = {}
+        for row in rows:
+            if (
+                row["Species"] != species
+                or not row["Max_GS"]
+                or row["Age_weeks"] not in {"1", "3", "5"}
+            ):
+                continue
+            grouped.setdefault(row["ID"], []).append(
+                (float(row["Age_weeks"]), float(row["Max_GS"]))
+            )
+        return [
+            ols_slope(points)
+            for points in grouped.values()
+            if len({point[0] for point in points}) >= 2
+        ]
+
     try:
         with (problem_root / "species_max_lifespan.csv").open(newline="") as handle:
             lifespan = list(csv.DictReader(handle))
@@ -564,25 +664,91 @@ def _butterfly_survival_summary(
             for row in lifespan
             if row["Feeding_habit"] == "NPF"
         )
-        import statistics
-
-        expected = {
-            "median_species_max_ratio": statistics.median(pollen)
-            / statistics.median(non_pollen),
-            "maximum_verified_lifespan_days": max(pollen + non_pollen),
+        rng = random.Random(73635)
+        ratio = statistics.median(pollen) / statistics.median(non_pollen)
+        ratio_samples: list[float] = []
+        for _ in range(1000):
+            sampled_pollen = [pollen[rng.randrange(len(pollen))] for _ in pollen]
+            sampled_non_pollen = [
+                non_pollen[rng.randrange(len(non_pollen))] for _ in non_pollen
+            ]
+            ratio_samples.append(
+                statistics.median(sampled_pollen)
+                / statistics.median(sampled_non_pollen)
+            )
+        expected: dict[str, tuple[float, float, float]] = {
+            "median_species_max_ratio": (
+                ratio,
+                percentile(ratio_samples, 0.025),
+                percentile(ratio_samples, 0.975),
+            ),
+            "maximum_verified_lifespan_days": (
+                max(pollen + non_pollen),
+                max(pollen + non_pollen),
+                max(pollen + non_pollen),
+            ),
         }
         with (problem_root / "diet_survival.csv").open(newline="") as handle:
-            diet_rows = list(csv.DictReader(handle))
+            diet_rows = [
+                row
+                for row in csv.DictReader(handle)
+                if row["Age"] and float(row["Age"]) != 0
+            ]
         for species in ("Hecale", "Dryas"):
             for diet in ("PF", "PD"):
-                expected[f"{species.casefold()}_{diet.casefold()}_km_median_days"] = km_median(
-                    [
-                        row
-                        for row in diet_rows
-                        if row["Species"] == species and row["Diet"] == diet
-                    ]
+                subset = [
+                    row
+                    for row in diet_rows
+                    if row["Species"] == species and row["Diet"] == diet
+                ]
+                value = km_median(subset)
+                lower, upper = bootstrap_interval(
+                    list(subset),
+                    lambda sample: km_median(sample),  # type: ignore[arg-type]
+                    rng,
                 )
+                expected[f"{species.casefold()}_{diet.casefold()}_km_median_days"] = (
+                    value,
+                    lower,
+                    upper,
+                )
+        hazard_values: dict[str, float] = {}
+        for species in ("Hecale", "Dryas"):
+            subset = [
+                row
+                for row in diet_rows
+                if row["Species"] == species and row["Diet"] == "PD"
+            ]
+            value = log_hazard_slope(subset)
+            key = f"{species.casefold()}_pd_log_hazard_slope"
+            hazard_values[key] = value
+            expected[key] = (value, value, value)
+        with (problem_root / "grip_strength.csv").open(newline="") as handle:
+            grip_rows = list(csv.DictReader(handle))
+        hecale_grip = individual_grip_slopes(grip_rows, "Hecale")
+        dryas_grip = individual_grip_slopes(grip_rows, "Dryas")
+        grip_contrast = statistics.median(hecale_grip) - statistics.median(dryas_grip)
+        grip_samples: list[float] = []
+        for _ in range(1000):
+            sampled_hecale = [
+                hecale_grip[rng.randrange(len(hecale_grip))]
+                for _ in hecale_grip
+            ]
+            sampled_dryas = [
+                dryas_grip[rng.randrange(len(dryas_grip))]
+                for _ in dryas_grip
+            ]
+            grip_samples.append(
+                statistics.median(sampled_hecale)
+                - statistics.median(sampled_dryas)
+            )
+        expected["grip_age_slope_contrast"] = (
+            grip_contrast,
+            percentile(grip_samples, 0.025),
+            percentile(grip_samples, 0.975),
+        )
         submitted: dict[str, tuple[float, float, float]] = {}
+        submitted_row_count = 0
         with metrics_path.open(newline="") as handle:
             reader = csv.DictReader(handle)
             if not {"metric", "estimate", "ci_lower", "ci_upper"}.issubset(
@@ -590,6 +756,7 @@ def _butterfly_survival_summary(
             ):
                 return f"{prefix} invalid metric schema."
             for row in reader:
+                submitted_row_count += 1
                 submitted[row["metric"]] = (
                     float(row["estimate"]),
                     float(row["ci_lower"]),
@@ -597,22 +764,41 @@ def _butterfly_survival_summary(
                 )
     except (OSError, ValueError, KeyError, csv.Error, ZeroDivisionError):
         return f"{prefix} could not validate submitted metrics."
+    submission_shape_valid = (
+        submitted_row_count == len(expected) and len(submitted) == len(expected)
+    )
     matched = 0
+    ci_matched = 0
     valid_intervals = 0
-    for metric, value in expected.items():
+    for metric, expected_row in expected.items():
         row = submitted.get(metric)
         if row is None:
             continue
+        value, expected_lower, expected_upper = expected_row
         estimate, lower, upper = row
         tolerance = max(1e-6, abs(value) * 1e-3)
         matched += abs(estimate - value) <= tolerance
+        lower_tolerance = max(1e-6, abs(expected_lower) * 1e-3)
+        upper_tolerance = max(1e-6, abs(expected_upper) * 1e-3)
+        ci_matched += (
+            abs(lower - expected_lower) <= lower_tolerance
+            and abs(upper - expected_upper) <= upper_tolerance
+        )
         valid_intervals += lower <= estimate <= upper
+    if not submission_shape_valid:
+        matched = 0
+        ci_matched = 0
+        valid_intervals = 0
     return (
-        f"{prefix} matched={matched}/{len(expected)}; valid_intervals={valid_intervals}/"
-        f"{len(expected)}; median_species_max_ratio={expected['median_species_max_ratio']:.6g}; "
-        f"maximum_lifespan_days={expected['maximum_verified_lifespan_days']:.6g}; "
-        f"hecale_PD_median={expected['hecale_pd_km_median_days']:.6g}; "
-        f"dryas_PD_median={expected['dryas_pd_km_median_days']:.6g}."
+        f"{prefix} matched={matched}/{len(expected)}; ci_matched={ci_matched}/"
+        f"{len(expected)}; valid_intervals={valid_intervals}/"
+        f"{len(expected)}; median_species_max_ratio={expected['median_species_max_ratio'][0]:.6g}; "
+        f"maximum_lifespan_days={expected['maximum_verified_lifespan_days'][0]:.6g}; "
+        f"hecale_PD_median={expected['hecale_pd_km_median_days'][0]:.6g}; "
+        f"dryas_PD_median={expected['dryas_pd_km_median_days'][0]:.6g}; "
+        f"hecale_PD_hazard_slope={hazard_values['hecale_pd_log_hazard_slope']:.6g}; "
+        f"dryas_PD_hazard_slope={hazard_values['dryas_pd_log_hazard_slope']:.6g}; "
+        f"grip_age_slope_contrast={grip_contrast:.6g}."
     )
 
 
@@ -712,17 +898,27 @@ def _verify_analysis_manifest(
 ) -> tuple[bool, list[str]]:
     if manifest_path is None:
         return False, ["No analysis manifest was submitted."]
+    max_manifest_bytes = int(os.getenv("BIOEVAL_MAX_MANIFEST_BYTES", "1000000"))
+    max_artifacts = int(os.getenv("BIOEVAL_MAX_ARTIFACT_COUNT", "100"))
+    max_file_bytes = int(os.getenv("BIOEVAL_MAX_ARTIFACT_BYTES", "100000000"))
+    max_total_bytes = int(os.getenv("BIOEVAL_MAX_ARTIFACT_TOTAL_BYTES", "500000000"))
     try:
+        if manifest_path.stat().st_size > max_manifest_bytes:
+            return False, ["Analysis manifest exceeds the size limit."]
         manifest = json.loads(manifest_path.read_text(errors="replace"))
     except (OSError, json.JSONDecodeError) as exc:
         return False, [f"Analysis manifest could not be read: {exc}"]
     artifacts = manifest.get("artifacts")
     if not isinstance(artifacts, list) or not artifacts:
         return False, ["Analysis manifest has no declared artifacts."]
+    if len(artifacts) > max_artifacts:
+        return False, ["Analysis manifest declares too many artifacts."]
 
     root = artifact_root or manifest_path.parent
     messages: list[str] = []
     valid = True
+    seen_paths: set[str] = set()
+    total_bytes = 0
     for item in artifacts:
         if not isinstance(item, dict):
             valid = False
@@ -734,6 +930,22 @@ def _verify_analysis_manifest(
             valid = False
             messages.append(f"Missing or unsafe artifact path: {relative!r}.")
             continue
+        normalized = str(artifact.resolve().relative_to(root.resolve()))
+        if normalized in seen_paths:
+            valid = False
+            messages.append(f"Duplicate artifact path: {relative}.")
+            continue
+        seen_paths.add(normalized)
+        size = artifact.stat().st_size
+        total_bytes += size
+        if size > max_file_bytes:
+            valid = False
+            messages.append(f"Artifact exceeds the per-file size limit: {relative}.")
+            continue
+        if total_bytes > max_total_bytes:
+            valid = False
+            messages.append("Declared artifacts exceed the total size limit.")
+            continue
         expected_hash = item.get("sha256")
         if not isinstance(expected_hash, str) or not re.fullmatch(
             r"[0-9a-fA-F]{64}", expected_hash
@@ -741,7 +953,11 @@ def _verify_analysis_manifest(
             valid = False
             messages.append(f"Missing or invalid SHA-256 for artifact: {relative}.")
             continue
-        actual_hash = hashlib.sha256(artifact.read_bytes()).hexdigest()
+        digest = hashlib.sha256()
+        with artifact.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(chunk)
+        actual_hash = digest.hexdigest()
         if actual_hash.casefold() != expected_hash.casefold():
             valid = False
             messages.append(f"SHA-256 mismatch for artifact: {relative}.")
@@ -942,7 +1158,8 @@ def _apply_forge_metric_gate(
     pattern = re.compile(
         r"coverage=(\d+)/(\d+); duplicates=(\d+); unknown_rows=(\d+); "
         r"baseline_RMSE=([0-9.eE+-]+); dependency_RMSE=([0-9.eE+-]+); "
-        r"baseline_MAE=([0-9.eE+-]+); dependency_MAE=([0-9.eE+-]+)"
+        r"baseline_MAE=([0-9.eE+-]+); dependency_MAE=([0-9.eE+-]+); "
+        r"frozen_RMSE=([0-9.eE+-]+); frozen_MAE=([0-9.eE+-]+)"
     )
     match = pattern.search(evaluator_summary)
     reasons: list[str] = []
@@ -954,6 +1171,7 @@ def _apply_forge_metric_gate(
             float,
             match.group(5, 6, 7, 8),
         )
+        frozen_rmse, frozen_mae = map(float, match.group(9, 10))
         if total == 0 or covered / total < 0.95:
             reasons.append("FORGE held-out prediction coverage was below 95%.")
         if duplicates:
@@ -966,6 +1184,10 @@ def _apply_forge_metric_gate(
         ):
             reasons.append(
                 "Dependency-informed predictions did not improve RMSE without degrading MAE."
+            )
+        if baseline_rmse > frozen_rmse or baseline_mae > frozen_mae * 1.05:
+            reasons.append(
+                "Submitted expression baseline underperformed the frozen training-only baseline."
             )
         direction = re.search(
             r"EGFR_erlotinib_n=(\d+); benefit_dependency_r=([0-9.eE+naN-]+); "
@@ -1040,7 +1262,9 @@ def _apply_f1_model_gate(
         r"four_minus_three_BIC=([0-9.eE+inf-]+); invalid_rows=(\d+)",
         evaluator_summary or "",
     )
-    reasons: list[str] = []
+    reasons: list[str] = [
+        "F1 model predictions are not independently recomputed from the supplied observations."
+    ]
     if match is None:
         reasons.append("F1 deterministic model-selection evidence was unavailable.")
     else:
@@ -1070,26 +1294,41 @@ def _apply_butterfly_metric_gate(
     evaluator_summary: str | None,
 ) -> JudgeResult:
     match = re.search(
-        r"matched=(\d+)/(\d+); valid_intervals=(\d+)/(\d+); "
+        r"matched=(\d+)/(\d+); ci_matched=(\d+)/(\d+); "
+        r"valid_intervals=(\d+)/(\d+); "
         r"median_species_max_ratio=([0-9.eE+-]+); "
         r"maximum_lifespan_days=([0-9.eE+-]+); "
-        r"hecale_PD_median=([0-9.eE+-]+); dryas_PD_median=([0-9.eE+-]+)",
+        r"hecale_PD_median=([0-9.eE+-]+); dryas_PD_median=([0-9.eE+-]+); "
+        r"hecale_PD_hazard_slope=([0-9.eE+-]+); "
+        r"dryas_PD_hazard_slope=([0-9.eE+-]+); "
+        r"grip_age_slope_contrast=([0-9.eE+-]+)\.",
         evaluator_summary or "",
     )
     reasons: list[str] = []
     if match is None:
         reasons.append("Butterfly deterministic survival metrics were unavailable.")
     else:
-        matched, total, intervals, interval_total = map(
-            int, match.group(1, 2, 3, 4)
+        matched, total, ci_matched, ci_total, intervals, interval_total = map(
+            int, match.group(1, 2, 3, 4, 5, 6)
         )
-        ratio, maximum, hecale_pd, dryas_pd = map(float, match.group(5, 6, 7, 8))
-        if matched != total or intervals != interval_total:
+        ratio, maximum, hecale_pd, dryas_pd, hecale_hazard, dryas_hazard, grip = map(
+            float, match.group(7, 8, 9, 10, 11, 12, 13)
+        )
+        if (
+            matched != total
+            or ci_matched != ci_total
+            or intervals != interval_total
+            or total != 9
+        ):
             reasons.append("Submitted butterfly estimates or intervals failed verification.")
         if not 2.5 <= ratio <= 4.0 or maximum < 330:
             reasons.append("Species lifespan effects failed the prespecified numeric bounds.")
         if hecale_pd <= dryas_pd:
             reasons.append("Pollen-deprived Heliconius did not outlive the comparison species.")
+        if hecale_hazard >= dryas_hazard:
+            reasons.append("Butterfly actuarial-ageing direction failed verification.")
+        if grip <= 0:
+            reasons.append("Butterfly grip-ageing direction failed verification.")
     if reasons:
         result.execution_score = 0.0
         result.score = min(result.score, 0.49)
@@ -1108,6 +1347,7 @@ def judge_with_llm(
     log_dir: Path | None = None,
     analysis_manifest: Path | None = None,
     artifact_root: Path | None = None,
+    allow_conditional: bool = False,
 ) -> JudgeResult:
     ensure_bedrock_bearer_token()
     if not os.environ.get("AWS_BEARER_TOKEN_BEDROCK") and not os.environ.get("AWS_PROFILE"):
@@ -1117,6 +1357,12 @@ def judge_with_llm(
         )
 
     spec = load_problem_spec(problem_id)
+    if spec.benchmark_status == "acquisition_only":
+        raise ValueError(f"{problem_id} is acquisition-only and cannot be judged.")
+    if spec.benchmark_status == "conditional" and not allow_conditional:
+        raise ValueError(
+            f"{problem_id} is conditional; explicit judge approval is required."
+        )
     manifest_verified, manifest_messages = _verify_analysis_manifest(
         analysis_manifest,
         artifact_root,
@@ -1127,38 +1373,50 @@ def judge_with_llm(
         artifact_root,
         manifest_verified,
     )
+    forge_summary = _forge_hidden_holdout_summary(
+        problem_id=problem_id,
+        manifest_path=analysis_manifest,
+        artifact_root=artifact_root,
+        manifest_verified=manifest_verified,
+    )
+    idr_summary = _idr_hidden_holdout_summary(
+        problem_id=problem_id,
+        manifest_path=analysis_manifest,
+        artifact_root=artifact_root,
+        manifest_verified=manifest_verified,
+    )
+    f1_summary = _f1_model_selection_summary(
+        problem_id=problem_id,
+        manifest_path=analysis_manifest,
+        artifact_root=artifact_root,
+        manifest_verified=manifest_verified,
+    )
+    butterfly_summary = _butterfly_survival_summary(
+        problem_id=problem_id,
+        manifest_path=analysis_manifest,
+        artifact_root=artifact_root,
+        manifest_verified=manifest_verified,
+    )
     evaluator_summaries = [
         summary
         for summary in (
             registered_evaluator.summary if registered_evaluator else None,
-            _forge_hidden_holdout_summary(
-                problem_id=problem_id,
-                manifest_path=analysis_manifest,
-                artifact_root=artifact_root,
-                manifest_verified=manifest_verified,
-            ),
-            _idr_hidden_holdout_summary(
-                problem_id=problem_id,
-                manifest_path=analysis_manifest,
-                artifact_root=artifact_root,
-                manifest_verified=manifest_verified,
-            ),
-            _f1_model_selection_summary(
-                problem_id=problem_id,
-                manifest_path=analysis_manifest,
-                artifact_root=artifact_root,
-                manifest_verified=manifest_verified,
-            ),
-            _butterfly_survival_summary(
-                problem_id=problem_id,
-                manifest_path=analysis_manifest,
-                artifact_root=artifact_root,
-                manifest_verified=manifest_verified,
-            ),
+            forge_summary,
+            idr_summary,
+            f1_summary,
+            butterfly_summary,
         )
         if summary
     ]
-    evaluator_summary = evaluator_summaries[0] if evaluator_summaries else None
+    evaluator_summary = {
+        FORGE_PROBLEM_ID: forge_summary,
+        IDR_PROBLEM_ID: idr_summary,
+        F1_PROBLEM_ID: f1_summary,
+        BUTTERFLY_PROBLEM_ID: butterfly_summary,
+    }.get(
+        problem_id,
+        registered_evaluator.summary if registered_evaluator else None,
+    )
     judge_transcript = transcript
     if evaluator_summaries:
         judge_transcript = "\n".join(
@@ -1242,6 +1500,23 @@ def judge_with_llm(
         result = _apply_f1_model_gate(result, evaluator_summary)
     elif problem_id == BUTTERFLY_PROBLEM_ID:
         result = _apply_butterfly_metric_gate(result, evaluator_summary)
+    special_evaluators = {
+        FORGE_PROBLEM_ID,
+        IDR_PROBLEM_ID,
+        F1_PROBLEM_ID,
+        BUTTERFLY_PROBLEM_ID,
+    }
+    if (
+        spec.benchmark_status in {"active", "conditional"}
+        and registered_evaluator is None
+        and problem_id not in special_evaluators
+    ):
+        result.execution_score = 0.0
+        result.score = min(result.score, 0.49)
+        result.verdict = "fail"
+        result.evidence_validation.append(
+            "Runnable problem has no deterministic scientific evaluator."
+        )
     return apply_evaluator_gate(result, registered_evaluator)
 
 
@@ -1256,6 +1531,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default=os.getenv("JUDGE_API_BASE", DEFAULT_BEDROCK_API_BASE),
     )
     parser.add_argument("--run-id", default=os.getenv("BIOEVAL_RUN_ID"))
+    parser.add_argument("--allow-conditional", action="store_true")
     parser.add_argument("--output-file", type=Path)
     parser.add_argument("--score-log", type=Path)
     parser.add_argument(
@@ -1296,6 +1572,7 @@ def main() -> None:
         log_dir=log_dir,
         analysis_manifest=analysis_manifest,
         artifact_root=artifact_root,
+        allow_conditional=args.allow_conditional,
     )
     result_dict = result.model_dump()
     record = {

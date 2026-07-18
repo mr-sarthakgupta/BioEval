@@ -9,7 +9,9 @@ contains paper/repo identifiers is withheld.
 
 from __future__ import annotations
 
+import bz2
 import gzip
+import lzma
 import re
 import tarfile
 import xml.etree.ElementTree as ET
@@ -38,6 +40,10 @@ RESULT_EXTENSIONS = {".graphml"}
 INSPECTABLE_ARCHIVE_SUFFIXES = (".zip", ".tar", ".tar.gz", ".tgz", ".tar.bz2")
 # Archives we cannot inspect with the stdlib -> always reject.
 OPAQUE_ARCHIVE_SUFFIXES = (".rar", ".7z")
+ALLOWED_DATA_EXTENSIONS = {
+    ".csv", ".tsv", ".txt", ".mtx", ".pdb", ".rds", ".tree", ".newick",
+    ".npy", ".npz", ".parquet", ".xlsx", ".gz", ".bz2", ".xz",
+}
 
 REPO_HINT_NAMES = {
     "setup.py", "pyproject.toml", "requirements.txt", "environment.yml",
@@ -104,6 +110,12 @@ def _archive_is_clean(path: Path) -> str | None:
             return f"archive contains restricted file '{raw}'"
         if base in REPO_HINT_NAMES or ".git/" in raw.lower():
             return f"archive looks like a code repository ('{raw}')"
+        if _has_suffix(base, INSPECTABLE_ARCHIVE_SUFFIXES + OPAQUE_ARCHIVE_SUFFIXES) or suffix in {
+            ".gz",
+            ".bz2",
+            ".xz",
+        }:
+            return f"archive contains nested compressed content '{raw}'"
     return None
 
 
@@ -185,6 +197,34 @@ def _gzip_content_leak(path: Path, markers: list[bytes]) -> str | None:
         return "gzip could not be fully scanned for identifiers"
 
 
+def _compressed_content_leak(
+    path: Path,
+    markers: list[bytes],
+    opener,
+    label: str,
+) -> str | None:
+    if not markers:
+        return None
+    expanded = 0
+    try:
+        with opener(path, "rb") as stream:
+            overlap = max((len(marker) for marker in markers), default=1) - 1
+            carry = b""
+            while True:
+                chunk = stream.read(_SCAN_CHUNK_BYTES)
+                if not chunk:
+                    return None
+                expanded += len(chunk)
+                if expanded > _MAX_EXPANDED_SCAN_BYTES:
+                    return f"{label} expands beyond the safe inspection limit"
+                blob = (carry + chunk).lower()
+                if any(marker and marker in blob for marker in markers):
+                    return f"{label} content matches a hidden paper/repo identifier"
+                carry = blob[-overlap:] if overlap else b""
+    except Exception:
+        return f"{label} could not be fully scanned for identifiers"
+
+
 def _xlsx_sheet_names(path: Path) -> list[str]:
     try:
         with zipfile.ZipFile(path) as zf:
@@ -252,6 +292,8 @@ def scan_file(path: Path, identifiers: list[str]) -> str | None:
     name = path.name.lower()
     suffix = path.suffix.lower()
 
+    if name.startswith("."):
+        return "hidden files are not grantable"
     if name in BLOCKED_BASENAMES:
         return "metadata/readme files are not grantable"
     if RESULT_NAME_RE.search(name):
@@ -268,6 +310,12 @@ def scan_file(path: Path, identifiers: list[str]) -> str | None:
         return "precomputed result/network files are not grantable"
     if _has_suffix(name, OPAQUE_ARCHIVE_SUFFIXES):
         return "archive format cannot be inspected; withheld"
+    if not suffix:
+        return "extensionless files are not grantable"
+    if suffix not in ALLOWED_DATA_EXTENSIONS and not _has_suffix(
+        name, INSPECTABLE_ARCHIVE_SUFFIXES
+    ):
+        return "unrecognized file format is not grantable"
     if _has_suffix(name, INSPECTABLE_ARCHIVE_SUFFIXES):
         reason = _archive_is_clean(path)
         if reason:
@@ -280,6 +328,14 @@ def scan_file(path: Path, identifiers: list[str]) -> str | None:
             return reason
     elif name.endswith(".gz"):
         reason = _gzip_content_leak(path, markers)
+        if reason:
+            return reason
+    elif name.endswith(".bz2"):
+        reason = _compressed_content_leak(path, markers, bz2.open, "bzip2")
+        if reason:
+            return reason
+    elif name.endswith(".xz"):
+        reason = _compressed_content_leak(path, markers, lzma.open, "xz")
         if reason:
             return reason
     # Filename check.

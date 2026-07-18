@@ -174,6 +174,7 @@ class ExperimentContractTests(unittest.TestCase):
                     problems_root=root / "problems",
                     staging_root=root / "staging",
                     default_problem_id="test",
+                    enforce_problem_status=False,
                 )
             )
             endpoint = next(
@@ -206,6 +207,7 @@ class ExperimentContractTests(unittest.TestCase):
                     problems_root=root / "problems",
                     staging_root=root / "staging",
                     default_problem_id="test",
+                    enforce_problem_status=False,
                 )
             )
             endpoint = next(
@@ -247,6 +249,7 @@ class ExperimentContractTests(unittest.TestCase):
                     problems_root=root / "problems",
                     staging_root=root / "staging",
                     default_problem_id="test",
+                    enforce_problem_status=False,
                 )
             )
             endpoint = next(

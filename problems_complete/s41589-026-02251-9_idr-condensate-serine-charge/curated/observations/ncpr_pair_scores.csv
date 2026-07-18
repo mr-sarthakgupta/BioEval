@@ -150,7 +150,6 @@ Others (n=18),TAF15(IDR2),TIA1,0.288686
 Others (n=18),TAF15(IDR2),hnRNPA1,0.717031
 Others (n=18),TAF15(IDR2),hnRNPA2,0.57638
 Others (n=18),TAF15(IDR2),hnRNPA3,0.588761
-Others (n=18),TAF15(IDR2),hnRNPDL,0.208735
 Others (n=18),TAF15(IDR2),hnRNPH1,0.315946
 Others (n=18),TDP43,TIA1,0.810869
 Others (n=18),TDP43,hnRNPA1,0.771342
@@ -161,7 +160,6 @@ Others (n=18),TDP43,hnRNPH1,0.715769
 Others (n=18),TIA1,hnRNPA1,0.737144
 Others (n=18),TIA1,hnRNPA2,0.21542
 Others (n=18),TIA1,hnRNPA3,0.202585
-Others (n=18),TIA1,hnRNPDL,0.116623
 Others (n=18),TIA1,hnRNPH1,0.280934
 Others (n=18),hnRNPA1,hnRNPA2,0.809791
 Others (n=18),hnRNPA1,hnRNPA3,0.846531
@@ -174,9 +172,7 @@ Others (n=18),hnRNPA3,hnRNPDL,0.332775
 Others (n=18),hnRNPA3,hnRNPH1,0.271987
 Others (n=18),hnRNPDL,hnRNPH1,0.0287
 NCPR+ vs NCPR- (between-group pairs),BRD9,FUS,-0.004906
-NCPR+ vs NCPR- (between-group pairs),BRD9,PRCC,0.230161
 NCPR+ vs NCPR- (between-group pairs),BRD9,TAF15(IDR1),-0.073442
-NCPR+ vs NCPR- (between-group pairs),BRD9,hnRNPK,-0.248028
 NCPR+ vs NCPR- (between-group pairs),FMRP,FUS,0.093774
 NCPR+ vs NCPR- (between-group pairs),FMRP,PRCC,0.010845
 NCPR+ vs NCPR- (between-group pairs),FMRP,TAF15(IDR1),0.092563

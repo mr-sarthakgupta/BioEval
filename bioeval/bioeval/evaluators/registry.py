@@ -51,6 +51,25 @@ def _load_rules(problem_id: str) -> dict:
         return {"_load_error": f"{type(exc).__name__}: {exc}"}
     if not isinstance(value, dict):
         return {"_load_error": "artifact rules root is not an object"}
+    if set(value) != {"artifacts"} or not isinstance(value.get("artifacts"), dict):
+        return {"_load_error": "artifact rules must contain exactly one artifacts object"}
+    allowed_rule_keys = {
+        "numeric_bounds",
+        "minimum_unique",
+        "allowed_values",
+        "required_values",
+        "ordered_columns",
+    }
+    for artifact, rules in value["artifacts"].items():
+        if not isinstance(artifact, str) or not isinstance(rules, dict):
+            return {"_load_error": "artifact rule entries must be named objects"}
+        unknown = set(rules) - allowed_rule_keys
+        if unknown:
+            return {
+                "_load_error": (
+                    f"unsupported rules for {artifact}: {', '.join(sorted(unknown))}"
+                )
+            }
     return value
 
 
@@ -99,12 +118,14 @@ def _contract_evaluator(problem_id: str) -> Evaluator:
             try:
                 with path.open(newline="", encoding="utf-8") as handle:
                     reader = csv.DictReader(handle)
-                    fields = set(reader.fieldnames or [])
+                    fieldnames = reader.fieldnames or []
+                    fields = set(fieldnames)
                     rows = list(reader)
             except (OSError, csv.Error, UnicodeError):
                 failures.append(f"Could not parse required CSV artifact: {contract.path}.")
                 continue
             missing = set(contract.columns) - fields
+            extra = fields - set(contract.columns)
             forbidden = set(contract.forbidden_columns) & fields
             if missing:
                 failures.append(
@@ -113,6 +134,31 @@ def _contract_evaluator(problem_id: str) -> Evaluator:
             if forbidden:
                 failures.append(
                     f"{contract.path} contains forbidden columns: {', '.join(sorted(forbidden))}."
+                )
+            if extra:
+                failures.append(
+                    f"{contract.path} contains undeclared columns: "
+                    f"{', '.join(sorted(extra))}."
+                )
+            if len(fieldnames) != len(fields):
+                failures.append(f"{contract.path} contains duplicate column names.")
+            overflow = sum(None in row for row in rows)
+            if overflow:
+                failures.append(
+                    f"{contract.path} has {overflow} row(s) with extra CSV fields."
+                )
+            serialized_rows = [
+                json.dumps(
+                    {str(key): value for key, value in row.items()},
+                    sort_keys=True,
+                    separators=(",", ":"),
+                )
+                for row in rows
+            ]
+            duplicate_rows = len(serialized_rows) - len(set(serialized_rows))
+            if duplicate_rows:
+                failures.append(
+                    f"{contract.path} has {duplicate_rows} duplicate row(s)."
                 )
             if len(rows) < contract.min_rows:
                 failures.append(

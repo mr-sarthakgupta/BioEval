@@ -1,0 +1,13 @@
+{
+  "artifacts": {
+    "idr_predictions.csv": {
+      "minimum_unique": {
+        "assay": 3,
+        "pair": 8
+      },
+      "numeric_bounds": {
+        "predicted_pearson_r": [-1.0, 1.0]
+      }
+    }
+  }
+}

@@ -28,7 +28,13 @@ def load_catalog(problem_root: Path) -> DataCatalog:
             f"No data catalog found at {path}. Every problem needs a data_catalog.yaml."
         )
     raw = yaml.safe_load(path.read_text()) or {}
-    return DataCatalog.model_validate(raw)
+    catalog = DataCatalog.model_validate(raw)
+    if catalog.problem_id != problem_root.name:
+        raise ValueError(
+            f"Catalog problem_id {catalog.problem_id!r} does not match "
+            f"directory {problem_root.name!r}."
+        )
+    return catalog
 
 
 def resolve_entry_files(problem_root: Path, entry: CatalogEntry) -> list[Path]:

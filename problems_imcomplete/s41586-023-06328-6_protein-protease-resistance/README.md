@@ -26,7 +26,9 @@ s41586-023-06328-6_protein-protease-resistance/
 
 ## Dataset notes
 
-- The runnable scope is count-based protease resistance, not absolute thermodynamic stability.
+- The intended scope is count-based protease resistance, not absolute thermodynamic
+  stability. It remains conditional until held-out scientific metrics are
+  deterministically recomputed.
 - Only raw NGS count tables and the optional raw qPCR control are downloaded.
 - Selective setup pins Zenodo record `7992926`, downloads
   `Raw_NGS_count_tables.zip` and `Pipeline_qPCR_data.zip`, and extracts only four

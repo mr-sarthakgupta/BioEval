@@ -4,35 +4,40 @@ entries:
   - id: community_observations_2017
     description: Plot- and subplot-level grassland community outcomes from the earlier observation year under crossed nutrient, herbivore-access, and light treatments.
     kind: raw
-    grantable: true
+    grantable: false
+    reason: The authenticated Dryad file is not vendored locally.
     modalities: [txt, community, diversity, factorial]
     source_paths: [dryad/204170/communitydata_2017_nature.txt]
 
   - id: community_observations_2019
     description: Plot- and subplot-level grassland community outcomes from the later observation year under crossed nutrient, herbivore-access, and light treatments.
     kind: raw
-    grantable: true
+    grantable: false
+    reason: The authenticated Dryad file is not vendored locally.
     modalities: [txt, community, diversity, factorial]
     source_paths: [dryad/204170/communitydata_2019_nature.txt]
 
   - id: understory_light_measurements
     description: Understory photosynthetically active radiation measurements for treatment plots.
     kind: raw
-    grantable: true
+    grantable: false
+    reason: The authenticated Dryad file is not vendored locally.
     modalities: [txt, light, environment]
     source_paths: [dryad/204170/light_data.txt]
 
   - id: temperature_humidity_means
     description: Plot-level mean temperature and humidity observations associated with the light manipulation.
     kind: processed
-    grantable: true
+    grantable: false
+    reason: The authenticated Dryad file is not vendored locally.
     modalities: [txt, temperature, humidity]
     source_paths: [dryad/204170/humidity_temp_data_means_2019.txt]
 
   - id: pinned_dryad_snapshot
     description: Public repository version containing the experimental community and physical measurements.
     kind: online
-    grantable: true
+    grantable: false
+    reason: Authentication is required and an online pointer is not a runnable frozen input.
     modalities: [txt, community, environment]
     approx_bytes: 18425
     online:

@@ -1,0 +1,19 @@
+{
+  "artifacts": {
+    "butterfly_metrics.csv": {
+      "required_values": {
+        "metric": [
+          "median_species_max_ratio",
+          "maximum_verified_lifespan_days",
+          "hecale_pf_km_median_days",
+          "hecale_pd_km_median_days",
+          "dryas_pf_km_median_days",
+          "dryas_pd_km_median_days",
+          "hecale_pd_log_hazard_slope",
+          "dryas_pd_log_hazard_slope",
+          "grip_age_slope_contrast"
+        ]
+      }
+    }
+  }
+}

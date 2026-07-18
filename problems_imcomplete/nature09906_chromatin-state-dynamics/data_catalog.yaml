@@ -4,7 +4,8 @@ entries:
   - id: core_chromatin_bed_tracks
     description: Replicate-level BED tracks for core chromatin marks and whole-cell-extract controls across nine cell types in hg18 coordinates.
     kind: raw
-    grantable: true
+    grantable: false
+    reason: The full 44.37 GB bundle is not staged or resource-validated.
     modalities: [bed-gz, chip-seq, chromatin, hg18]
     approx_bytes: 44368287353
     source_paths: [core-bed/*.bed.gz]
@@ -12,14 +13,16 @@ entries:
   - id: pilot_two_cell_small_chromosomes
     description: Resource pilot containing chr21 and chr22 intervals from allowlisted H1 and K562 core chromatin tracks.
     kind: raw
-    grantable: true
+    grantable: false
+    reason: The declared two-cell pilot files are not staged.
     modalities: [bed-gz, chip-seq, pilot, hg18]
     source_paths: [pilot-h1-k562-chr21-chr22/*.bed.gz]
 
   - id: expression_validation_arrays
     description: Nineteen raw CEL expression-array files for independent state-expression validation.
     kind: raw
-    grantable: true
+    grantable: false
+    reason: The expression-array files are not staged or normalization-validated.
     modalities: [cel-gz, expression-array]
     approx_bytes: 49106218
     source_paths: [expression-cel/*.CEL.gz]
@@ -27,7 +30,8 @@ entries:
   - id: expression_sample_platform_map
     description: Frozen CEL-to-cell-type, replicate, and Affymetrix platform mapping.
     kind: processed
-    grantable: true
+    grantable: false
+    reason: Host-side mapping is retained for future acquisition but has no runnable input bundle.
     source_base: problem
     modalities: [csv, expression-array, sample-map]
     source_paths: [curated/expression_sample_map.csv]
@@ -35,7 +39,8 @@ entries:
   - id: hg18_reference_and_gene_annotation
     description: Frozen hg18 two-bit reference and UCSC refGene annotation required for coordinate and expression analyses.
     kind: raw
-    grantable: true
+    grantable: false
+    reason: The reference and annotation files are not staged with verified pre-footprint provenance.
     modalities: [2bit, gene-annotation, hg18]
     source_paths:
       - reference/hg18.2bit

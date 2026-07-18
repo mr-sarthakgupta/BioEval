@@ -1,0 +1,42 @@
+{
+  "artifacts": {
+    "observation_summary.csv": {
+    "ordered_columns": [
+      [
+        "q10",
+        "median",
+        "q90"
+      ]
+    ],
+    "allowed_values": {
+      "dataset": [
+        "concentration",
+        "measured_diffusive_flux"
+      ]
+    },
+    "required_values": {
+      "dataset": [
+        "concentration",
+        "measured_diffusive_flux"
+      ]
+    },
+    "numeric_bounds": {
+      "positive_rows": {
+        "min": 1
+      },
+      "source_count": {
+        "min": 1
+      },
+      "q10": {
+        "min": 0
+      },
+      "median": {
+        "min": 0
+      },
+      "q90": {
+        "min": 0
+      }
+    }
+    }
+  }
+}

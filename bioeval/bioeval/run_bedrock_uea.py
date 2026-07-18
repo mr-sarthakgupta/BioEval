@@ -132,6 +132,7 @@ def run_problem(problem_id: str, args: argparse.Namespace, root: Path, env_file:
         {
             "BIOEVAL_PROBLEM_ID": problem_id,
             "BIOEVAL_PROBLEMS_DIR": problems_dir,
+            "BIOEVAL_ALLOW_CONDITIONAL": "1" if args.include_conditional else "0",
             "UEA_BEDROCK_MODEL": args.model,
             "UEA_BEDROCK_API_BASE": args.api_base,
             "UEA_MODEL": args.model,
@@ -210,6 +211,8 @@ def run_problem(problem_id: str, args: argparse.Namespace, root: Path, env_file:
                 "--run-id",
                 run_id,
             ]
+            if args.include_conditional:
+                judge_cmd.append("--allow-conditional")
             manifest = run_root / "results" / "analysis_manifest.json"
             if manifest.is_file():
                 judge_cmd.extend(

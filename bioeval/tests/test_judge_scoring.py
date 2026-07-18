@@ -13,7 +13,10 @@ from bioeval.evaluators import evaluate_problem_artifacts
 from bioeval.evaluators.biology import _MrcMap
 from bioeval.evaluators.registry import _load_rules
 from bioeval.judge import (
+    BUTTERFLY_PROBLEM_ID,
     FORGE_PROBLEM_ID,
+    _apply_butterfly_metric_gate,
+    _butterfly_survival_summary,
     _deterministic_result,
     _forge_hidden_holdout_summary,
     _verify_analysis_manifest,
@@ -22,6 +25,71 @@ from bioeval.problems import load_problem_spec
 
 
 class JudgeScoringTests(unittest.TestCase):
+    def test_butterfly_metrics_recompute_ageing_and_intervals(self) -> None:
+        rows = [
+            ("median_species_max_ratio", 3.3047619047619046, 1.814207650273224, 6.103448275862069),
+            ("maximum_verified_lifespan_days", 348, 348, 348),
+            ("hecale_pf_km_median_days", 63, 52, 78),
+            ("hecale_pd_km_median_days", 47, 38, 59),
+            ("dryas_pf_km_median_days", 27, 22, 29),
+            ("dryas_pd_km_median_days", 29, 23, 32),
+            ("hecale_pd_log_hazard_slope", 0.056839152540220185, 0.056839152540220185, 0.056839152540220185),
+            ("dryas_pd_log_hazard_slope", 0.11968719389194762, 0.11968719389194762, 0.11968719389194762),
+            ("grip_age_slope_contrast", 0.0615, -0.081, 0.177),
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            metrics = root / "butterfly_metrics.csv"
+            with metrics.open("w", newline="") as handle:
+                writer = csv.writer(handle)
+                writer.writerow(["metric", "estimate", "ci_lower", "ci_upper"])
+                writer.writerows(rows)
+            manifest = root / "analysis_manifest.json"
+            manifest.write_text(
+                json.dumps({"artifacts": [{"path": metrics.name}]}),
+                encoding="utf-8",
+            )
+            summary = _butterfly_survival_summary(
+                problem_id=BUTTERFLY_PROBLEM_ID,
+                manifest_path=manifest,
+                artifact_root=root,
+                manifest_verified=True,
+            )
+            self.assertIn("matched=9/9; ci_matched=9/9", summary or "")
+            result = _deterministic_result(
+                draft={
+                    "conclusion_scores": [],
+                    "caveat_scores": [],
+                    "overall_feedback": "",
+                    "leakage_suspected": False,
+                    "leakage_rationale": "",
+                },
+                expected_conclusions=[],
+                expected_caveats=[],
+                final_answer="",
+                transcript=None,
+                artifact_root=root,
+                manifest_verified=True,
+                manifest_messages=[],
+            )
+            result.verdict = "pass"
+            result.score = 1.0
+            result.execution_score = 1.0
+            gated = _apply_butterfly_metric_gate(result, summary)
+            self.assertNotEqual(gated.verdict, "fail")
+            rows[0] = (rows[0][0], rows[0][1], 0, 0)
+            with metrics.open("w", newline="") as handle:
+                writer = csv.writer(handle)
+                writer.writerow(["metric", "estimate", "ci_lower", "ci_upper"])
+                writer.writerows(rows)
+            bad_summary = _butterfly_survival_summary(
+                problem_id=BUTTERFLY_PROBLEM_ID,
+                manifest_path=manifest,
+                artifact_root=root,
+                manifest_verified=True,
+            )
+            self.assertIn("ci_matched=8/9", bad_summary or "")
+
     def test_malformed_artifact_rules_fail_closed(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -35,10 +103,11 @@ class JudgeScoringTests(unittest.TestCase):
                 rules = _load_rules("test-problem")
             self.assertIn("_load_error", rules)
 
-    def test_new_conditional_contracts_reject_malformed_artifacts(self) -> None:
+    def test_new_biology_contracts_reject_malformed_artifacts(self) -> None:
         problem_ids = (
             "s41586-019-0933-9_mouse-gastrulation",
             "s41586-025-08855-w_rna-hydration",
+            "s41586-023-06344-6_global-river-methane",
         )
         for problem_id in problem_ids:
             with self.subTest(problem_id=problem_id), tempfile.TemporaryDirectory() as tmp:
@@ -65,6 +134,71 @@ class JudgeScoringTests(unittest.TestCase):
                 )
                 assert output is not None
                 self.assertTrue(output.failures)
+
+    def test_river_evaluator_recomputes_frozen_observation_summaries(self) -> None:
+        problem_id = "s41586-023-06344-6_global-river-methane"
+        rows = [
+            {
+                "dataset": "concentration",
+                "positive_rows": 23218,
+                "source_count": 246,
+                "q10": 0.016705726000000004,
+                "median": 0.2,
+                "q90": 1.8015192934999984,
+            },
+            {
+                "dataset": "measured_diffusive_flux",
+                "positive_rows": 1721,
+                "source_count": 68,
+                "q10": 0.075201331,
+                "median": 1.08,
+                "q90": 16.47377856,
+            },
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            summary = root / "observation_summary.csv"
+            with summary.open("w", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+                writer.writeheader()
+                writer.writerows(rows)
+            manifest = root / "analysis_manifest.json"
+            manifest.write_text(
+                json.dumps({"artifacts": [{"path": summary.name}]}),
+                encoding="utf-8",
+            )
+
+            output = evaluate_problem_artifacts(
+                problem_id, manifest, root, True
+            )
+            assert output is not None
+            self.assertEqual(output.failures, [])
+
+            rows[0]["median"] = 999
+            with summary.open("w", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+                writer.writeheader()
+                writer.writerows(rows)
+            output = evaluate_problem_artifacts(
+                problem_id, manifest, root, True
+            )
+            assert output is not None
+            self.assertTrue(
+                any("concentration.median" in item for item in output.failures)
+            )
+
+            rows[0]["median"] = 0.2
+            with summary.open("w", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+                writer.writeheader()
+                writer.writerows([*rows, rows[0]])
+            output = evaluate_problem_artifacts(
+                problem_id, manifest, root, True
+            )
+            assert output is not None
+            self.assertTrue(
+                any("exactly one row" in item for item in output.failures)
+            )
 
     def test_gastrulation_evaluator_scores_frozen_expression_holdout(self) -> None:
         problem_id = "s41586-019-0933-9_mouse-gastrulation"
@@ -234,6 +368,30 @@ class JudgeScoringTests(unittest.TestCase):
             self.assertIn("density_valid=24", output.summary)
             with calls.open(newline="") as handle:
                 rows = list(csv.DictReader(handle))
+            duplicate_rows = []
+            for map_id in ("map_a", "map_b"):
+                source_rows = [
+                    row
+                    for row in rows
+                    if row["map_blind_id"] == map_id
+                    and row["site_id"] == density_sites[0]["site_id"]
+                ]
+                for index in range(5):
+                    duplicate_rows.extend(
+                        [{**row, "site_id": f"duplicate_{index}"} for row in source_rows]
+                    )
+            with calls.open("w", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=fields)
+                writer.writeheader()
+                writer.writerows(duplicate_rows)
+            output = evaluate_problem_artifacts(
+                problem_id, manifest, root, True
+            )
+            assert output is not None
+            self.assertTrue(
+                any("same spatial peak" in item for item in output.failures)
+            )
+
             for row in rows:
                 row["x_angstrom"] = str(float(row["x_angstrom"]) + 20)
             with calls.open("w", newline="") as handle:
@@ -454,6 +612,20 @@ class JudgeScoringTests(unittest.TestCase):
             verified, messages = _verify_analysis_manifest(manifest, root)
             self.assertFalse(verified)
             self.assertTrue(any("Missing or invalid SHA-256" in item for item in messages))
+
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "artifacts": [
+                            {"path": "analysis.txt", "sha256": digest},
+                            {"path": "analysis.txt", "sha256": digest},
+                        ]
+                    }
+                )
+            )
+            verified, messages = _verify_analysis_manifest(manifest, root)
+            self.assertFalse(verified)
+            self.assertTrue(any("Duplicate artifact path" in item for item in messages))
 
 
 if __name__ == "__main__":

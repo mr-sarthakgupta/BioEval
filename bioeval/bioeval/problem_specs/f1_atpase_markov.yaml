@@ -1,4 +1,9 @@
 problem_id: s41467-026-73844-0_f1-atpase-markov-model
+benchmark_status: conditional
+readiness_reason: >-
+  The staged observations support exploratory model fitting, but the current
+  model-summary gate validates only submitted arithmetic and does not recompute
+  model predictions. Promotion requires an input-recomputing evaluator.
 title: F1-ATPase rotary catalysis mechanism
 doi: 10.1038/s41467-026-73844-0
 target_footprint_date: 2026-03-20

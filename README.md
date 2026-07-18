@@ -60,7 +60,7 @@ cp .env.example .env
 Pick a problem:
 
 ```bash
-export BIOEVAL_PROBLEM_ID=s41467-026-73635-7_butterfly-longevity-pollen-feeding
+export BIOEVAL_PROBLEM_ID=s41467-026-73977-2_forge-cancer-drug-response
 ```
 
 Create a recorded run directory:
@@ -257,20 +257,27 @@ Each run directory contains:
 
 ## Current Problems
 
-- `s41467-026-73844-0_f1-atpase-markov-model`
 - `s41467-026-73635-7_butterfly-longevity-pollen-feeding`
 - `s41467-026-73977-2_forge-cancer-drug-response`
 - `s41589-026-02251-9_idr-condensate-serine-charge`
-- `s41586-022-05383-9_light-competition-plant-diversity` (runnable; first
-  Dryad download requires `DRYAD_TOKEN`)
-- `s41586-023-06328-6_protein-protease-resistance` (runnable count-based scope)
 
-Conditional candidate specs are indexed separately in `problems_imcomplete/`:
+Conditional and acquisition-only records are indexed separately in
+`problems_imcomplete/`, including:
 
-- `s41586-023-06344-6_global-river-methane` (observation scope runnable; global
-  aggregation withheld)
-- `nature09906_chromatin-state-dynamics` (exact manifests and acquisition profiles;
-  full data and pilot gates pending)
+- `s41586-022-05383-9_light-competition-plant-diversity` (authenticated Dryad
+  observation files are not vendored)
+- `s41586-019-0933-9_mouse-gastrulation` (bounded sparse-count pilot pending
+  blinded review)
+- `s41467-026-73844-0_f1-atpase-markov-model` (model predictions are not yet
+  independently recomputed)
+- `s41586-023-06328-6_protein-protease-resistance` (count inputs are staged;
+  deterministic held-out scoring is pending)
+- `s41586-023-06344-6_global-river-methane` (deterministic observation-summary
+  pilot pending blinded review; global aggregation withheld)
+- `s41586-025-08855-w_rna-hydration` (bounded replicated map-density pilot pending
+  threshold calibration and resource review)
+- `nature09906_chromatin-state-dynamics` (exact manifests retained; full data,
+  references, arrays, and pilot are not staged)
 
 Problem specs live in `bioeval/problem_specs`. The UEA-visible prompt is
 `sandbox_prompt`; `expected_conclusions`, `expected_caveats`, `judge_rubric`, and

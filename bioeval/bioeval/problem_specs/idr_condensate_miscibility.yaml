@@ -1,4 +1,5 @@
 problem_id: s41589-026-02251-9_idr-condensate-serine-charge
+benchmark_status: active
 title: Sequence grammar for IDR condensate miscibility
 doi: 10.1038/s41589-026-02251-9
 target_footprint_date: 2026-04-20
@@ -15,6 +16,10 @@ sandbox_prompt: |
   held-out template. Submit `idr_predictions.csv` with columns assay, pair, group,
   replicate, and predicted_pearson_r. The evaluator recomputes hidden coverage,
   RMSE, and improvement over a training-mean baseline.
+required_artifacts:
+  - path: idr_predictions.csv
+    columns: [assay, pair, group, replicate, predicted_pearson_r]
+    min_rows: 268
 expected_conclusions:
   - Pairwise miscibility among IDR condensates can be related to amino-acid composition.
   - Serine and aromatic residues tend to promote miscibility.

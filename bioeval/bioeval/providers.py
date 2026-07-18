@@ -333,7 +333,13 @@ def fetch_zenodo(
         if not url:
             continue
         destination = _safe_destination(dest_dir, name)
-        n = _download(url, destination, max_bytes=max_bytes)
+        remaining = None if max_total_bytes is None else max_total_bytes - total
+        if remaining is not None and remaining <= 0:
+            break
+        effective_limit = (
+            remaining if max_bytes is None else min(max_bytes, remaining)
+        ) if remaining is not None else max_bytes
+        n = _download(url, destination, max_bytes=effective_limit)
         total += n
         out.append(FetchedFile(path=destination, bytes=n, url=url))
     return out
@@ -364,7 +370,13 @@ def fetch_figshare(
         if not url:
             continue
         destination = _safe_destination(dest_dir, name)
-        n = _download(url, destination, max_bytes=max_bytes)
+        remaining = None if max_total_bytes is None else max_total_bytes - total
+        if remaining is not None and remaining <= 0:
+            break
+        effective_limit = (
+            remaining if max_bytes is None else min(max_bytes, remaining)
+        ) if remaining is not None else max_bytes
+        n = _download(url, destination, max_bytes=effective_limit)
         total += n
         out.append(FetchedFile(path=destination, bytes=n, url=url))
     return out
@@ -399,7 +411,13 @@ def fetch_dryad(
             continue
         url = urllib.parse.urljoin("https://datadryad.org", relative_url)
         destination = _safe_destination(dest_dir, name)
-        n = _download(url, destination, max_bytes=max_bytes, headers=headers)
+        remaining = None if max_total_bytes is None else max_total_bytes - total
+        if remaining is not None and remaining <= 0:
+            break
+        effective_limit = (
+            remaining if max_bytes is None else min(max_bytes, remaining)
+        ) if remaining is not None else max_bytes
+        n = _download(url, destination, max_bytes=effective_limit, headers=headers)
         total += n
         out.append(FetchedFile(path=destination, bytes=n, url=url))
     return out

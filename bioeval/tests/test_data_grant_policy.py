@@ -27,12 +27,14 @@ class DataGrantPolicyTests(unittest.TestCase):
             safe = CatalogEntry(
                 id="safe",
                 description="safe curated data",
+                grantable=True,
                 source_base="problem",
                 source_paths=["curated/safe.csv"],
             )
             hidden = CatalogEntry(
                 id="hidden",
                 description="hidden evaluator labels",
+                grantable=True,
                 source_base="problem",
                 source_paths=["evaluator/labels.csv"],
             )
@@ -94,6 +96,7 @@ class DataGrantPolicyTests(unittest.TestCase):
                             "Individual Drosophila melanogaster survival records "
                             "under laboratory diet conditions."
                         ),
+                        grantable=True,
                         modalities=["survival", "csv"],
                         source_paths=["survival.csv"],
                     )

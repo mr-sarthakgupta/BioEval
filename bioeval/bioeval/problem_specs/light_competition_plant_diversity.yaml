@@ -1,44 +1,20 @@
 problem_id: s41586-022-05383-9_light-competition-plant-diversity
-benchmark_status: conditional
+benchmark_status: acquisition_only
 readiness_reason: >-
-  The authenticated Dryad snapshot is pinned but not vendored locally, and the
-  available aggregate tables do not support reconstruction of species-level diversity.
-title: Light competition and grassland plant diversity
+  The four allowlisted Dryad observation files require authentication and are not
+  vendored locally. Metadata alone cannot support a runnable treatment-effect task.
+title: Grassland light-competition input acquisition record
 doi: 10.1038/s41586-022-05383-9
 target_footprint_date: 2022-11-01
 external_source_cutoff: 2022-10-31T23:59:59Z
-sandbox_prompt: |
-  You are investigating how herbivore exclusion, fertilization, and experimental
-  light addition affect grassland plant diversity. Obtain the available plot- and
-  subplot-level observations through structured experiment-agent requests. Respect
-  the randomized block and paired-subplot design, including nesting and the
-  accidentally fertilized control plots.
-
-  Estimate prespecified treatment main effects and interactions separately for each
-  observed community year. Report effect direction, magnitude, uncertainty, and
-  sensitivity across at least two defensible analysis families. Test whether the
-  physical measurements verify that lamps increased understory light and whether
-  herbivore exclusion reduced it. Treat non-significant temperature or humidity
-  differences as inconclusive unless an equivalence margin was specified in advance.
-  Do not claim formal mediation from measurements collected in different years, and
-  do not generalize a single-site sheep-grazing experiment into a universal policy.
-expected_conclusions:
-  - In the 2019 observations, herbivore exclusion reduces plant richness and Shannon diversity.
-  - Experimental light addition mitigates the diversity loss associated with herbivore exclusion in 2019.
-  - Fertilization has a negative diversity effect that is not durably rescued by light across the observed years.
-  - Herbivore exclusion increases total vegetation and litter cover while reducing understory light; the lamp treatment increases understory light.
-  - The observations support light limitation as a partial mechanism, but they do not establish formal mediation or broad grazing-policy effects.
-judge_rubric:
-  - Are treatment and interaction contrasts recomputed at the correct experimental unit with block and paired-subplot structure preserved?
-  - Is pseudoreplication at the quadrat, subplot, year, or repeated-measure level treated as a major error?
-  - Are 2017 and 2019 analyzed as observation years rather than independent randomized replicates?
-  - Are effect directions, uncertainty intervals, and robustness to model choice reported?
-  - Are accidental fertilization, small environmental sample sizes, and non-contemporaneous light measurements handled explicitly?
-  - Does the answer avoid interpreting non-significance as equivalence or observational alignment as formal mediation?
+sandbox_prompt: This acquisition-only record is not executable.
+expected_conclusions: []
+judge_rubric: []
 expected_caveats:
   - Deposited community outcomes are already aggregated to quadrat level rather than raw species-cover observations.
   - The experiment was conducted at one site with ten blocks and one herbivore regime.
   - Light and community responses were not all measured contemporaneously.
+required_artifacts: []
 leak_markers:
   - "Light competition drives herbivore and nutrient effects on plant diversity"
   - Eskelinen

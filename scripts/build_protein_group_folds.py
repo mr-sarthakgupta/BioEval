@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PROBLEM = ROOT / "problems_complete" / "s41586-023-06328-6_protein-protease-resistance"
+PROBLEM = ROOT / "problems_imcomplete" / "s41586-023-06328-6_protein-protease-resistance"
 SOURCE = PROBLEM / "data" / "primary-observations" / "ngs-counts"
 OUTPUT = PROBLEM / "curated" / "protein_group_folds.csv"
 MUTATION_SUFFIX = re.compile(

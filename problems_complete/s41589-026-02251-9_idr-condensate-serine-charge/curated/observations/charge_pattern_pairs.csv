@@ -18,13 +18,10 @@ blocky vs dispersed,BRD4,hnRNPK,0.2390436666666667
 blocky vs dispersed,BRD9,DDX4,-0.01154355625
 blocky vs dispersed,BRD9,FMRP,0.10184633
 blocky vs dispersed,BRD9,HES4,-0.045057975
-blocky vs dispersed,BRD9,PRCC,0.2301607
-blocky vs dispersed,BRD9,SFPQ,-0.099748875
 blocky vs dispersed,BRD9,SMARCA2,-0.003890911764705882
 blocky vs dispersed,BRD9,TAF15IDR1,-0.07344248333333332
 blocky vs dispersed,BRD9,TAF15IDR2,-0.017300092
 blocky vs dispersed,BRD9,hnRNPDL,0.06262979285714285
-blocky vs dispersed,BRD9,hnRNPK,-0.2480278
 blocky vs dispersed,DDX4,MED1,0.07706925
 blocky vs dispersed,DDX4,MLLT1,-0.1133713755555556
 blocky vs dispersed,FMRP,MED1,0.04880660000000001
@@ -164,7 +161,6 @@ charge-low,TIA1,hnRNPA1,0.73714425
 charge-low,TIA1,hnRNPA2,0.2154204571428572
 charge-low,TIA1,hnRNPA3,0.2025852
 charge-low,TIA1,hnRNPAB,0.05892602857142858
-charge-low,TIA1,hnRNPD,0.09894204285714285
 charge-low,TIA1,hnRNPH1,0.2809345
 charge-low,hnRNPA1,hnRNPA2,0.8097911428571428
 charge-low,hnRNPA1,hnRNPA3,0.8465308

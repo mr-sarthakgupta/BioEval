@@ -1,4 +1,9 @@
 problem_id: s41586-023-06328-6_protein-protease-resistance
+benchmark_status: conditional
+readiness_reason: >-
+  The count tables and frozen construct-family folds are staged, but no
+  deterministic evaluator recomputes held-out resistance, cross-protease, or
+  epistasis evidence. Promotion requires a bounded scientific artifact gate.
 title: Sequence determinants of protein protease resistance
 doi: 10.1038/s41586-023-06328-6
 target_footprint_date: 2022-12-06

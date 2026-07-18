@@ -1,4 +1,5 @@
 problem_id: s41467-026-73977-2_forge-cancer-drug-response
+benchmark_status: active
 title: Gene dependency-informed targeted therapy response
 doi: 10.1038/s41467-026-73977-2
 target_footprint_date: 2026-02-05

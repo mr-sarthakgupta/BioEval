@@ -27,11 +27,12 @@ s41586-022-05383-9_light-competition-plant-diversity/
 ## Dataset notes
 
 - Pinned Dryad version `204170` contains 14 files totaling 1,276,692 bytes.
-- Only community, light, temperature, and humidity observations are grantable.
+- The four community and physical-observation files are the future input
+  allowlist, but none are grantable until vendored and checksum-verified.
 - Trait-response tables, the paper-specific README, and Zenodo `7269719` author
   scripts are blocked as answer-bearing artifacts.
-- The observations are analysis-ready quadrat summaries, not raw species-cover or
-  sensor streams. They support treatment contrasts but not formal mediation.
+- If acquired, the observations are analysis-ready quadrat summaries rather than
+  raw species-cover or sensor streams; any future scope must remain at that level.
 - Dryad currently requires an API bearer token for file downloads. Set
   `DRYAD_TOKEN` and rerun `scripts/setup_problems.py --problem-id
   s41586-022-05383-9_light-competition-plant-diversity --profile selective`.

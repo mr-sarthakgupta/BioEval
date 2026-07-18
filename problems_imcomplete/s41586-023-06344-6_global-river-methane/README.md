@@ -26,12 +26,14 @@ s41586-023-06344-6_global-river-methane/
 
 ## Dataset notes
 
-- Scoped to held-out concentration, temperature-response and measured diffusive flux.
+- Hardened conditional scope: deterministic positive-value and source-coverage summaries
+  for methane concentration and directly measured diffusive flux.
 - The mixed 9.807 GB target archive and all gridded output rasters remain manifest-only and blocked.
 - Four GRiMeDB v2 observation tables are pinned to EDI package
   `knb-lter-ntl.420.2` and downloaded locally (11.5 MB total).
 - `curated/source_manifest.json` records SHA-256 checksums and
   `curated/source_folds.csv` freezes five literature-source folds.
-- The scoped observation analysis is runnable. The folder remains incomplete because
-  the global 27.9 Tg per year conclusion is intentionally out of scope until the
-  independent aggregation gate in `PROMOTION_CHECKLIST.md` passes.
+- `observation_summary.csv` is scored by direct recomputation from the frozen tables;
+  promotion still requires blinded scientific review.
+- The global 27.9 Tg per year conclusion remains intentionally out of scope; the
+  optional scope-extension conditions are listed in `PROMOTION_CHECKLIST.md`.

@@ -35,5 +35,5 @@ nature09906_chromatin-state-dynamics/
   processes one H1/K562 compressed track at a time and retains chr21/chr22 only.
 - Coordinates are frozen to hg18. External annotation releases must predate
   2011-01-21.
-- This remains conditional until the resource-bounded pilot and full allowlist pass
-  `PROMOTION_CHECKLIST.md`.
+- This is acquisition-only until a resource-bounded pilot is physically staged
+  and the relevant gates in `PROMOTION_CHECKLIST.md` pass.

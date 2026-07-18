@@ -3,9 +3,9 @@ problem_id: s41589-026-02251-9_idr-condensate-serine-charge
 entries:
   - id: idr_miscibility_assay_tables
     description: >-
-      Neutral CSV exports of only the experimental miscibility, composition, and
-      perturbation observation sheets. Figure statistics, fitted thresholds, ROC
-      analyses, model summaries, and other answer-bearing sheets are excluded.
+      Holdout-pair-redacted CSV exports of experimental miscibility, composition,
+      and perturbation observations. Parallel fusion/blocky outcomes, figure
+      statistics, fitted thresholds, ROC analyses, and model summaries are excluded.
     kind: processed
     grantable: true
     source_base: problem

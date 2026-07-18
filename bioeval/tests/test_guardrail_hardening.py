@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import bz2
 import gzip
 import subprocess
 import sys
@@ -81,6 +82,31 @@ class GuardrailHardeningTests(unittest.TestCase):
             with gzip.open(path, "wb") as handle:
                 handle.write(b"\x00" * 512 + b"EMD-42498" + b"\x00" * 512)
             self.assertIsNotNone(scan_file(path, ["EMD-42498"]))
+
+    def test_hidden_and_extensionless_files_are_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            for name in (".env", "analysis"):
+                path = Path(tmp) / name
+                path.write_text("apparently harmless")
+                self.assertIsNotNone(scan_file(path, []), name)
+
+    def test_bzip2_and_nested_compression_are_rejected_or_scanned(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            compressed = root / "measurements.csv.bz2"
+            with bz2.open(compressed, "wb") as handle:
+                handle.write(b"held-out-paper-marker")
+            self.assertIsNotNone(
+                scan_file(compressed, ["held-out-paper-marker"])
+            )
+
+            nested = root / "measurements.zip"
+            payload = gzip.compress(b"held-out-paper-marker")
+            with zipfile.ZipFile(nested, "w") as archive:
+                archive.writestr("nested.csv.gz", payload)
+            self.assertIsNotNone(
+                scan_file(nested, ["held-out-paper-marker"])
+            )
 
     def test_common_statistics_worksheet_name_is_not_blocked(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

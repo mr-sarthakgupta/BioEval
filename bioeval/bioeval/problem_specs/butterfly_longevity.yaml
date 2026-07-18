@@ -1,4 +1,5 @@
 problem_id: s41467-026-73635-7_butterfly-longevity-pollen-feeding
+benchmark_status: active
 title: Heliconiini butterfly longevity and pollen feeding
 doi: 10.1038/s41467-026-73635-7
 target_footprint_date: 2026-06-17
@@ -14,8 +15,16 @@ sandbox_prompt: |
   Submit `butterfly_metrics.csv` with columns metric, estimate, ci_lower, and
   ci_upper. Include median_species_max_ratio, maximum_verified_lifespan_days,
   hecale_pf_km_median_days, hecale_pd_km_median_days, dryas_pf_km_median_days,
-  and dryas_pd_km_median_days. The evaluator recomputes each point estimate from
-  the neutral observation tables and verifies that every interval brackets it.
+  dryas_pd_km_median_days, hecale_pd_log_hazard_slope,
+  dryas_pd_log_hazard_slope, and grip_age_slope_contrast. Use 1,000 stratified
+  bootstrap resamples with seed 73635 and percentile endpoints for the species
+  ratio, KM medians, and grip contrast; hazard slopes and maximum lifespan are
+  exact derived quantities. The evaluator independently recomputes all estimates
+  and intervals from the neutral observation tables.
+required_artifacts:
+  - path: butterfly_metrics.csv
+    columns: [metric, estimate, ci_lower, ci_upper]
+    min_rows: 9
 expected_conclusions:
   - Pollen-feeding Heliconius species show substantially longer maximum and median lifespans than non-pollen-feeding Heliconiini outgroups.
   - The data support roughly a three-fold lifespan extension in Heliconius, with some maximum records approaching one year.

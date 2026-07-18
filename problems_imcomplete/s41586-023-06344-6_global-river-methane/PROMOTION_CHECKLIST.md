@@ -1,7 +1,10 @@
-# Promotion gate
+# Promotion and global-scope extension gate
 
-The observation-only scope is runnable, but this problem remains conditional.
-Promote a global-aggregation scope only when all conditions below are met:
+The deterministic observation-distribution task is conditional pending blinded
+review. A global-aggregation scope additionally requires all conditions below:
+
+- [ ] A blinded reviewer confirms that the bounded summary contract is
+      scientifically useful and cannot be passed through an unintended shortcut.
 
 - [ ] An input-only river-reach geometry/covariate bundle is reconstructed from
       sources that predate the target's earliest public footprint.

@@ -25,7 +25,7 @@ from typing import Iterable, Literal
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "bioeval"))
-from bioeval.providers import _safe_urlopen  # noqa: E402
+from bioeval.providers import _safe_destination, _safe_urlopen  # noqa: E402
 
 PROBLEMS_COMPLETE = ROOT / "problems_complete"
 PROBLEMS_INCOMPLETE = ROOT / "problems_imcomplete"
@@ -45,6 +45,7 @@ class ZenodoAsset:
 class DryadAsset:
     version_id: int
     subdir: str = "dryad"
+    include: tuple[str, ...] = ()
 
 
 @dataclass
@@ -84,6 +85,7 @@ PROBLEM_DEFS: list[Problem] = [
         doi="10.1038/s41467-026-73844-0",
         pdf_name="s41467-026-73844-0.pdf",
         repos=[("repo", "https://github.com/YixinChen95/MarkovianF1.git")],
+        destination="incomplete",
         zenodo=[ZenodoAsset("19133448")],
         notes=[
             "Experimental titration curves are also bundled in repo/BayesianTraining/input_data/.",
@@ -170,7 +172,18 @@ PROBLEM_DEFS: list[Problem] = [
         doi="10.1038/s41586-022-05383-9",
         pdf_name=None,
         repos=[],
-        dryad=[DryadAsset(204170)],
+        destination="incomplete",
+        dryad=[
+            DryadAsset(
+                204170,
+                include=(
+                    "communitydata_2017_nature.txt",
+                    "communitydata_2019_nature.txt",
+                    "light_data.txt",
+                    "humidity_temp_data_means_2019.txt",
+                ),
+            )
+        ],
         notes=[
             "Pinned Dryad version 204170; author scripts and paper-specific README are blocked.",
             "Analysis-ready quadrat observations support treatment contrasts but not formal mediation.",
@@ -182,6 +195,7 @@ PROBLEM_DEFS: list[Problem] = [
         doi="10.1038/s41586-023-06328-6",
         pdf_name=None,
         repos=[],
+        destination="incomplete",
         zenodo=[
             ZenodoAsset(
                 "7992926",
@@ -223,7 +237,7 @@ PROBLEM_DEFS: list[Problem] = [
             ),
         ],
         notes=[
-            "Scoped to held-out concentration, temperature-response and measured diffusive flux.",
+            "Conditional bounded scope recomputes concentration and directly measured diffusive-flux distributions.",
             "The mixed 9.807 GB target archive and all gridded output rasters remain manifest-only and blocked.",
         ],
     ),
@@ -479,11 +493,12 @@ def download_zenodo(
     for f in meta.get("files", []):
         url = f["links"]["self"]
         name = f["key"]
+        destination = _safe_destination(target, name)
         selected = profile == "full" or (profile == "selective" and (not asset.include or name in asset.include))
         if selected:
             size = download_file(
                 url,
-                target / name,
+                destination,
                 expected_bytes=f.get("size"),
                 checksum=f.get("checksum"),
             )
@@ -497,7 +512,7 @@ def download_zenodo(
                 "bytes": size,
                 "downloaded": selected,
                 "checksum": f.get("checksum"),
-                "sha256": _sha256_file(target / name) if selected else None,
+                "sha256": _sha256_file(destination) if selected else None,
             }
         )
     return out
@@ -518,11 +533,14 @@ def download_dryad(
     out: list[dict] = []
     for item in files:
         name = item["path"]
+        destination = _safe_destination(target, name)
         links = item.get("_links", {})
         download = links.get("stash:download", {}).get("href")
         if download:
             download = urllib.parse.urljoin("https://datadryad.org", download)
-        selected = profile in {"selective", "full"}
+        selected = profile == "full" or (
+            profile == "selective" and (not asset.include or name in asset.include)
+        )
         downloaded = False
         if selected and download:
             token = os.getenv("DRYAD_TOKEN")
@@ -530,7 +548,7 @@ def download_dryad(
             try:
                 size = download_file(
                     download,
-                    target / name,
+                    destination,
                     expected_bytes=item.get("size"),
                     sha256=item.get("digest") if item.get("digestType") == "sha-256" else None,
                     headers=headers,
@@ -551,7 +569,7 @@ def download_dryad(
                 "downloaded": downloaded,
                 "authentication_required": bool(selected and download and not downloaded),
                 "digest": item.get("digest"),
-                "sha256": _sha256_file(target / name) if downloaded else None,
+                "sha256": _sha256_file(destination) if downloaded else None,
             }
         )
     return out
@@ -566,10 +584,11 @@ def download_figshare(article_id: int, dest_dir: Path) -> list[dict]:
     for f in meta.get("files", []):
         url = f["download_url"]
         name = f["name"]
+        destination = _safe_destination(target, name)
         supplied_md5 = f.get("supplied_md5") or f.get("computed_md5")
         size = download_file(
             url,
-            target / name,
+            destination,
             expected_bytes=f.get("size"),
             checksum=f"md5:{supplied_md5}" if supplied_md5 else None,
         )
@@ -580,7 +599,7 @@ def download_figshare(article_id: int, dest_dir: Path) -> list[dict]:
                 "file": name,
                 "bytes": size,
                 "checksum": f"md5:{supplied_md5}" if supplied_md5 else None,
-                "sha256": _sha256_file(target / name),
+                "sha256": _sha256_file(destination),
             }
         )
     return out
@@ -1069,7 +1088,8 @@ def setup_problem(
         entries.extend(build_external_manifests(problem, problem_dir))
     if "tracebind" in problem.problem_id:
         entries.extend(build_geo_manifest(problem_dir))
-        entries.extend(build_external_manifests(problem, problem_dir))
+        if profile == "full":
+            entries.extend(build_external_manifests(problem, problem_dir))
     if "forge" in problem.problem_id:
         entries.extend(build_external_manifests(problem, problem_dir))
 

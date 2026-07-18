@@ -21,6 +21,7 @@ from bioeval.evaluators.registry import (
 
 GASTRULATION_ID = "s41586-019-0933-9_mouse-gastrulation"
 RNA_HYDRATION_ID = "s41586-025-08855-w_rna-hydration"
+RIVER_METHANE_ID = "s41586-023-06344-6_global-river-methane"
 
 
 def _problem_root(problem_id: str) -> Path:
@@ -67,6 +68,111 @@ def _combine_contract(
         manifest_path,
         artifact_root,
         manifest_verified,
+    )
+
+
+def _linear_quantile(values: list[float], fraction: float) -> float:
+    ordered = sorted(values)
+    position = fraction * (len(ordered) - 1)
+    lower = math.floor(position)
+    upper = math.ceil(position)
+    if lower == upper:
+        return ordered[lower]
+    weight = position - lower
+    return ordered[lower] * (1.0 - weight) + ordered[upper] * weight
+
+
+def _river_methane_evaluator(
+    manifest_path: Path | None,
+    artifact_root: Path | None,
+    manifest_verified: bool,
+) -> EvaluatorOutput:
+    contract = _combine_contract(
+        RIVER_METHANE_ID, manifest_path, artifact_root, manifest_verified
+    )
+    _, declared, declaration_failures = _declared_artifacts(
+        manifest_path, artifact_root, manifest_verified
+    )
+    failures = [*contract.failures, *declaration_failures]
+    summary_path = declared.get("observation_summary.csv")
+    if summary_path is None:
+        failures.append("River observation summary was not declared.")
+        return EvaluatorOutput(contract.summary, failures)
+
+    root = _problem_root(RIVER_METHANE_ID) / "data" / "primary-observations"
+    definitions = {
+        "concentration": (
+            root / "GRiMe_concentrations_v2.csv",
+            "CH4mean",
+            lambda row: True,
+        ),
+        "measured_diffusive_flux": (
+            root / "GRiMe_fluxes_v2.csv",
+            "Diffusive_CH4_Flux_Mean",
+            lambda row: row.get("Diff_Method", "") not in {"", "NA", "conc+k"},
+        ),
+    }
+    try:
+        submitted_rows = _read_csv(summary_path)
+        submitted = {row["dataset"]: row for row in submitted_rows}
+        if len(submitted_rows) != len(definitions) or len(submitted) != len(definitions):
+            failures.append(
+                "River observation summary must contain exactly one row per dataset."
+            )
+        expected: dict[str, dict[str, float | int]] = {}
+        for name, (path, value_column, include) in definitions.items():
+            values: list[float] = []
+            sources: set[str] = set()
+            for row in _read_csv(path):
+                if not include(row):
+                    continue
+                try:
+                    value = float(row[value_column])
+                except (KeyError, TypeError, ValueError):
+                    continue
+                if math.isfinite(value) and value > 0:
+                    values.append(value)
+                    sources.add(row["Source_ID"])
+            expected[name] = {
+                "positive_rows": len(values),
+                "source_count": len(sources),
+                "q10": _linear_quantile(values, 0.10),
+                "median": _linear_quantile(values, 0.50),
+                "q90": _linear_quantile(values, 0.90),
+            }
+    except (OSError, csv.Error, KeyError):
+        failures.append("Could not read river methane inputs or submitted summary.")
+        return EvaluatorOutput(contract.summary, failures)
+
+    for name, reference in expected.items():
+        row = submitted.get(name)
+        if row is None:
+            failures.append(f"Missing river summary row for {name}.")
+            continue
+        for column in ("positive_rows", "source_count"):
+            try:
+                actual = int(row[column])
+            except (KeyError, TypeError, ValueError):
+                failures.append(f"{name}.{column} is not an integer.")
+                continue
+            if actual != reference[column]:
+                failures.append(f"{name}.{column} does not match the frozen observations.")
+        for column in ("q10", "median", "q90"):
+            try:
+                actual = float(row[column])
+            except (KeyError, TypeError, ValueError):
+                failures.append(f"{name}.{column} is not numeric.")
+                continue
+            target = float(reference[column])
+            if not math.isfinite(actual) or not math.isclose(
+                actual, target, rel_tol=1e-5, abs_tol=1e-8
+            ):
+                failures.append(f"{name}.{column} does not match the frozen observations.")
+
+    return EvaluatorOutput(
+        f"{contract.summary}; verified_observation_summaries="
+        f"{len(definitions) - sum('Missing river summary row' in item for item in failures)}",
+        list(dict.fromkeys(failures)),
     )
 
 
@@ -344,7 +450,6 @@ def _rna_hydration_evaluator(
         if math.dist(points[0], points[1]) > 1.5:
             failures.append("A replicated hydration site differs by more than 1.5 Å.")
             continue
-        eligible += 1
         point = tuple(sum(values) / len(values) for values in zip(*points))
         site_valid = True
         for row, row_point in zip(site_rows, points):
@@ -367,7 +472,16 @@ def _rna_hydration_evaluator(
                 )
                 site_valid = False
         if site_valid:
+            if any(
+                math.dist(point, existing) <= 1.5
+                for existing in valid_points[map_id]
+            ):
+                failures.append(
+                    "Distinct RNA site IDs collapse onto the same spatial peak."
+                )
+                continue
             valid_points[map_id].append(point)
+            eligible += 1
 
     if eligible < 10:
         failures.append("Fewer than 10 replicated density sites were submitted.")
@@ -405,3 +519,4 @@ def _rna_hydration_evaluator(
 
 register_evaluator(GASTRULATION_ID, _gastrulation_evaluator)
 register_evaluator(RNA_HYDRATION_ID, _rna_hydration_evaluator)
+register_evaluator(RIVER_METHANE_ID, _river_methane_evaluator)
