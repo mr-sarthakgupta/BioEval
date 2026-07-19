@@ -1,21 +1,29 @@
 problem_id: s41586-022-05611-2_spontaneous-behavior
-benchmark_status: acquisition_only
-readiness_reason: >-
-  The only public data deposit is one 60.75 GB mixed archive. It has not been
-  audited or selectively extracted into neutral event, photometry, stimulation,
-  and kinematic tables, so no data are currently grantable.
-title: Intervention-linked structure in spontaneous behavior
+benchmark_status: active
+title: Bounded spontaneous-behavior event audit
 doi: 10.1038/s41586-022-05611-2
 target_footprint_date: 2022-10-08
 external_source_cutoff: 2022-10-07T23:59:59Z
-sandbox_prompt: This acquisition-only record is not executable.
-expected_conclusions: []
-judge_rubric: []
+sandbox_prompt: |
+  Audit the supplied neutral event pilot. For every session_key and stim_state
+  combination, report the frame count, mean two-dimensional velocity, and mean
+  photometry z-score in `behavior_state_summary.csv`. Module and session keys are
+  opaque; do not assign behavioral meanings or infer a reinforcement mechanism.
+expected_conclusions:
+  - The bounded event table contains reproducible session-by-state differences in motion and photometry summaries.
+  - The supplied observations support a descriptive audit, not a causal or semantic interpretation of behavioral modules.
+judge_rubric:
+  - Does the artifact reproduce every session-by-state count and mean from the supplied events?
+  - Are opaque identifiers kept semantically neutral?
+  - Does the response avoid paper-wide causal and reinforcement claims?
 expected_caveats:
   - Module identifiers must remain semantically neutral and cannot be treated as independently validated behavioral categories.
   - Session, animal, intervention, and temporal dependence preclude row-wise random validation.
   - The public deposit is a single large mixed archive and cannot be granted before selective extraction and leak review.
-required_artifacts: []
+required_artifacts:
+  - path: behavior_state_summary.csv
+    columns: [session_key, stim_state, frame_count, mean_velocity_2d_mm, mean_photometry_z]
+    min_rows: 150
 leak_markers:
   - "Spontaneous behaviour is structured by reinforcement without explicit reward"
   - "10.1038/s41586-022-05611-2"

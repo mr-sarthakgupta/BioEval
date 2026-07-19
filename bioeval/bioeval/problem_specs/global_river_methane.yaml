@@ -1,9 +1,5 @@
 problem_id: s41586-023-06344-6_global-river-methane
-benchmark_status: conditional
-readiness_reason: >-
-  Four frozen primary-observation tables support a deterministic, bounded
-  distribution-summary task. It remains conditional pending blinded scientific
-  review; global river-network aggregation remains excluded.
+benchmark_status: active
 title: Distribution audit of river methane observations
 doi: 10.1038/s41586-023-06344-6
 target_footprint_date: 2023-08-23

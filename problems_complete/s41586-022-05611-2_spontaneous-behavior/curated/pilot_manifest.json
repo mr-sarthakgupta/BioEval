@@ -1,0 +1,7 @@
+{
+  "source_member": "dlight_raw_data/3s-pulsed-stim-dataframe.parquet",
+  "source_rows": 2575275,
+  "curated_rows": 2553123,
+  "selection": "all nonzero feedback_status rows plus rows with source index modulo 10 equal to zero",
+  "sha256": "e71494e5b326acf56987a95a6cc319ee644699ccde12e07f10b36987f4454680"
+}

@@ -1,0 +1,7 @@
+parameter,value
+chromosomes,chr21;chr22
+bin_size_bp,1000000
+read_assignment,interval_midpoint
+normalization,reads_per_million_pilot_reads
+pseudocount_rpm,1
+enrichment,log2((mark_rpm+1)/(matched_wce_rpm+1))

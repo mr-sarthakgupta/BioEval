@@ -1,9 +1,5 @@
 problem_id: s41586-025-08855-w_rna-hydration
-benchmark_status: conditional
-readiness_reason: >-
-  Four identifier-sanitized half-maps, a pre-footprint polymer-only RNA
-  scaffold, and evaluator-side half-map density recomputation form a bounded
-  replication task. Target solvent coordinates are not used for scoring.
+benchmark_status: active
 title: Replicated map-density inference around a folded RNA
 doi: 10.1038/s41586-025-08855-w
 target_footprint_date: 2024-06-16

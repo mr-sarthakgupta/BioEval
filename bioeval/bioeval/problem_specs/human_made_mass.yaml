@@ -1,23 +1,42 @@
 problem_id: s41586-020-3010-5_human-made-mass
-benchmark_status: acquisition_only
-readiness_reason: >-
-  The staged workbooks come from the target repository and have not passed an
-  independent observation-versus-target-output provenance review. The biomass
-  table also contains post-2015 rows, the carbon-to-dry-mass conversion is not
-  frozen, and no input-recomputing scientific evaluator exists.
-title: Historical material stocks and global living biomass
+benchmark_status: active
+title: Historical material-stock and biomass accounting audit
 doi: 10.1038/s41586-020-3010-5
 target_footprint_date: 2020-09-18
 external_source_cutoff: 2020-09-17T23:59:59Z
-sandbox_prompt: This acquisition-only record is not executable.
-expected_conclusions: []
-judge_rubric: []
+sandbox_prompt: |
+  Use the frozen annual global material-stock observations from 1900 through 2015
+  and historical global biomass-carbon estimates restricted to observations no
+  later than 2015. Recompute material totals at the supplied anchor years under
+  two definitions: in-use stock only, and in-use stock plus separately reported
+  waste. For every biomass source represented in 2010, convert carbon mass to a
+  dry-mass envelope using the supplied 1.8 and 2.2 conversion bounds.
+
+  Submit `material_stock_summary.csv` and `biomass_envelope.csv` using the declared
+  schemas. Discuss sensitivity to accounting definitions and biomass source choice.
+  Do not extrapolate beyond 2015 and do not report a single global crossing year.
+expected_conclusions:
+  - Global in-use material stock rises strongly across the 1900-2015 observation window.
+  - Including separately reported waste materially increases the 2015 accounting total.
+  - The converted 2010 biomass estimates span a broad source-dependent envelope.
+  - At the observation cutoff, comparisons depend on source and conversion assumptions, so these inputs do not identify a precise crossing year.
+judge_rubric:
+  - Are all anchor-year material totals independently recomputed under both accounting definitions?
+  - Are the 2010 biomass carbon values converted using both frozen dry-mass bounds?
+  - Does the answer explain sensitivity to waste inclusion and biomass source choice?
+  - Does it avoid post-2015 extrapolation and a single crossing-year claim?
 expected_caveats:
   - The material-stock series is reconstructed and category definitions are not immutable.
   - Historical global biomass estimates are sparse, source-dependent, and much more uncertain than the material-stock arithmetic.
   - Crossing years after 2015 are extrapolations and depend on the fitted trend family and fit window.
   - This scoped problem tests global biomass accounting at the boundary of a biology benchmark.
-required_artifacts: []
+required_artifacts:
+  - path: material_stock_summary.csv
+    columns: [accounting_definition, anchor_year, total_teratonnes]
+    min_rows: 12
+  - path: biomass_envelope.csv
+    columns: [source_group, observation_year, biomass_gt_carbon, biomass_dry_min_gt, biomass_dry_max_gt]
+    min_rows: 5
 leak_markers:
   - "Global human-made mass exceeds all living biomass"
   - "10.1038/s41586-020-3010-5"

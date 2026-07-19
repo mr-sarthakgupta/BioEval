@@ -258,26 +258,24 @@ Each run directory contains:
 ## Current Problems
 
 - `s41467-026-73635-7_butterfly-longevity-pollen-feeding`
+- `s41467-026-73164-3_tracebind-atac-footprinting`
+- `s41467-026-73844-0_f1-atpase-markov-model`
 - `s41467-026-73977-2_forge-cancer-drug-response`
+- `nature09906_chromatin-state-dynamics`
+- `s41586-019-0933-9_mouse-gastrulation`
+- `s41586-020-3010-5_human-made-mass`
+- `s41586-022-05611-2_spontaneous-behavior`
+- `s41586-023-06328-6_protein-protease-resistance`
+- `s41586-023-06344-6_global-river-methane`
+- `s41586-025-08855-w_rna-hydration`
+- `s41586-026-10588-3_mitochondria-nuclear-pore-interaction`
 - `s41589-026-02251-9_idr-condensate-serine-charge`
 
-Conditional and acquisition-only records are indexed separately in
+Acquisition-only records are indexed separately in
 `problems_imcomplete/`, including:
 
 - `s41586-022-05383-9_light-competition-plant-diversity` (authenticated Dryad
   observation files are not vendored)
-- `s41586-019-0933-9_mouse-gastrulation` (bounded sparse-count pilot pending
-  blinded review)
-- `s41467-026-73844-0_f1-atpase-markov-model` (model predictions are not yet
-  independently recomputed)
-- `s41586-023-06328-6_protein-protease-resistance` (count inputs are staged;
-  deterministic held-out scoring is pending)
-- `s41586-023-06344-6_global-river-methane` (deterministic observation-summary
-  pilot pending blinded review; global aggregation withheld)
-- `s41586-025-08855-w_rna-hydration` (bounded replicated map-density pilot pending
-  threshold calibration and resource review)
-- `nature09906_chromatin-state-dynamics` (exact manifests retained; full data,
-  references, arrays, and pilot are not staged)
 
 Problem specs live in `bioeval/problem_specs`. The UEA-visible prompt is
 `sandbox_prompt`; `expected_conclusions`, `expected_caveats`, `judge_rubric`, and

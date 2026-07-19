@@ -1,0 +1,20 @@
+{
+  "artifacts": {
+    "rna_library_summary.csv": {
+      "allowed_values": {
+        "sample": ["RKO1", "RKO2", "RKO3", "WT1", "WT2", "WT3"]
+      },
+      "required_values": {
+        "sample": ["RKO1", "RKO2", "RKO3", "WT1", "WT2", "WT3"]
+      },
+      "numeric_bounds": {
+        "gene_rows": {"min": 1},
+        "detected_genes": {"min": 1},
+        "total_expected_count": {"min": 1}
+      },
+      "ordered_columns": [
+        ["detected_genes", "gene_rows"]
+      ]
+    }
+  }
+}

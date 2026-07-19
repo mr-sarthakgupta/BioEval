@@ -1,0 +1,25 @@
+{
+  "curation": "bounded observation-only accounting bundle; post-2015 observations, projections, fitted trajectories, and crossing calculations excluded",
+  "outputs": [
+    {
+      "path": "annual_material_stocks_1900_2015.csv",
+      "bytes": 11720,
+      "sha256": "6bb0350ca7612526129e3d51beffedb4790a1de94a83b04b3e161430178894c8"
+    },
+    {
+      "path": "historical_biomass_estimates_pre2016.csv",
+      "bytes": 413,
+      "sha256": "adcc022085eedc7060021e2edcc4650623ace035d8ae9d414d1ab8102ba7ef3d"
+    },
+    {
+      "path": "field_dictionary.csv",
+      "bytes": 797,
+      "sha256": "5dfabcbd8063fd08765641a14da5b958d38570a6ede93d02fd2ca1d386fc2fe2"
+    },
+    {
+      "path": "accounting_constants.csv",
+      "bytes": 190,
+      "sha256": "f401ab19b1e035fb2d5f28aadb3c985e78dfca37816a7c9d02cedd9bd4b90ef4"
+    }
+  ]
+}

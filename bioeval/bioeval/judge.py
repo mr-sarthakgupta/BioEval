@@ -1385,12 +1385,6 @@ def judge_with_llm(
         artifact_root=artifact_root,
         manifest_verified=manifest_verified,
     )
-    f1_summary = _f1_model_selection_summary(
-        problem_id=problem_id,
-        manifest_path=analysis_manifest,
-        artifact_root=artifact_root,
-        manifest_verified=manifest_verified,
-    )
     butterfly_summary = _butterfly_survival_summary(
         problem_id=problem_id,
         manifest_path=analysis_manifest,
@@ -1403,7 +1397,6 @@ def judge_with_llm(
             registered_evaluator.summary if registered_evaluator else None,
             forge_summary,
             idr_summary,
-            f1_summary,
             butterfly_summary,
         )
         if summary
@@ -1411,7 +1404,6 @@ def judge_with_llm(
     evaluator_summary = {
         FORGE_PROBLEM_ID: forge_summary,
         IDR_PROBLEM_ID: idr_summary,
-        F1_PROBLEM_ID: f1_summary,
         BUTTERFLY_PROBLEM_ID: butterfly_summary,
     }.get(
         problem_id,
@@ -1496,14 +1488,11 @@ def judge_with_llm(
         result = _apply_forge_metric_gate(result, evaluator_summary)
     elif problem_id == IDR_PROBLEM_ID:
         result = _apply_idr_metric_gate(result, evaluator_summary)
-    elif problem_id == F1_PROBLEM_ID:
-        result = _apply_f1_model_gate(result, evaluator_summary)
     elif problem_id == BUTTERFLY_PROBLEM_ID:
         result = _apply_butterfly_metric_gate(result, evaluator_summary)
     special_evaluators = {
         FORGE_PROBLEM_ID,
         IDR_PROBLEM_ID,
-        F1_PROBLEM_ID,
         BUTTERFLY_PROBLEM_ID,
     }
     if (

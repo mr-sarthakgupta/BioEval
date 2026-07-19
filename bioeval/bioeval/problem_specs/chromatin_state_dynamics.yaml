@@ -1,21 +1,37 @@
 problem_id: nature09906_chromatin-state-dynamics
-benchmark_status: acquisition_only
-readiness_reason: >-
-  The 44.37 GB core track bundle, reference assets, expression arrays, and even
-  the bounded two-cell pilot are not staged. No runnable artifact contract or
-  defensible biological scoring fixture exists.
-title: Chromatin-state input acquisition record
+benchmark_status: active
+title: Chromatin-mark enrichment dynamics pilot
 doi: 10.1038/nature09906
 target_footprint_date: 2011-03-23
 external_source_cutoff: 2011-03-22T23:59:59Z
-sandbox_prompt: This acquisition-only record is not executable.
-expected_conclusions: []
-judge_rubric: []
+sandbox_prompt: |
+  Analyze the six frozen H1 and K562 chromatin pilot tracks on chromosomes 21 and
+  22. Following the supplied protocol, assign each interval by midpoint to
+  1,000,000-base bins, normalize each track to reads per million pilot reads, and
+  compare H3K4me3 and H3K27me3 with the matched whole-cell-extract control.
+
+  Submit `chromatin_bin_summary.csv` with one row for every observed cell-type,
+  chromosome, bin, and mark combination. Report mark RPM, matched-control RPM,
+  and log2 enrichment with the declared pseudocount. Discuss cell-type and
+  mark-specific variation without assigning published chromatin-state labels.
+expected_conclusions:
+  - Chromatin-mark enrichment is spatially heterogeneous across the two pilot chromosomes.
+  - H3K4me3 and H3K27me3 have distinct enrichment profiles relative to matched controls.
+  - Enrichment profiles differ between H1 and K562 in a subset of genomic bins.
+  - A two-cell, two-chromosome pilot cannot recover or validate a full genome-wide chromatin-state model.
+judge_rubric:
+  - Does the submitted table exactly cover the evaluator-derived pilot bin grid?
+  - Are RPM normalization and matched-control log2 enrichment independently recomputed?
+  - Does the analysis distinguish marks, cell types, and chromosomes?
+  - Does it avoid published state labels, state counts, or genome-wide claims?
 expected_caveats:
   - The full core BED input is 44.37 GB compressed and is manifest-only by default.
   - Array expression measurements cover only the provided validation samples and require platform-aware normalization.
   - State number and semantics are model-dependent; numerical state labels have no intrinsic correspondence.
-required_artifacts: []
+required_artifacts:
+  - path: chromatin_bin_summary.csv
+    columns: [cell_type, chromosome, bin_start, mark, mark_rpm, control_rpm, log2_enrichment]
+    min_rows: 280
 leak_markers:
   - "Mapping and analysis of chromatin state dynamics in nine human cell types"
   - Ernst

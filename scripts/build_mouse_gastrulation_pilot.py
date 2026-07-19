@@ -366,7 +366,7 @@ def build(archive: Path, meta_path: Path, genes_path: Path, problem_root: Path) 
 def main() -> None:
     parser = argparse.ArgumentParser()
     root = Path(__file__).resolve().parents[1]
-    problem_root = root / "problems_imcomplete" / PROBLEM_ID
+    problem_root = root / "problems_complete" / PROBLEM_ID
     parser.add_argument(
         "--archive",
         type=Path,

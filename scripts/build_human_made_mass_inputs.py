@@ -138,7 +138,7 @@ def main() -> None:
         type=Path,
         default=(
             Path(__file__).resolve().parents[1]
-            / "problems_imcomplete"
+            / "problems_complete"
             / "s41586-020-3010-5_human-made-mass"
             / "evaluator"
             / "host-audit"

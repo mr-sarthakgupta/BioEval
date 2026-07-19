@@ -69,7 +69,7 @@ class Problem:
     title: str
     doi: str
     pdf_name: str | None
-    repos: list[tuple[str, str]]  # (submodule_path_relative_to_problem, git_url)
+    repos: list[tuple[str, str]]  # (vendored_path_relative_to_problem, source_git_url)
     destination: Literal["complete", "incomplete"] = "complete"
     zenodo: list[ZenodoAsset] = field(default_factory=list)
     dryad: list[DryadAsset] = field(default_factory=list)
@@ -85,7 +85,6 @@ PROBLEM_DEFS: list[Problem] = [
         doi="10.1038/s41467-026-73844-0",
         pdf_name="s41467-026-73844-0.pdf",
         repos=[("repo", "https://github.com/YixinChen95/MarkovianF1.git")],
-        destination="incomplete",
         zenodo=[ZenodoAsset("19133448")],
         notes=[
             "Experimental titration curves are also bundled in repo/BayesianTraining/input_data/.",
@@ -145,7 +144,7 @@ PROBLEM_DEFS: list[Problem] = [
         doi="10.1038/s41467-026-73164-3",
         pdf_name="s41467-026-73164-3.pdf",
         repos=[("repo", "https://github.com/lyx-lin/TraceBIND.git")],
-        destination="incomplete",
+        destination="complete",
         zenodo=[ZenodoAsset("19446219")],
         notes=[
             "Benchmark GEO series: GSE195460, GSE151302, GSE115098, GSE232222, GSE195443, GSE220289",
@@ -195,7 +194,6 @@ PROBLEM_DEFS: list[Problem] = [
         doi="10.1038/s41586-023-06328-6",
         pdf_name=None,
         repos=[],
-        destination="incomplete",
         zenodo=[
             ZenodoAsset(
                 "7992926",
@@ -213,7 +211,6 @@ PROBLEM_DEFS: list[Problem] = [
         doi="10.1038/s41586-023-06344-6",
         pdf_name=None,
         repos=[],
-        destination="incomplete",
         urls=[
             UrlAsset(
                 "https://pasta.lternet.edu/package/data/eml/knb-lter-ntl/420/2/ba3e270bcab8ace5d157c995e4b791e4",
@@ -252,7 +249,6 @@ PROBLEM_DEFS: list[Problem] = [
                 "https://github.com/milo-lab/anthropogenic_mass.git",
             )
         ],
-        destination="incomplete",
         notes=[
             "Curate only the 1900-2015 material-stock input and sparse historical biomass estimates.",
             "Block repository identity, post-2015 projections, annual biomass trajectories, crossover calculations, code, and figures.",
@@ -265,11 +261,32 @@ PROBLEM_DEFS: list[Problem] = [
         doi="10.1038/s41586-022-05611-2",
         pdf_name=None,
         repos=[],
-        destination="incomplete",
+        destination="complete",
         notes=[
-            "Acquisition-only: Zenodo 7274803 is one 60,751,713,398-byte mixed archive.",
-            "The setup script intentionally does not download the archive.",
-            "Promote only after a budgeted input-only allowlist and neutral event-table curation.",
+            "Zenodo 7274803 is one 60,751,713,398-byte mixed archive and is not downloaded in full.",
+            "The runnable pilot is range-extracted and curated with scripts/extract_spontaneous_behavior_member.py.",
+            "Only the anonymized bounded event table is grantable.",
+        ],
+    ),
+    Problem(
+        problem_id="s41586-026-10588-3_mitochondria-nuclear-pore-interaction",
+        title="Bounded Ranbp2 RNA-library audit",
+        doi="10.1038/s41586-026-10588-3",
+        pdf_name="s41586-026-10588-3.pdf",
+        repos=[],
+        destination="complete",
+        urls=[
+            UrlAsset(
+                "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE325nnn/GSE325290/suppl/GSE325290_ALL.GRCm38_99.rsem.genes.results.txt.gz",
+                "GSE325290_ALL.GRCm38_99.rsem.genes.results.txt.gz",
+                subdir="acquired/geo",
+                expected_bytes=1056658,
+                sha256="4b8dca3681684148d10710c26983ad08e1c5311baf6865abfbfac170bfff2c31",
+            )
+        ],
+        notes=[
+            "Only the six-library RSEM expected-count matrix is grantable.",
+            "Nature supplements and target repositories remain blocked.",
         ],
     ),
     Problem(
@@ -278,7 +295,6 @@ PROBLEM_DEFS: list[Problem] = [
         doi="10.1038/s41586-019-0933-9",
         pdf_name=None,
         repos=[],
-        destination="incomplete",
         urls=[
             UrlAsset(
                 "https://www.ebi.ac.uk/biostudies/files/E-MTAB-6967/atlas_data.tar.gz",
@@ -313,7 +329,6 @@ PROBLEM_DEFS: list[Problem] = [
         doi="10.1038/s41586-025-08855-w",
         pdf_name=None,
         repos=[],
-        destination="incomplete",
         urls=[
             UrlAsset(
                 "https://ftp.ebi.ac.uk/pub/databases/emdb/structures/EMD-42498/other/emd_42498_half_map_1.map.gz",
@@ -360,7 +375,6 @@ PROBLEM_DEFS: list[Problem] = [
         doi="10.1038/nature09906",
         pdf_name=None,
         repos=[],
-        destination="incomplete",
         notes=[
             "GEO GSE26386 core ChIP/WCE data remain manifest-only by default.",
             "All deposited state segmentations, labels and model outputs are blocked.",
@@ -620,7 +634,7 @@ def write_readme(problem: Problem, path: Path) -> None:
         f"{problem.problem_id}/",
         "├── README.md          # this file",
         "├── paper/             # article PDF",
-        "├── repo/              # analysis code (git submodule)",
+        "├── repo/              # vendored analysis code (normal tracked folder)",
         "└── data/              # downloaded datasets and manifests",
         "    ├── zenodo/",
         "    ├── figshare/",

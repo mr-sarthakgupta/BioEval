@@ -209,7 +209,7 @@ def main() -> None:
     parser.add_argument("--source-pdb", type=Path, default=Path("/tmp/7EZ0.pdb"))
     parser.add_argument("--source-half-maps", type=Path, default=None)
     args = parser.parse_args()
-    problem_root = root / "problems_imcomplete" / PROBLEM_ID
+    problem_root = root / "problems_complete" / PROBLEM_ID
     build(
         problem_root,
         args.source_pdb.resolve(),

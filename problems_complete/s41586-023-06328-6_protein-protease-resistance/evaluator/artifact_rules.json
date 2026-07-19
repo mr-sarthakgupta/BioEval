@@ -1,0 +1,29 @@
+{
+  "artifacts": {
+    "resistance_holdout_summary.csv": {
+      "allowed_values": {
+        "library": ["lib1"],
+        "protease": ["trypsin", "chymotrypsin", "cross"]
+      },
+      "required_values": {
+        "protease": ["trypsin", "chymotrypsin", "cross"]
+      },
+      "numeric_bounds": {
+        "fold0_group_count": {"min": 100},
+        "qc_pass_groups": {"min": 100},
+        "median_norm_log_survival_auc": {"min": -10, "max": 1},
+        "q10_norm_log_survival_auc": {"min": -10, "max": 1},
+        "q90_norm_log_survival_auc": {"min": -10, "max": 1},
+        "replicate_mae_median": {"min": 0},
+        "cross_protease_spearman": {"min": 0, "max": 1}
+      },
+      "ordered_columns": [
+        [
+          "q10_norm_log_survival_auc",
+          "median_norm_log_survival_auc",
+          "q90_norm_log_survival_auc"
+        ]
+      ]
+    }
+  }
+}

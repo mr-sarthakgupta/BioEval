@@ -1,0 +1,36 @@
+{
+  "artifacts": {
+    "f1_observation_summary.csv": {
+      "allowed_values": {
+        "dataset": [
+          "turnover",
+          "coupling",
+          "atp_binding",
+          "adp_binding",
+          "mixed_binding"
+        ]
+      },
+      "required_values": {
+        "dataset": [
+          "turnover",
+          "coupling",
+          "atp_binding",
+          "adp_binding",
+          "mixed_binding"
+        ]
+      },
+      "numeric_bounds": {
+        "observation_count": {"min": 1},
+        "min_concentration_molar": {"min": 0},
+        "max_concentration_molar": {"min": 0},
+        "min_observed_value": {"min": 0},
+        "max_observed_value": {"min": 0},
+        "spearman_concentration_value": {"min": -1, "max": 1}
+      },
+      "ordered_columns": [
+        ["min_concentration_molar", "max_concentration_molar"],
+        ["min_observed_value", "max_observed_value"]
+      ]
+    }
+  }
+}

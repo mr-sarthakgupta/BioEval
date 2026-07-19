@@ -1,0 +1,416 @@
+[
+  {
+    "name": "dlight_intermediate_results/",
+    "compressed": 0,
+    "uncompressed": 0,
+    "offset": 0
+  },
+  {
+    "name": "dlight_intermediate_results/3min_max_dlight_0-0.3s_vs_usage.p.gz",
+    "compressed": 27578063,
+    "uncompressed": 27578063,
+    "offset": 58
+  },
+  {
+    "name": "dlight_intermediate_results/3min_max_dlight_0-0.3s_vs_usage_shuffled_agg.parquet",
+    "compressed": 2268806,
+    "uncompressed": 3197237,
+    "offset": 27578215
+  },
+  {
+    "name": "dlight_intermediate_results/dlight-chrimson_snippets_offline_features.parquet",
+    "compressed": 608613846,
+    "uncompressed": 611490971,
+    "offset": 29847131
+  },
+  {
+    "name": "dlight_intermediate_results/dlight-food-peaks.p.z",
+    "compressed": 4796109,
+    "uncompressed": 5813730,
+    "offset": 638461084
+  },
+  {
+    "name": "dlight_intermediate_results/fig1-syllable-sorting.p",
+    "compressed": 476,
+    "uncompressed": 986,
+    "offset": 643257272
+  },
+  {
+    "name": "dlight_intermediate_results/lagged_analysis_session_bins.toml",
+    "compressed": 48,
+    "uncompressed": 48,
+    "offset": 643257829
+  },
+  {
+    "name": "dlight_intermediate_results/open_loop_dlight_data.p.z",
+    "compressed": 7726774,
+    "uncompressed": 8312766,
+    "offset": 643257968
+  },
+  {
+    "name": "dlight_intermediate_results/performance-prediction-error-distances-and-dopamine.parquet",
+    "compressed": 37700635,
+    "uncompressed": 37731485,
+    "offset": 650984825
+  },
+  {
+    "name": "dlight_intermediate_results/syllable-classifier-from-dlight-amplitude-submission.tar.gz",
+    "compressed": 475439,
+    "uncompressed": 493630,
+    "offset": 688685577
+  },
+  {
+    "name": "dlight_intermediate_results/syllable-classifier-submission.tar.gz",
+    "compressed": 351444,
+    "uncompressed": 364332,
+    "offset": 689161133
+  },
+  {
+    "name": "dlight_intermediate_results/syllable_stats_photometry_offline.toml",
+    "compressed": 1147,
+    "uncompressed": 2548,
+    "offset": 689512672
+  },
+  {
+    "name": "dlight_intermediate_results/syllable_stats_photometry_online.toml",
+    "compressed": 1147,
+    "uncompressed": 2548,
+    "offset": 689513915
+  },
+  {
+    "name": "dlight_raw_data/",
+    "compressed": 0,
+    "uncompressed": 0,
+    "offset": 689515157
+  },
+  {
+    "name": "dlight_raw_data/3s-pulsed-stim-dataframe.parquet",
+    "compressed": 180054470,
+    "uncompressed": 182973236,
+    "offset": 689515203
+  },
+  {
+    "name": "dlight_raw_data/dlight_photometry_processed_full.toml",
+    "compressed": 45272,
+    "uncompressed": 199479,
+    "offset": 869569751
+  },
+  {
+    "name": "dlight_raw_data/dlight_photometry_processed_full_transfer.parquet",
+    "compressed": 8604367700,
+    "uncompressed": 8704087419,
+    "offset": 869615106
+  },
+  {
+    "name": "hek_raw_data/",
+    "compressed": 0,
+    "uncompressed": 0,
+    "offset": 9473982921
+  },
+  {
+    "name": "hek_raw_data/210716_JM_HEK293T_dLight/",
+    "compressed": 0,
+    "uncompressed": 0,
+    "offset": 9473982964
+  },
+  {
+    "name": "hek_raw_data/210716_JM_HEK293T_dLight/dLight_exp3_20210716_110931_sVG.tif",
+    "compressed": 180987004,
+    "uncompressed": 181981402,
+    "offset": 9473983032
+  },
+  {
+    "name": "hek_raw_data/210716_JM_HEK293T_dLight/dLight_exp4_20210716_112801_sVG.tif",
+    "compressed": 139100423,
+    "uncompressed": 140174758,
+    "offset": 9654970139
+  },
+  {
+    "name": "hek_raw_data/210716_JM_HEK293T_dLight/dLight_exp5_20210716_114158_sVG.tif",
+    "compressed": 156447971,
+    "uncompressed": 157550310,
+    "offset": 9794070665
+  },
+  {
+    "name": "hek_raw_data/UFM-L_0.01mm_60X_bin2_20220511_093613.tif",
+    "compressed": 653586,
+    "uncompressed": 706884,
+    "offset": 9950518739
+  },
+  {
+    "name": "keypoints_raw_data/",
+    "compressed": 0,
+    "uncompressed": 0,
+    "offset": 9951172409
+  },
+  {
+    "name": "keypoints_raw_data/photometry-dls-dlight-keypoints.tar.gz",
+    "compressed": 106478222,
+    "uncompressed": 106478222,
+    "offset": 9951172458
+  },
+  {
+    "name": "keypoints_raw_data/video-image.p",
+    "compressed": 275028,
+    "uncompressed": 903393,
+    "offset": 10057650767
+  },
+  {
+    "name": "misc_intermediate_results/",
+    "compressed": 0,
+    "uncompressed": 0,
+    "offset": 10057925857
+  },
+  {
+    "name": "misc_intermediate_results/autoencoder_characterization.parquet",
+    "compressed": 29213,
+    "uncompressed": 36351,
+    "offset": 10057925913
+  },
+  {
+    "name": "misc_intermediate_results/fig_s2-binned-tms.p",
+    "compressed": 1682,
+    "uncompressed": 27599,
+    "offset": 10057955218
+  },
+  {
+    "name": "misc_intermediate_results/fig_s2-syllable-sorting.p",
+    "compressed": 417,
+    "uncompressed": 912,
+    "offset": 10057956975
+  },
+  {
+    "name": "misc_raw_data/",
+    "compressed": 0,
+    "uncompressed": 0,
+    "offset": 10057957473
+  },
+  {
+    "name": "misc_raw_data/autoencoder_test_data.h5",
+    "compressed": 55460411,
+    "uncompressed": 58796283,
+    "offset": 10057957517
+  },
+  {
+    "name": "misc_raw_data/f1_scores_estimates_actual_calls.parquet",
+    "compressed": 20176325,
+    "uncompressed": 24082610,
+    "offset": 10113417996
+  },
+  {
+    "name": "misc_raw_data/latencies_stim.parquet",
+    "compressed": 41797,
+    "uncompressed": 58998,
+    "offset": 10133594405
+  },
+  {
+    "name": "misc_raw_data/latencies_stim_arduino_test.dat",
+    "compressed": 6522471,
+    "uncompressed": 40709928,
+    "offset": 10133636268
+  },
+  {
+    "name": "misc_raw_data/spinograms.p",
+    "compressed": 212584,
+    "uncompressed": 405885,
+    "offset": 10140158814
+  },
+  {
+    "name": "optoda_intermediate_results/",
+    "compressed": 0,
+    "uncompressed": 0,
+    "offset": 10140371454
+  },
+  {
+    "name": "optoda_intermediate_results/behavior_classes.toml",
+    "compressed": 178,
+    "uncompressed": 308,
+    "offset": 10140371512
+  },
+  {
+    "name": "optoda_intermediate_results/behavioral-distance.parquet",
+    "compressed": 30591,
+    "uncompressed": 82854,
+    "offset": 10140371769
+  },
+  {
+    "name": "optoda_intermediate_results/closed_loop_learners.toml",
+    "compressed": 127,
+    "uncompressed": 250,
+    "offset": 10140402445
+  },
+  {
+    "name": "optoda_intermediate_results/da-vs-learning-per-syllable.parquet",
+    "compressed": 27981,
+    "uncompressed": 77470,
+    "offset": 10140402655
+  },
+  {
+    "name": "optoda_intermediate_results/joint_syllable_map.toml",
+    "compressed": 143,
+    "uncompressed": 323,
+    "offset": 10140430729
+  },
+  {
+    "name": "optoda_intermediate_results/syllable_stats_offline.toml",
+    "compressed": 1250,
+    "uncompressed": 3120,
+    "offset": 10140430953
+  },
+  {
+    "name": "optoda_intermediate_results/syllable_stats_online.toml",
+    "compressed": 1160,
+    "uncompressed": 2552,
+    "offset": 10140432288
+  },
+  {
+    "name": "optoda_raw_data/",
+    "compressed": 0,
+    "uncompressed": 0,
+    "offset": 10140433532
+  },
+  {
+    "name": "optoda_raw_data/closed_loop_behavior_transfer.parquet",
+    "compressed": 47542844730,
+    "uncompressed": 47656456973,
+    "offset": 10140433578
+  },
+  {
+    "name": "optoda_raw_data/closed_loop_behavior_velocity_conditioned.parquet",
+    "compressed": 273530409,
+    "uncompressed": 381400181,
+    "offset": 57683278411
+  },
+  {
+    "name": "optoda_raw_data/closed_loop_behavior_with_simulated_triggers_transfer.parquet",
+    "compressed": 1965693988,
+    "uncompressed": 2034267803,
+    "offset": 57956808915
+  },
+  {
+    "name": "optoda_raw_data/learning_aggregate.parquet",
+    "compressed": 7464257,
+    "uncompressed": 8330665,
+    "offset": 59922503010
+  },
+  {
+    "name": "optoda_raw_data/learning_timecourse_binsize-30.parquet",
+    "compressed": 102553481,
+    "uncompressed": 169099691,
+    "offset": 59929967339
+  },
+  {
+    "name": "optoda_raw_data/learning_timecourse_processed.parquet",
+    "compressed": 26236709,
+    "uncompressed": 28685788,
+    "offset": 60032520904
+  },
+  {
+    "name": "optoda_raw_data/learning_timecourse_processed_summary.parquet",
+    "compressed": 524744,
+    "uncompressed": 685859,
+    "offset": 60058757696
+  },
+  {
+    "name": "realtime_package/",
+    "compressed": 0,
+    "uncompressed": 0,
+    "offset": 60059282531
+  },
+  {
+    "name": "realtime_package/arhmm.p",
+    "compressed": 1072384,
+    "uncompressed": 10575572,
+    "offset": 60059282578
+  },
+  {
+    "name": "realtime_package/autoencoder.h5",
+    "compressed": 76430243,
+    "uncompressed": 82669400,
+    "offset": 60060355016
+  },
+  {
+    "name": "realtime_package/flip_detector.h5",
+    "compressed": 53037,
+    "uncompressed": 113592,
+    "offset": 60136785320
+  },
+  {
+    "name": "realtime_package/metadata.yaml",
+    "compressed": 1227,
+    "uncompressed": 5290,
+    "offset": 60136838420
+  },
+  {
+    "name": "realtime_package/pc_components.h5",
+    "compressed": 253462,
+    "uncompressed": 268730,
+    "offset": 60136839707
+  },
+  {
+    "name": "realtime_package/preprocessor.p",
+    "compressed": 1560,
+    "uncompressed": 2322,
+    "offset": 60137093232
+  },
+  {
+    "name": "rl_intermediate_results/",
+    "compressed": 0,
+    "uncompressed": 0,
+    "offset": 60137094853
+  },
+  {
+    "name": "rl_intermediate_results/rl_model_heldout_results_best_lag_rands.p",
+    "compressed": 6154524,
+    "uncompressed": 17760387,
+    "offset": 60137094907
+  },
+  {
+    "name": "rl_intermediate_results/rl_model_heldout_results_best_lag_rands.parquet",
+    "compressed": 142042,
+    "uncompressed": 163373,
+    "offset": 60143249526
+  },
+  {
+    "name": "rl_intermediate_results/rl_model_heldout_results_lags.p",
+    "compressed": 132074008,
+    "uncompressed": 372963587,
+    "offset": 60143391669
+  },
+  {
+    "name": "rl_intermediate_results/rl_model_heldout_results_lags.parquet",
+    "compressed": 2671850,
+    "uncompressed": 2992025,
+    "offset": 60275465762
+  },
+  {
+    "name": "rl_intermediate_results/rl_model_parameters.toml",
+    "compressed": 109,
+    "uncompressed": 352,
+    "offset": 60278137703
+  },
+  {
+    "name": "rl_intermediate_results/rl_model_stats.toml",
+    "compressed": 130,
+    "uncompressed": 192,
+    "offset": 60278137890
+  },
+  {
+    "name": "rl_raw_data/",
+    "compressed": 0,
+    "uncompressed": 0,
+    "offset": 60278138093
+  },
+  {
+    "name": "rl_raw_data/rl_modeling_dlight_data_offline.parquet",
+    "compressed": 208168716,
+    "uncompressed": 236397531,
+    "offset": 60278138135
+  },
+  {
+    "name": "rl_raw_data/rl_modeling_dlight_data_online.parquet",
+    "compressed": 265396618,
+    "uncompressed": 302544245,
+    "offset": 60486306932
+  }
+]

@@ -1,14 +1,30 @@
 problem_id: s41467-026-73164-3_tracebind-atac-footprinting
-benchmark_status: acquisition_only
-readiness_reason: >-
-  Declared archives and raw benchmark ATAC inputs are absent, and the third-party
-  bias model has not been classified as an allowed input or forbidden output.
-title: TraceBIND ATAC footprinting acquisition stub
+benchmark_status: active
+title: Bounded ATAC fragment and peak audit
 doi: 10.1038/s41467-026-73164-3
-sandbox_prompt: This acquisition-only record is not executable.
-expected_conclusions: []
-judge_rubric: []
-expected_caveats: []
+target_footprint_date: 2026-04-07
+external_source_cutoff: 2026-04-06T23:59:59Z
+sandbox_prompt: |
+  Audit the selectively extracted ATAC fragment pilot. For each supplied peak,
+  report the number of overlapping fragment rows, the sum of fragment count
+  weights, and the weighted number of fragment endpoints falling inside the
+  half-open peak interval. Submit `peak_fragment_summary.csv`. Do not use or
+  claim validation of footprint calls, fitted bias models, chromVAR results, or
+  the full paper benchmark.
+expected_conclusions:
+  - Fragment support varies across the ten supplied peak intervals.
+  - Weighted fragment and endpoint counts provide a reproducible input-level audit but do not establish transcription-factor binding.
+judge_rubric:
+  - Are half-open interval overlaps and weighted counts recomputed exactly?
+  - Does the artifact contain exactly the supplied peak IDs?
+  - Does the response avoid unsupported footprint, binding, and model-superiority claims?
+expected_caveats:
+  - This bounded pilot audits footprinting inputs, not sample-specific bias correction or binding-site inference.
+  - Cell identifiers are opaque and cell-type labels are not supplied.
+required_artifacts:
+  - path: peak_fragment_summary.csv
+    columns: [peak_id, overlapping_fragment_rows, weighted_fragment_count, insertion_endpoint_count]
+    min_rows: 10
 leak_markers:
   - "s41467-026-73164-3"
   - TraceBIND

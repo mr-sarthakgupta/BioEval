@@ -1,0 +1,17 @@
+{
+  "artifacts": {
+    "behavior_state_summary.csv": {
+      "allowed_values": {
+        "stim_state": ["-1", "0", "1"]
+      },
+      "numeric_bounds": {
+        "frame_count": {"min": 1},
+        "mean_velocity_2d_mm": {"min": 0}
+      },
+      "minimum_unique": {
+        "session_key": 50,
+        "stim_state": 3
+      }
+    }
+  }
+}

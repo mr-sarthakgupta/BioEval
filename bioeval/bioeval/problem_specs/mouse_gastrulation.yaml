@@ -1,11 +1,5 @@
 problem_id: s41586-019-0933-9_mouse-gastrulation
-benchmark_status: conditional
-readiness_reason: >-
-  A stage-balanced, label-free 2,048-cell by 2,108-gene count pilot is staged;
-  every retained gene is detected in at least one percent of pilot cells.
-  Holdout source ordinality and batch are hidden, and predictions are compared
-  with a frozen expression-based pseudobulk baseline. It remains conditional
-  pending blinded trajectory review.
+benchmark_status: active
 title: Time-resolved single-cell structure during mouse development
 doi: 10.1038/s41586-019-0933-9
 target_footprint_date: 2018-10-11

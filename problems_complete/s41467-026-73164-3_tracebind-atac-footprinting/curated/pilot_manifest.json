@@ -1,0 +1,17 @@
+{
+  "source_archive_sha256": "2186b1f2343fe7f6a7713869637820c1dbc5989e2cd932d03cf8330b871aa45a",
+  "members": [
+    "footprints_identification/peaks_region_subset.txt",
+    "footprints_identification/atac_fragments_subset.tsv.gz"
+  ],
+  "files": {
+    "pilot_peaks.csv": {
+      "bytes": 301,
+      "sha256": "fd734873783ab2ecccb8943443c3ea8d52dab79acf2b4d7d4eabcf5334faa93c"
+    },
+    "pilot_fragments.csv.gz": {
+      "bytes": 245046,
+      "sha256": "52c9f054ecefb447628d85440b01e3810011c029842c578be31453f94a6fe6fe"
+    }
+  }
+}

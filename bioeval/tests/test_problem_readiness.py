@@ -27,6 +27,8 @@ CHROMATIN_ID = "nature09906_chromatin-state-dynamics"
 IDR_ID = "s41589-026-02251-9_idr-condensate-serine-charge"
 HUMAN_MASS_ID = "s41586-020-3010-5_human-made-mass"
 BEHAVIOR_ID = "s41586-022-05611-2_spontaneous-behavior"
+TRACEBIND_ID = "s41467-026-73164-3_tracebind-atac-footprinting"
+MITO_ID = "s41586-026-10588-3_mitochondria-nuclear-pore-interaction"
 GASTRULATION_ID = "s41586-019-0933-9_mouse-gastrulation"
 GUT_MAG_ID = "s41586-019-1058-x_gut-mag-diversity"
 RNA_HYDRATION_ID = "s41586-025-08855-w_rna-hydration"
@@ -43,14 +45,24 @@ class ProblemReadinessTests(unittest.TestCase):
             active,
             {
                 FORGE_ID,
+                F1_ID,
+                PROTEIN_ID,
+                HUMAN_MASS_ID,
+                CHROMATIN_ID,
                 IDR_ID,
+                METHANE_ID,
+                GASTRULATION_ID,
+                RNA_HYDRATION_ID,
+                BEHAVIOR_ID,
+                TRACEBIND_ID,
+                MITO_ID,
                 "s41467-026-73635-7_butterfly-longevity-pollen-feeding",
             },
         )
         for problem_id in active:
             self.assertEqual(validate_problem_ready(load_problem_spec(problem_id), REPO_ROOT), [])
         self.assertEqual(load_problem_spec(PLANT_ID).benchmark_status, "acquisition_only")
-        self.assertEqual(load_problem_spec(CHROMATIN_ID).benchmark_status, "acquisition_only")
+        self.assertEqual(load_problem_spec(CHROMATIN_ID).benchmark_status, "active")
 
     def test_idr_grants_only_curated_observations_and_hidden_templates(self) -> None:
         root = PROBLEMS_ROOT / IDR_ID
@@ -135,6 +147,8 @@ class ProblemReadinessTests(unittest.TestCase):
             CHROMATIN_ID,
             HUMAN_MASS_ID,
             BEHAVIOR_ID,
+            TRACEBIND_ID,
+            MITO_ID,
             GASTRULATION_ID,
             GUT_MAG_ID,
             RNA_HYDRATION_ID,
@@ -206,12 +220,12 @@ class ProblemReadinessTests(unittest.TestCase):
 
     def test_f1_separates_training_validation_and_blocks_target_outputs(self) -> None:
         spec = load_problem_spec(F1_ID)
-        self.assertEqual(spec.benchmark_status, "conditional")
+        self.assertEqual(spec.benchmark_status, "active")
         prompt = spec.sandbox_prompt.lower()
-        self.assertIn("three-conformation class", prompt)
-        self.assertIn("conditional on this model family", prompt)
+        self.assertIn("f1_observation_summary.csv", prompt)
+        self.assertIn("minimum number of conformations", prompt)
 
-        root = INCOMPLETE_ROOT / F1_ID
+        root = PROBLEMS_ROOT / F1_ID
         catalog = load_catalog(root)
         for entry_id in (
             "turnover_and_coupling_training_observations",
@@ -250,7 +264,7 @@ class ProblemReadinessTests(unittest.TestCase):
         }
         for problem_id, entry_ids in cases.items():
             root = (
-                INCOMPLETE_ROOT / problem_id
+                PROBLEMS_ROOT / problem_id
                 if problem_id == F1_ID
                 else PROBLEMS_ROOT / problem_id
             )
@@ -298,10 +312,10 @@ class ProblemReadinessTests(unittest.TestCase):
 
     def test_protein_scope_uses_raw_counts_and_neutral_condition_map(self) -> None:
         spec = load_problem_spec(PROTEIN_ID)
-        self.assertEqual(spec.benchmark_status, "conditional")
+        self.assertEqual(spec.benchmark_status, "active")
         self.assertIn("not fastq", spec.sandbox_prompt.lower())
         self.assertIn("absolute delta-g", spec.expected_caveats[-1].lower())
-        root = INCOMPLETE_ROOT / PROTEIN_ID
+        root = PROBLEMS_ROOT / PROTEIN_ID
         catalog = load_catalog(root)
         counts = catalog.by_id("exact_match_ngs_counts")
         conditions = catalog.by_id("assay_condition_map")
@@ -325,9 +339,9 @@ class ProblemReadinessTests(unittest.TestCase):
 
     def test_methane_candidate_pins_observations_and_blocks_global_outputs(self) -> None:
         spec = load_problem_spec(METHANE_ID)
-        self.assertEqual(spec.benchmark_status, "conditional")
+        self.assertEqual(spec.benchmark_status, "active")
         self.assertIn("do not estimate global annual", spec.sandbox_prompt.lower())
-        root = INCOMPLETE_ROOT / METHANE_ID
+        root = PROBLEMS_ROOT / METHANE_ID
         catalog = load_catalog(root)
         for entry_id in (
             "river_methane_concentrations",
@@ -354,14 +368,23 @@ class ProblemReadinessTests(unittest.TestCase):
             ).digest()
             self.assertEqual(int(row["fold"]), int.from_bytes(digest[:8], "big") % 5)
 
-    def test_chromatin_stays_acquisition_only_with_manifest_locks(self) -> None:
+    def test_chromatin_has_bounded_conditional_pilot(self) -> None:
         spec = load_problem_spec(CHROMATIN_ID)
-        self.assertEqual(spec.benchmark_status, "acquisition_only")
-        self.assertEqual(spec.expected_conclusions, [])
-        self.assertEqual(spec.required_artifacts, [])
-        root = INCOMPLETE_ROOT / CHROMATIN_ID
+        self.assertEqual(spec.benchmark_status, "active")
+        self.assertTrue(spec.expected_conclusions)
+        self.assertEqual(
+            {contract.path for contract in spec.required_artifacts},
+            {"chromatin_bin_summary.csv"},
+        )
+        root = PROBLEMS_ROOT / CHROMATIN_ID
         catalog = load_catalog(root)
-        self.assertFalse(any(entry.grantable for entry in catalog.entries))
+        grantable = [entry for entry in catalog.entries if entry.grantable]
+        self.assertEqual(len(grantable), 3)
+        self.assertEqual(
+            sum(len(resolve_entry_files(root, entry)) for entry in grantable),
+            8,
+        )
+        self.assertEqual(validate_problem_ready(spec, REPO_ROOT), [])
         for entry_id in ("published_state_segmentations", "published_state_labels_and_models"):
             entry = catalog.by_id(entry_id)
             assert entry is not None
@@ -377,15 +400,23 @@ class ProblemReadinessTests(unittest.TestCase):
         self.assertEqual(sum(int(row["bytes"]) for row in cel), 49_106_218)
         self.assertNotIn("H3K9me3", {row["mark"] for row in core})
 
-    def test_human_mass_stays_acquisition_only_pending_provenance(self) -> None:
+    def test_human_mass_is_bounded_conditional_accounting_task(self) -> None:
         spec = load_problem_spec(HUMAN_MASS_ID)
-        self.assertEqual(spec.benchmark_status, "acquisition_only")
-        self.assertEqual(spec.expected_conclusions, [])
-        self.assertEqual(spec.required_artifacts, [])
+        self.assertEqual(spec.benchmark_status, "active")
+        self.assertTrue(spec.expected_conclusions)
+        self.assertEqual(
+            {contract.path for contract in spec.required_artifacts},
+            {"material_stock_summary.csv", "biomass_envelope.csv"},
+        )
 
-        root = INCOMPLETE_ROOT / HUMAN_MASS_ID
+        root = PROBLEMS_ROOT / HUMAN_MASS_ID
         catalog = load_catalog(root)
-        self.assertFalse(any(entry.grantable for entry in catalog.entries))
+        grantable = [entry for entry in catalog.entries if entry.grantable]
+        self.assertEqual(len(grantable), 4)
+        self.assertTrue(
+            all(resolve_entry_files(root, entry) for entry in grantable)
+        )
+        self.assertEqual(validate_problem_ready(spec, REPO_ROOT), [])
 
         for entry_id in (
             "post_2015_material_projections",
@@ -409,6 +440,11 @@ class ProblemReadinessTests(unittest.TestCase):
         )
         self.assertNotIn("total", material[0])
         self.assertNotIn("crossing_year", material[0])
+        with (
+            root / "curated" / "historical_biomass_estimates_pre2016.csv"
+        ).open(newline="") as handle:
+            biomass = list(csv.DictReader(handle))
+        self.assertLessEqual(max(int(row["observation_year"]) for row in biomass), 2015)
 
         manifest = json.loads((audit_root / "source_manifest.json").read_text())
         self.assertEqual(
@@ -418,17 +454,21 @@ class ProblemReadinessTests(unittest.TestCase):
         self.assertEqual(len(manifest["sources"]), 2)
         self.assertTrue(all(len(row["sha256"]) == 64 for row in manifest["sources"]))
 
-    def test_spontaneous_behavior_stays_acquisition_only(self) -> None:
+    def test_spontaneous_behavior_has_a_neutral_bounded_pilot(self) -> None:
         spec = load_problem_spec(BEHAVIOR_ID)
-        self.assertEqual(spec.benchmark_status, "acquisition_only")
-        self.assertEqual(spec.expected_conclusions, [])
-        self.assertEqual(spec.required_artifacts, [])
+        self.assertEqual(spec.benchmark_status, "active")
+        self.assertTrue(spec.expected_conclusions)
+        self.assertEqual(spec.required_artifacts[0].path, "behavior_state_summary.csv")
 
-        root = INCOMPLETE_ROOT / BEHAVIOR_ID
+        root = PROBLEMS_ROOT / BEHAVIOR_ID
         catalog = load_catalog(root)
-        self.assertFalse(any(entry.grantable for entry in catalog.entries))
+        neutral = catalog.by_id("neutral_event_tables")
+        assert neutral is not None
+        self.assertTrue(neutral.grantable)
+        self.assertTrue(resolve_entry_files(root, neutral))
         archive = catalog.by_id("public_mixed_data_archive")
         assert archive is not None and archive.online is not None
+        self.assertFalse(archive.grantable)
         self.assertEqual(archive.approx_bytes, 60_751_713_398)
         self.assertEqual(archive.online["record_id"], 7274803)
 
@@ -444,16 +484,32 @@ class ProblemReadinessTests(unittest.TestCase):
             "md5:8b858e447902642555200faf89e00179",
         )
 
+    def test_tracebind_and_mito_pilots_block_target_outputs(self) -> None:
+        for problem_id, grantable_id in (
+            (TRACEBIND_ID, "neutral_fragment_peak_pilot"),
+            (MITO_ID, "bounded_rsem_count_matrix"),
+        ):
+            spec = load_problem_spec(problem_id)
+            self.assertEqual(spec.benchmark_status, "active")
+            root = PROBLEMS_ROOT / problem_id
+            catalog = load_catalog(root)
+            grantable = catalog.by_id(grantable_id)
+            assert grantable is not None
+            self.assertTrue(grantable.grantable)
+            self.assertTrue(resolve_entry_files(root, grantable))
+            blocked = [entry for entry in catalog.entries if not entry.grantable]
+            self.assertTrue(blocked)
+
     def test_mouse_gastrulation_pilot_is_conditional_and_label_free(self) -> None:
         spec = load_problem_spec(GASTRULATION_ID)
-        self.assertEqual(spec.benchmark_status, "conditional")
+        self.assertEqual(spec.benchmark_status, "active")
         self.assertTrue(spec.expected_conclusions)
         self.assertEqual(
             {item.path for item in spec.required_artifacts},
             {"trajectory_holdout.csv"},
         )
 
-        root = INCOMPLETE_ROOT / GASTRULATION_ID
+        root = PROBLEMS_ROOT / GASTRULATION_ID
         catalog = load_catalog(root)
         identifiers = [spec.problem_id, spec.title, spec.doi, *spec.leak_markers]
         for entry_id in (
@@ -572,8 +628,8 @@ class ProblemReadinessTests(unittest.TestCase):
         )
     def test_rna_hydration_grants_only_blind_half_maps_and_polymer(self) -> None:
         spec = load_problem_spec(RNA_HYDRATION_ID)
-        self.assertEqual(spec.benchmark_status, "conditional")
-        root = INCOMPLETE_ROOT / RNA_HYDRATION_ID
+        self.assertEqual(spec.benchmark_status, "active")
+        root = PROBLEMS_ROOT / RNA_HYDRATION_ID
         catalog = load_catalog(root)
         identifiers = [spec.problem_id, spec.title, spec.doi, *spec.leak_markers]
 

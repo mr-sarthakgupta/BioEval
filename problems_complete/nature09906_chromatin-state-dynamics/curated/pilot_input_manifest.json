@@ -1,0 +1,15 @@
+{
+  "scope": "H1 and K562; H3K4me3, H3K27me3, and WCE; chr21 and chr22",
+  "outputs": [
+    {
+      "path": "pilot_track_map.csv",
+      "bytes": 822,
+      "sha256": "625756adfc2af06ceb8bb32176c9e83190e7d79c1016372990048d12440200dc"
+    },
+    {
+      "path": "pilot_binning_protocol.csv",
+      "bytes": 213,
+      "sha256": "dd7bd80bf992e779ffc03a3815316a5484408f7e356ee87346a81ce5fc41f96e"
+    }
+  ]
+}

@@ -1,0 +1,547 @@
+---
+title: "Generate Van Krevelen/Stacked Bar Plots (Figure 2)"
+author: "Young C. Song"
+date: "`r Sys.Date()`"
+output: html_document
+
+### The following code is based on the vignette (ftmsRanalysis.Rmd) in the ftmsRanalysis. This script visualizes
+### the distributions of the SOM classes associated with the unique molecular signatures present in each soil type (Figure 2).
+### More info on the package, including the original code are available at: https://rdrr.io/github/lmbramer/fticRanalysis/
+###
+### The modifications were made by Young C. Song during the May of 2025 in the following lines:
+### 114     Exploratory: generate raw counts of each SOM class.
+### 138-481 Perform the pairwise G-tests of uniqueness for all soil types. For each of the six comparisons,
+###         determine the unique molecular signatures in each soil type (if exists) and draw a stacked bar chart
+###         depicting the relative distributions of SOM classes from those signatures.
+### 487-542 Save the van Krevelen plot for each of the six comparisons and generate the SVG files of the VK plots.
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(dev = 'svg')
+
+#Note: lines 24-31 need to be executed only once.
+#install.packges("hexbin")
+#install.packages("devtools")
+#devtools::install_github("delta-rho/datadr")
+#
+#install.packages('reticulate')
+#reticulate::install_miniconda()
+#reticulate::conda_install('r-reticulate', 'python-kaleido')
+#reticulate::conda_install('r-reticulate', 'plotly', channel = 'plotly')
+
+library(here)
+library(ftmsRanalysis)
+library(dplyr)
+library(ggplot2)
+library(plotly)
+```
+
+
+
+
+```{r}
+myedata <- read.csv(here("Data", "1000_Soil_FTICR_all_samples_mass.csv"))
+
+str(myedata)
+```
+
+```{r}
+myfdata <- read.csv(here("Data", "fdata_1000soils.csv")) # this seems like it's emeta
+names(myfdata)
+
+myfdata <- data.frame(SampleID = names(myedata)[-1],
+                      Layer = "TOP",
+                      Respiration = c(rep("High", 14), rep("Low", 12), rep("High", 12), rep("Low", 9)))
+myfdata$Layer[grep("BTM", myfdata$SampleID)] <- "BTM"
+```
+
+## e_meta (Molecular Identification Data)
+The emeta object is a data frame with one row per peak and columns containing other meta data. Either a column giving the molecular formula or elemental count columns are required. It must have an ID column corresponding to the ID column in edata. If information about isotopic peaks is available and specified, these peaks are currently filtered from the data upon peakData object creation.
+
+```{r}
+myemeta <- read.csv(here("Data", "1000_Soil_fticr_peak_man_subset_w_som_cat.csv"))
+str(myemeta)
+```
+## Constructing a peakData object
+
+```{r}
+mypeakObj <- as.peakData(myedata, myfdata, myemeta, 
+                       edata_cname="Mass", fdata_cname="SampleID", 
+                       mass_cname="Mass", element_col_names = list("C"="C", "H"="H", "O"="O", "N"="N", "S"="S", "P"="P"), 
+                       data_scale = "pres")
+mypeakObj
+
+saveRDS(mypeakObj, here("Processed_Data", "mypeakObj.RDS"))
+```
+During object construction, the molecular formula is calculated from the elemental columns (and elemental columns would be created in the case that molecular formulae were provided):
+```{r}
+tail(mypeakObj$e_meta)
+```
+
+# Preprocessing
+
+## Transforming abundance values
+
+When dealing with 'omics data quantitatively, we often log-transform to stabilize variances and reduce skew for downstream data processing. Alternatively, it's common to treat FT-MS data as presence/absence data. We can use the `edata_transform` function to transform the data scale for either of these options.
+
+When we plot the transformed data, the difference in scale is apparent.
+
+## Calculating meta-data
+It is frequently useful for biological analysis and interpretation to calculate values related to chemical properties of each peak, such as the nominal oxidation state of Carbon (NOSC), aromaticity, and elemental ratios. This can be done via the `compound_calcs` function. By default, this function calculates all available meta-data fields, specific fields can be chosen with the `calc_fns` parameter.
+
+```{r}
+mypeakObj <- compound_calcs(mypeakObj)
+mypeakObj
+```
+Classification of compounds based on their elemental composition is often desirable. The `assign_elemental_composition` function accomplishes this task.
+
+```{r}
+mypeakObj <- assign_elemental_composition(mypeakObj)
+table(mypeakObj$e_meta[,getElCompColName(mypeakObj)])
+```
+
+Further, each compound formula can also be assigned to biochemical compound classes (e.g. lipids, lignins, etc.) based on their chemical properties (e.g. O:C, H:C ratios), and the `assign_class` function performs this assignment. 
+
+```{r}
+mypeakObj <- assign_class(mypeakObj, boundary_set = "bs1")
+table(mypeakObj$e_meta[, getBS1ColName(mypeakObj)])
+```
+
+Other filtering options include number of molecule observations, formula presence or absence, or emeta columns.
+
+```{r eval = FALSE}
+table(mypeakObj$e_meta$SOM.category, useNA = "ifany")
+```
+# Comparison of experimental groups
+The `group_designation` method defines treatment groups based on the variable(s)
+specified as main effects. Here we define groups based on the crop/flora type. 
+
+```{r}
+mypeakObj <- group_designation(mypeakObj, main_effects=c("Layer", "Respiration"))
+getGroupDF(mypeakObj)
+
+groupDF <- getGroupDF(mypeakObj)
+
+write.csv(mypeakObj$e_meta, here("Results", "Molecular_Metadata.csv"), row.names = FALSE)
+```
+The `summarizeGroups` function calculates group-level summaries per peak, such as the number or proportion of samples in which peak is observed. The resulting object's `e_data` element contains one column per group, per summary function.
+
+```{r message=FALSE}
+group_summary <- summarizeGroups(mypeakObj, summary_functions = 
+                                   c("n_present", "prop_present"))
+head(group_summary$e_data)
+
+write.csv(group_summary$e_data, here("Results", "YS_Summary_by_Group.csv"), row.names = FALSE)
+```
+
+```{r}
+byGroup <- divideByGroupComparisons(mypeakObj, 
+                                comparisons = "all")
+
+BTMhigh_vs_BTMlow  <- byGroup[[1]]
+BTMhigh_vs_TOPhigh <- byGroup[[2]]
+BTMhigh_vs_TOPlow  <- byGroup[[3]]
+BTMlow_vs_TOPhigh  <- byGroup[[4]]
+BTMlow_vs_TOPlow   <- byGroup[[5]]   
+TOPhigh_vs_TOPlow  <- byGroup[[6]]
+
+
+#### Comparison 1: BTM_High vs BTM_Low
+BTMhigh_vs_BTMlow_unique <- summarizeGroupComparisons(BTMhigh_vs_BTMlow, 
+            summary_functions="uniqueness_gtest", 
+            summary_function_params=list(
+                  uniqueness_gtest=list(pres_fn="nsamps", 
+                          pres_thresh=2, pvalue_thresh=0.05)))
+table(BTMhigh_vs_BTMlow_unique$e_data$uniqueness_gtest, useNA = "ifany")
+
+my_merged <- merge(x = BTMhigh_vs_BTMlow_unique$e_data, y = BTMhigh_vs_BTMlow_unique$e_meta, by = "Mass", all.x = TRUE)
+##### Distribution of SOMs unique to BTM_High
+my_merged_btm_high <- my_merged[which(my_merged$uniqueness_gtest == "Unique to BTM_High"), ]
+max(my_merged_btm_high$pval)
+min(my_merged_btm_high$pval)
+btm_high <- table(as.factor(my_merged_btm_high$SOM.category))
+btm_high_prop <- proportions(btm_high)
+round(btm_high_prop * 100, 1)
+
+btm_high_data <- as.data.frame(btm_high_prop)
+
+btm_high_data <- btm_high_data %>%
+  mutate('SampleType' = "BTM_High")
+
+##### Distribution of SOMs unique to BTM_Low
+my_merged_btm_low <- my_merged[which(my_merged$uniqueness_gtest == "Unique to BTM_Low"), ]
+max(my_merged_btm_low$pval)
+min(my_merged_btm_low$pval)
+btm_low <- table(as.factor(my_merged_btm_low$SOM.category))
+btm_low_prop <- proportions(btm_low)
+round(btm_low_prop * 100, 1)
+
+btm_low_data <- as.data.frame(btm_low_prop)
+
+btm_low_data <- btm_low_data %>%
+  mutate('SampleType' = "BTM_Low")
+
+##### Distribution of SOMs observed in both
+my_merged_both <- my_merged[which(my_merged$uniqueness_gtest == "Observed in Both"), ]
+max(my_merged_both$pval)
+min(my_merged_both$pval)
+both <- table(as.factor(my_merged_both$SOM.category))
+both_prop <- proportions(both)
+round(both_prop * 100, 1)
+
+both_data <- as.data.frame(both_prop)
+
+both_data <- both_data %>%
+  mutate('SampleType' = "Observed in Both")
+
+##### Merge the dfs btm_high_data and btm_low_data
+merged_data <- rbind(btm_high_data, btm_low_data, both_data)
+write.csv(merged_data,"comparison_6_merged.csv")
+
+##### Sort the merged df, first by sample type, then by frequency (from high to low)
+merged_data <- merged_data[order(merged_data[,3], -merged_data[,2]), ]
+
+##### Draw the stacked bar chart
+stacked_bar<-ggplot(merged_data, aes(x=SampleType, y=Freq, fill=Var1)) + 
+  geom_bar(stat="identity", position="stack") +
+  coord_flip() + 
+  labs(title = "Stacked Bar Chart Sorted by Group and Percentage",
+       x = NULL, 
+       y = "Percentage (%)",
+       fill="Category") +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+
+ggsave("BTMhigh_vs_BTMlow_unique_bar.svg", plot=stacked_bar, device="svg")
+
+################################################
+##### Comparison 2: BTM_High vs TOP_High
+BTMhigh_vs_TOPhigh_unique <- summarizeGroupComparisons(BTMhigh_vs_TOPhigh, 
+            summary_functions="uniqueness_gtest", 
+            summary_function_params=list(
+                  uniqueness_gtest=list(pres_fn="nsamps", 
+                          pres_thresh=2, pvalue_thresh=0.05)))
+table(BTMhigh_vs_TOPhigh_unique$e_data$uniqueness_gtest, useNA = "ifany")
+
+my_merged <- merge(x = BTMhigh_vs_TOPhigh_unique$e_data, y = BTMhigh_vs_TOPhigh_unique$e_meta, by = "Mass", all.x = TRUE)
+
+##### Distribution of SOMs unique to BTM_High
+my_merged_btm_high <- my_merged[which(my_merged$uniqueness_gtest == "Unique to BTM_High"), ]
+max(my_merged_btm_high$pval)
+min(my_merged_btm_high$pval)
+btm_high <- table(as.factor(my_merged_btm_high$SOM.category))
+btm_high_prop <- proportions(btm_high)
+round(btm_high_prop * 100, 1)
+
+btm_high_data <- as.data.frame(btm_high_prop)
+
+btm_high_data <- btm_high_data %>%
+  mutate('SampleType' = "BTM_High")
+
+##### Distribution of SOMs observed in both
+my_merged_both <- my_merged[which(my_merged$uniqueness_gtest == "Observed in Both"), ]
+max(my_merged_both$pval)
+min(my_merged_both$pval)
+both <- table(as.factor(my_merged_both$SOM.category))
+both_prop <- proportions(both)
+round(both_prop * 100, 1)
+
+both_data <- as.data.frame(both_prop)
+
+both_data <- both_data %>%
+  mutate('SampleType' = "Observed in Both")
+
+##### Merge the dfs btm_high_data and btm_low_data
+merged_data <- rbind(btm_high_data, both_data)
+write.csv(merged_data,"comparison_2_merged.csv")
+
+##### Sort the merged df, first by sample type, then by frequency (from high to low)
+merged_data <- merged_data[order(merged_data[,3], -merged_data[,2]), ]
+
+##### Draw the stacked bar chart
+stacked_bar<-ggplot(merged_data, aes(x=SampleType, y=Freq, fill=Var1)) + 
+  geom_bar(stat="identity", position="stack") +
+  coord_flip() + 
+  labs(title = "Stacked Bar Chart Sorted by Group and Percentage",
+       x = NULL, 
+       y = "Percentage (%)",
+       fill="Category") +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+
+ggsave("BTMhigh_vs_TOPhigh_unique_bar.svg", plot=stacked_bar, device="svg")
+
+################################################
+#### Comparison 3: BTM_High vs TOP_Low
+BTMhigh_vs_TOPlow_unique <- summarizeGroupComparisons(BTMhigh_vs_TOPlow, 
+            summary_functions="uniqueness_gtest", 
+            summary_function_params=list(
+                  uniqueness_gtest=list(pres_fn="nsamps", 
+                          pres_thresh=2, pvalue_thresh=0.05)))
+table(BTMhigh_vs_TOPlow_unique$e_data$uniqueness_gtest, useNA = "ifany")
+
+my_merged <- merge(x = BTMhigh_vs_TOPlow_unique$e_data, y = BTMhigh_vs_TOPlow_unique$e_meta, by = "Mass", all.x = TRUE)
+
+##### Distribution of SOMs unique to BTM_High
+my_merged_btm_high <- my_merged[which(my_merged$uniqueness_gtest == "Unique to BTM_High"), ]
+max(my_merged_btm_high$pval)
+min(my_merged_btm_high$pval)
+btm_high <- table(as.factor(my_merged_btm_high$SOM.category))
+btm_high_prop <- proportions(btm_high)
+round(btm_high_prop * 100, 1)
+
+btm_high_data <- as.data.frame(btm_high_prop)
+
+btm_high_data <- btm_high_data %>%
+  mutate('SampleType' = "BTM_High")
+
+##### Distribution of SOMs observed in both
+my_merged_both <- my_merged[which(my_merged$uniqueness_gtest == "Observed in Both"), ]
+max(my_merged_both$pval)
+min(my_merged_both$pval)
+both <- table(as.factor(my_merged_both$SOM.category))
+both_prop <- proportions(both)
+round(both_prop * 100, 1)
+
+both_data <- as.data.frame(both_prop)
+
+both_data <- both_data %>%
+  mutate('SampleType' = "Observed in Both")
+
+##### Merge the dfs btm_high_data and btm_low_data
+merged_data <- rbind(btm_high_data, both_data)
+write.csv(merged_data,"comparison_3_merged.csv")
+
+##### Sort the merged df, first by sample type, then by frequency (from high to low)
+merged_data <- merged_data[order(merged_data[,3], -merged_data[,2]), ]
+
+##### Draw the stacked bar chart
+stacked_bar<-ggplot(merged_data, aes(x=SampleType, y=Freq, fill=Var1)) + 
+  geom_bar(stat="identity", position="stack") +
+  coord_flip() + 
+  labs(title = "Stacked Bar Chart Sorted by Group and Percentage",
+       x = NULL, 
+       y = "Percentage (%)",
+       fill="Category") +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+
+ggsave("BTMhigh_vs_TOPlow_unique_bar.svg", plot=stacked_bar, device="svg")
+
+################################################
+#### Comparison 4: BTM_Low vs TOP_High
+BTMlow_vs_TOPhigh_unique <- summarizeGroupComparisons(BTMlow_vs_TOPhigh, 
+            summary_functions="uniqueness_gtest", 
+            summary_function_params=list(
+                  uniqueness_gtest=list(pres_fn="nsamps", 
+                          pres_thresh=2, pvalue_thresh=0.05)))
+table(BTMlow_vs_TOPhigh_unique$e_data$uniqueness_gtest, useNA = "ifany")
+
+my_merged <- merge(x = BTMlow_vs_TOPhigh_unique$e_data, y = BTMlow_vs_TOPhigh_unique$e_meta, by = "Mass", all.x = TRUE)
+
+##### Distribution of SOMs unique to BTM_Low
+my_merged_btm_low <- my_merged[which(my_merged$uniqueness_gtest == "Unique to BTM_Low"), ]
+max(my_merged_btm_low$pval)
+min(my_merged_btm_low$pval)
+btm_low <- table(as.factor(my_merged_btm_low$SOM.category))
+btm_low_prop <- proportions(btm_low)
+round(btm_low_prop * 100, 1)
+
+btm_low_data <- as.data.frame(btm_low_prop)
+
+btm_low_data <- btm_low_data %>%
+  mutate('SampleType' = "BTM_Low")
+
+##### Distribution of SOMs observed in both
+my_merged_both <- my_merged[which(my_merged$uniqueness_gtest == "Observed in Both"), ]
+both <- table(as.factor(my_merged_both$SOM.category))
+max(my_merged_both$pval)
+min(my_merged_both$pval)
+both_prop <- proportions(both)
+round(both_prop * 100, 1)
+
+both_data <- as.data.frame(both_prop)
+
+both_data <- both_data %>%
+  mutate('SampleType' = "Observed in Both")
+
+##### Merge the dfs btm_high_data and btm_low_data
+merged_data <- rbind(btm_low_data, both_data)
+write.csv(merged_data,"comparison_4_merged.csv")
+
+##### Sort the merged df, first by sample type, then by frequency (from high to low)
+merged_data <- merged_data[order(merged_data[,3], -merged_data[,2]), ]
+
+##### Draw the stacked bar chart
+stacked_bar<-ggplot(merged_data, aes(x=SampleType, y=Freq, fill=Var1)) + 
+  geom_bar(stat="identity", position="stack") +
+  coord_flip() + 
+  labs(title = "Stacked Bar Chart Sorted by Group and Percentage",
+       x = NULL, 
+       y = "Percentage (%)",
+       fill="Category") +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+
+ggsave("BTMlow_vs_TOPhigh_unique_bar.svg", plot=stacked_bar, device="svg")
+
+################################################
+#### Comparison 5: BTM_Low_vs_TOP_Low
+BTMlow_vs_TOPlow_unique <- summarizeGroupComparisons(BTMlow_vs_TOPlow, 
+            summary_functions="uniqueness_gtest", 
+            summary_function_params=list(
+                  uniqueness_gtest=list(pres_fn="nsamps", 
+                          pres_thresh=2, pvalue_thresh=0.05)))
+table(BTMlow_vs_TOPlow_unique$e_data$uniqueness_gtest, useNA = "ifany")
+
+my_merged <- merge(x = BTMlow_vs_TOPlow_unique$e_data, y = BTMlow_vs_TOPlow_unique$e_meta, by = "Mass", all.x = TRUE)
+
+##### Distribution of SOMs unique to BTM_Low
+my_merged_btm_low <- my_merged[which(my_merged$uniqueness_gtest == "Unique to BTM_Low"), ]
+max(my_merged_btm_low$pval)
+min(my_merged_btm_low$pval)
+btm_low <- table(as.factor(my_merged_btm_low$SOM.category))
+btm_low_prop <- proportions(btm_low)
+round(btm_low_prop * 100, 1)
+
+btm_low_data <- as.data.frame(btm_low_prop)
+
+btm_low_data <- btm_low_data %>%
+  mutate('SampleType' = "BTM_Low")
+
+##### Distribution of SOMs observed in both
+my_merged_both <- my_merged[which(my_merged$uniqueness_gtest == "Observed in Both"), ]
+both <- table(as.factor(my_merged_both$SOM.category))
+max(my_merged_both$pval)
+min(my_merged_both$pval)
+both_prop <- proportions(both)
+round(both_prop * 100, 1)
+
+both_data <- as.data.frame(both_prop)
+
+both_data <- both_data %>%
+  mutate('SampleType' = "Observed in Both")
+
+##### Merge the dfs btm_high_data and btm_low_data
+merged_data <- rbind(btm_low_data, both_data)
+write.csv(merged_data,"comparison_5_merged.csv")
+
+##### Sort the merged df, first by sample type, then by frequency (from high to low)
+merged_data <- merged_data[order(merged_data[,3], -merged_data[,2]), ]
+
+##### Draw the stacked bar chart
+stacked_bar<-ggplot(merged_data, aes(x=SampleType, y=Freq, fill=Var1)) + 
+  geom_bar(stat="identity", position="stack") +
+  coord_flip() + 
+  labs(title = "Stacked Bar Chart Sorted by Group and Percentage",
+       x = NULL, 
+       y = "Percentage (%)",
+       fill="Category") +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+
+ggsave("BTMlow_vs_TOPlow_unique_bar.svg", plot=stacked_bar, device="svg")
+
+################################################
+#### Comparison 6: TOP_High_vs_TOP_Low 
+TOPhigh_vs_TOPlow_unique <- summarizeGroupComparisons(TOPhigh_vs_TOPlow , 
+            summary_functions="uniqueness_gtest", 
+            summary_function_params=list(
+                  uniqueness_gtest=list(pres_fn="nsamps", 
+                          pres_thresh=2, pvalue_thresh=0.05)))
+table(TOPhigh_vs_TOPlow_unique$e_data$uniqueness_gtest, useNA = "ifany")
+
+my_merged <- merge(x = TOPhigh_vs_TOPlow_unique$e_data, y = TOPhigh_vs_TOPlow_unique$e_meta, by = "Mass", all.x = TRUE)
+
+##### Distribution of SOMs observed in both
+my_merged_both <- my_merged[which(my_merged$uniqueness_gtest == "Observed in Both"), ]
+max(my_merged_both$pval)
+min(my_merged_both$pval)
+both <- table(as.factor(my_merged_both$SOM.category))
+both_prop <- proportions(table(as.factor(my_merged_both$SOM.category)))
+round(both_prop * 100, 1)
+
+both_data <- as.data.frame(both_prop)
+write.csv(both_data,"comparison_6_merged.csv")
+
+both_data <- both_data %>%
+  mutate('SampleType' = "Observed in Both")
+
+##### Draw the stacked bar chart
+stacked_bar<-ggplot(both_data, aes(x=factor(1), y=Freq, fill=Var1)) + 
+  geom_bar(stat="identity", position="stack") +
+  coord_flip() + 
+  labs(title = "Stacked Bar Chart Sorted by Group and Percentage",
+       x = NULL, 
+       y = "Percentage (%)",
+       fill="Category") +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+
+ggsave("TOPhigh_vs_TOPlow_unique_bar.svg", plot=stacked_bar, device="svg")
+```
+
+Then we can construct a Van Krevelen plot colored by group membership.
+
+```{r}
+reticulate::use_miniconda('r-reticulate')
+
+####### Comparison 1: BTM_High vs BTM_Low
+vk <- vanKrevelenPlot(BTMhigh_vs_BTMlow_unique, colorCName = "uniqueness_gtest")
+save_image(vk, "BTMhigh_vs_BTMlow_unique.svg", format="svg")
+
+BTMhigh_vs_BTMlow_unique$e_data <- merge(BTMhigh_vs_BTMlow_unique$e_data, BTMhigh_vs_BTMlow_unique$e_meta[, c("Mass","SOM.category")])
+vk_som <- vanKrevelenPlot(BTMhigh_vs_BTMlow_unique, colorCName = "SOM.category")
+
+
+save_image(vk_som, "BTMhigh_vs_BTMlow_unique_SOM.svg", format="svg")
+
+
+#### Comparison 2: BTM_High vs TOP_High
+vk<-vanKrevelenPlot(BTMhigh_vs_TOPhigh_unique, colorCName = "uniqueness_gtest")
+save_image(vk, "BTMhigh_vs_TOPhigh_unique.svg")
+
+BTMhigh_vs_TOPhigh_unique$e_data <- merge(BTMhigh_vs_TOPhigh_unique$e_data, BTMhigh_vs_TOPhigh_unique$e_meta[, c("Mass","SOM.category")])
+vk_som <- vanKrevelenPlot(BTMhigh_vs_TOPhigh_unique, colorCName = "SOM.category")
+save_image(vk_som, "BTMhigh_vs_TOPhigh_unique_SOM.svg")
+
+
+#### Comparison 3: BTM_High vs TOP_Low
+vk<-vanKrevelenPlot(BTMhigh_vs_TOPlow_unique, colorCName = "uniqueness_gtest")
+save_image(vk, "BTMhigh_vs_TOPlow_unique.svg")
+
+BTMhigh_vs_TOPlow_unique$e_data <- merge(BTMhigh_vs_TOPlow_unique$e_data, BTMhigh_vs_TOPlow_unique$e_meta[, c("Mass","SOM.category")])
+vk_som <- vanKrevelenPlot(BTMhigh_vs_TOPlow_unique, colorCName = "SOM.category")
+save_image(vk_som, "BTMhigh_vs_TOPlow_unique_SOM.svg")
+
+
+#### Comparison 4: BTM_Low vs TOP_High
+vk<-vanKrevelenPlot(BTMlow_vs_TOPhigh_unique, colorCName = "uniqueness_gtest")
+save_image(vk, "BTMlow_vs_TOPhigh_unique.svg")
+
+BTMlow_vs_TOPhigh_unique$e_data <- merge(BTMlow_vs_TOPhigh_unique$e_data, BTMlow_vs_TOPhigh_unique$e_meta[, c("Mass","SOM.category")])
+vk_som <- vanKrevelenPlot(BTMlow_vs_TOPhigh_unique, colorCName = "SOM.category")
+save_image(vk_som, "BTMlow_vs_TOPhigh_unique_SOM.svg")
+
+
+#### Comparison 5: BTM_Low vs TOP_Low
+vk<-vanKrevelenPlot(BTMlow_vs_TOPlow_unique, colorCName = "uniqueness_gtest")
+save_image(vk, "BTMlow_vs_TOPlow_unique.svg")
+
+BTMlow_vs_TOPlow_unique$e_data <- merge(BTMlow_vs_TOPlow_unique$e_data, BTMlow_vs_TOPlow_unique$e_meta[, c("Mass","SOM.category")])
+vk_som <- vanKrevelenPlot(BTMlow_vs_TOPlow_unique, colorCName = "SOM.category")
+save_image(vk_som, "BTMlow_vs_TOPlow_unique_SOM.svg")
+
+
+#### Comparison 6: TOP_High_vs_TOP_Low
+vk<-vanKrevelenPlot(TOPhigh_vs_TOPlow_unique, colorCName = "uniqueness_gtest")
+save_image(vk, "TOPhigh_vs_TOPlow_unique.svg")
+
+TOPhigh_vs_TOPlow_unique$e_data <- merge(TOPhigh_vs_TOPlow_unique$e_data, TOPhigh_vs_TOPlow_unique$e_meta[, c("Mass","SOM.category")])
+vk_som <- vanKrevelenPlot(TOPhigh_vs_TOPlow_unique, colorCName = "SOM.category")
+save_image(vk_som, width=400, height=400, "TOPhigh_vs_TOPlow_unique_SOM.svg")
+
+```
+
+

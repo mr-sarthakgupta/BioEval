@@ -1,0 +1,21 @@
+problem_id: s41467-026-73164-3_tracebind-atac-footprinting
+entries:
+  - id: neutral_fragment_peak_pilot
+    description: Selectively extracted peak intervals and ATAC fragments with opaque cell identifiers.
+    kind: raw
+    grantable: true
+    source_base: problem
+    source_paths:
+      - curated/pilot_peaks.csv
+      - curated/pilot_fragments.csv.gz
+      - curated/pilot_manifest.json
+
+  - id: unvalidated_acquisition_payload
+    description: Mixed tutorial archive, GEO metadata, repository payload, and model artifacts.
+    kind: processed
+    grantable: false
+    reason: The mixed payload contains fitted models, bias predictions, chromVAR outputs, and target results.
+    source_base: problem
+    source_paths:
+      - data/**/*
+      - repo/**/*

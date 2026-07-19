@@ -1,0 +1,23 @@
+problem_id: s41586-026-10588-3_mitochondria-nuclear-pore-interaction
+entries:
+  - id: bounded_rsem_count_matrix
+    description: Six-library GSE325290 RSEM expected-count matrix for a library-level audit.
+    kind: raw
+    grantable: true
+    source_base: data
+    source_paths:
+      - acquired/geo/GSE325290_ALL.GRCm38_99.rsem.genes.results.txt.gz
+
+  - id: answer_bearing_supplementary_payload
+    description: Supplementary spreadsheets, documents, paper, metadata, and target code.
+    kind: processed
+    grantable: false
+    reason: These files contain paper-level results, labels, methods, and conclusions.
+    source_base: problem
+    source_paths:
+      - data/nature-supplementary/**/*
+      - data/metadata/**/*
+      - data/external/**/*
+      - data/MANIFEST.json
+      - paper/**/*
+      - repo/**/*

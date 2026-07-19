@@ -1,0 +1,24 @@
+{
+  "artifacts": {
+    "chromatin_bin_summary.csv": {
+      "allowed_values": {
+        "cell_type": ["H1", "K562"],
+        "chromosome": ["chr21", "chr22"],
+        "mark": ["H3K27me3", "H3K4me3"]
+      },
+      "required_values": {
+        "cell_type": ["H1", "K562"],
+        "chromosome": ["chr21", "chr22"],
+        "mark": ["H3K27me3", "H3K4me3"]
+      },
+      "numeric_bounds": {
+        "bin_start": {"min": 0},
+        "mark_rpm": {"min": 0},
+        "control_rpm": {"min": 0}
+      },
+      "minimum_unique": {
+        "bin_start": 35
+      }
+    }
+  }
+}

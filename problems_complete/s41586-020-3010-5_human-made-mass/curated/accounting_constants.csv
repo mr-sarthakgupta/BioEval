@@ -1,0 +1,5 @@
+parameter,value,unit
+observation_cutoff_year,2015,year
+carbon_to_dry_mass_min,1.8,dimensionless
+carbon_to_dry_mass_max,2.2,dimensionless
+anchor_years,1900;1950;1980;2000;2010;2015,year

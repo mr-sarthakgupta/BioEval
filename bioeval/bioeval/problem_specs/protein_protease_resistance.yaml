@@ -1,10 +1,6 @@
 problem_id: s41586-023-06328-6_protein-protease-resistance
-benchmark_status: conditional
-readiness_reason: >-
-  The count tables and frozen construct-family folds are staged, but no
-  deterministic evaluator recomputes held-out resistance, cross-protease, or
-  epistasis evidence. Promotion requires a bounded scientific artifact gate.
-title: Sequence determinants of protein protease resistance
+benchmark_status: active
+title: Count-based protein protease-resistance audit
 doi: 10.1038/s41586-023-06328-6
 target_footprint_date: 2022-12-06
 external_source_cutoff: 2022-12-05T23:59:59Z
@@ -20,24 +16,29 @@ sandbox_prompt: |
   Use the supplied frozen construct-family folds: folds 1-4 are development data
   and fold 0 is the final held-out evaluation set. Never repartition individual
   sequence rows; all variants assigned to a construct family must remain together.
-  Compare replicate agreement, cross-protease agreement, single-substitution effects,
-  insertion/deletion effects where identifiable, and non-additivity of double mutants.
+  For the library-1 fold-zero pilot, use pseudocount 0.5, require no-protease count
+  at least 10 and total arm depth at least 20, and compute normalized trapezoidal
+  area under log2 survival versus log10 dose. Report replicate agreement, phenotype
+  quantiles, and cross-protease rank agreement.
 
   These data are exact-match count tables, not FASTQ reads. Do not call resistance
   an absolute folding free energy and do not attempt to reproduce deposited K50,
   delta-G, quality-group, or model-output tables.
 expected_conclusions:
-  - Sequence abundance changes monotonically with protease dose for a substantial, quality-controlled subset of the library, enabling a count-based relative resistance phenotype.
-  - Relative mutation effects show reproducible site, substitution, and structural-context dependence across held-out protein domains.
+  - A quality-controlled subset of fold-zero library-1 groups supports a count-based relative resistance phenotype.
+  - Replicate-derived resistance summaries are sufficiently consistent for a bounded distribution audit.
   - Trypsin- and chymotrypsin-derived resistance measurements are correlated but retain protease-specific effects.
-  - Some double-mutant effects depart from an additive model, providing evidence of context-dependent epistasis on the count-based resistance scale.
   - Exact-match count tables support relative protease-resistance conclusions but do not independently identify absolute thermodynamic folding free energies.
 judge_rubric:
-  - Are raw counts normalized by condition depth with explicit treatment of compositionality, zeros, and no-protease support?
+  - Are raw counts transformed with the declared pseudocount, support gates, and normalized log-dose AUC?
   - Are dose-response and uncertainty metrics recomputed from counts rather than copied from fitted K50 or delta-G products?
-  - Is fold 0 used only for final evaluation, with no construct_group appearing in both development and evaluation partitions?
-  - Are mutation, cross-protease, and epistasis claims supported on held-out groups with machine-readable estimates?
+  - Is fold zero used for the final library-1 pilot summary?
+  - Are replicate agreement and cross-protease correlation supported by the machine-readable artifact?
   - Does the answer distinguish protease resistance from global folding stability and state the missing FASTQ/calibration limitations?
+required_artifacts:
+  - path: resistance_holdout_summary.csv
+    columns: [library, protease, fold0_group_count, qc_pass_groups, median_norm_log_survival_auc, q10_norm_log_survival_auc, q90_norm_log_survival_auc, replicate_mae_median, cross_protease_spearman]
+    min_rows: 3
 expected_caveats:
   - Instrument-level FASTQ reads and independently measured sequence-specific protease calibration parameters are not deposited.
   - Protease cleavage preferences and count compositionality can mimic folding effects.

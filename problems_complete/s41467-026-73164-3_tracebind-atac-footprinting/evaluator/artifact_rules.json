@@ -1,0 +1,14 @@
+{
+  "artifacts": {
+    "peak_fragment_summary.csv": {
+      "numeric_bounds": {
+        "overlapping_fragment_rows": {"min": 0},
+        "weighted_fragment_count": {"min": 0},
+        "insertion_endpoint_count": {"min": 0}
+      },
+      "minimum_unique": {
+        "peak_id": 10
+      }
+    }
+  }
+}

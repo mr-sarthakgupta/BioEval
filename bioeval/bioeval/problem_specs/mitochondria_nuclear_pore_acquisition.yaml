@@ -1,13 +1,29 @@
 problem_id: s41586-026-10588-3_mitochondria-nuclear-pore-interaction
-benchmark_status: acquisition_only
-readiness_reason: >-
-  Existing supplementary documents are answer-bearing and raw GEO, SRA, and PRIDE
-  observations have not been acquired or scoped.
-title: Mitochondria and nuclear-pore interaction acquisition stub
+benchmark_status: active
+title: Bounded Ranbp2 RNA-library audit
 doi: 10.1038/s41586-026-10588-3
-sandbox_prompt: This acquisition-only record is not executable.
-expected_conclusions: []
-judge_rubric: []
-expected_caveats: []
+target_footprint_date: 2026-05-20
+external_source_cutoff: 2026-05-19T23:59:59Z
+sandbox_prompt: |
+  Audit the supplied six-library RSEM expected-count matrix. For each sample,
+  report the total gene rows, number of genes with positive expected count, and
+  total expected count in `rna_library_summary.csv`. Treat RKO and WT names as
+  condition identifiers only. Do not use the blocked supplementary tables or
+  infer mitochondrial, nuclear-pore, proteomic, chromatin, or differentiation
+  mechanisms from this library-level quality-control task.
+expected_conclusions:
+  - All six libraries have reproducible total-count and detected-gene summaries.
+  - Library-depth differences must be accounted for before any condition-level expression analysis.
+judge_rubric:
+  - Does the artifact exactly reproduce row counts, detected genes, and count totals for all six libraries?
+  - Does the response distinguish library-level quality control from differential expression?
+  - Does it avoid mechanistic claims unsupported by this bounded matrix audit?
+expected_caveats:
+  - RSEM expected counts are processed sample-level observations rather than raw sequencing reads.
+  - This scope does not test the paper's microscopy, proteomics, phosphoproteomics, or chromatin claims.
+required_artifacts:
+  - path: rna_library_summary.csv
+    columns: [sample, gene_rows, detected_genes, total_expected_count]
+    min_rows: 6
 leak_markers:
   - "s41586-026-10588-3"

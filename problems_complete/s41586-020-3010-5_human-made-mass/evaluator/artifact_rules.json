@@ -1,0 +1,30 @@
+{
+  "artifacts": {
+    "material_stock_summary.csv": {
+      "allowed_values": {
+        "accounting_definition": ["in_use_only", "in_use_plus_waste"],
+        "anchor_year": ["1900", "1950", "1980", "2000", "2010", "2015"]
+      },
+      "required_values": {
+        "accounting_definition": ["in_use_only", "in_use_plus_waste"],
+        "anchor_year": ["1900", "1950", "1980", "2000", "2010", "2015"]
+      },
+      "numeric_bounds": {
+        "total_teratonnes": {"min": 0}
+      }
+    },
+    "biomass_envelope.csv": {
+      "required_values": {
+        "observation_year": ["2010"]
+      },
+      "numeric_bounds": {
+        "biomass_gt_carbon": {"min": 0},
+        "biomass_dry_min_gt": {"min": 0},
+        "biomass_dry_max_gt": {"min": 0}
+      },
+      "ordered_columns": [
+        ["biomass_dry_min_gt", "biomass_dry_max_gt"]
+      ]
+    }
+  }
+}
